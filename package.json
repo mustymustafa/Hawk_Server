@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./dist/www.js",
+    "start": "node ./dist/app.js",
     "dev": "nodemon ./src/app.ts",
     "build": "tsc -p ."
   },

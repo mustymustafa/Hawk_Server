@@ -10,14 +10,13 @@ import http from 'http';
 
 
 //database 
-/**
- *mongoose.connect(
-  `mongodb+srv://pharm:${process.env.DB_PASSWORD}@cluster0-r8kjr.mongodb.net/test?retryWrites=true&w=majority`,
-  { useNewUrlParser: true },
-).then(() =>   console.log('connected'))
+ mongoose.connect(
+    `mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+).then(() =>   console.log('database connected.....'))
 .catch((error) => console.log(error.toString()));
 
- */
+ 
 const app = express();
 
 
