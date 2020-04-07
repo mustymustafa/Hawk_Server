@@ -7,6 +7,9 @@ import cookieParser from 'cookie-parser';
 import http from 'http';
 
 import seedUser, {seedArtisan} from './schema/seed';
+import Middleware from './middleware/Middleware';
+import UserController from './controllers/UserController'
+
 
 
 
@@ -31,6 +34,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 //app.use(express.static(path.join(__dirname, 'public')));
 
+//routes
+
+app.post('/api/v1/signup', Middleware.signupMiddleware, UserController.signup);
+app.post('/api/v1/signin', Middleware.signinMiddleware, UserController.signin);
+
 
 
 //server
@@ -44,4 +52,4 @@ server.listen(port, ()=> {
 
 
 //seedUser();
-seedArtisan();
+//seedArtisan();

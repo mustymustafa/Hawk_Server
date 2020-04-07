@@ -128,13 +128,5 @@ export default class MiddleWare {
     }
   }
 
-  static adminAuthorization (req: any, res: Response, next: NextFunction) {
-    if (req.decoded.isAdmin === true) {
-      next();
-    } else {
-      return res.status(403).send({
-        message: 'This page is for Admins only'
-      });
-    }
-  }
+  
 }
