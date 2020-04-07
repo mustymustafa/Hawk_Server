@@ -6,6 +6,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import http from 'http';
 
+import seedUser, {seedArtisan} from './schema/seed';
+
 
 
 
@@ -41,3 +43,5 @@ server.listen(port, ()=> {
 });
 
 
+//seedUser();
+seedArtisan();
