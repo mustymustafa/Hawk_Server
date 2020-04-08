@@ -4,12 +4,12 @@ import Validator from '../validator/Validator';
 
 export default class MiddleWare {
   static signupMiddleware(req: Request, res: Response, next: NextFunction) {
-    let { email, password, fullName, cpassword, phone } = req.body;
+    let { email, password, fullname, cpassword, phone } = req.body;
 
     email = email.trim();
     phone=phone.trim();
     password = password.trim();
-    fullName = fullName.trim();
+    fullname = fullname.trim();
 
     let errors: {[error: string]: string}[] = []
     if (!Validator.validateEmail(email)) {
@@ -23,7 +23,7 @@ export default class MiddleWare {
       }]
     }
 
-    if (!phone || phone < 10 || phone > 10) {
+    if (!phone) {
       errors = [...errors, {
         phone: 'incorrect phone number entered'
       }]
@@ -35,10 +35,10 @@ export default class MiddleWare {
         cpassword: 'Passwords do not match'
       }]
     }
-    if (fullName.trim().length < 2) {
+    if (fullname.trim().length < 2) {
       errors = [
         ...errors, {
-          fullName: 'Full name is too short'
+          fullname: 'Full name is too short'
         }
       ]
     }
@@ -51,7 +51,7 @@ export default class MiddleWare {
   }
 
   static signinMiddleware (req: Request, res: Response, next: NextFunction) {
-    let { email, password, fullName } = req.body;
+    let { email, password,  } = req.body;
 
     email = email.trim();
     password = password.trim();
@@ -78,7 +78,7 @@ export default class MiddleWare {
   }
 
   static signinPhoneMiddleware (req: Request, res: Response, next: NextFunction) {
-    let { phone, password, fullName } = req.body;
+    let { phone, password, fullname } = req.body;
 
     phone = phone.trim();
     password = password.trim();

@@ -23,7 +23,7 @@ class UserController {
     // sign uo
   static async signup (request: Request, response: Response) {
     const {
-      fullName, email, password, phone, cpassword
+      fullname, email, password, phone, cpassword
     } = request.body;
 
     console.log(request.body);
@@ -45,10 +45,10 @@ class UserController {
           message: 'The Password do not match'
         });
       }
-      if (!phone || phone < 10 || phone > 10) {
+      if (!phone) {
        
         return response.status(409).send({
-          message: 'Please enter your 10 digit number',
+          message: 'Please enter a valid  number',
         });
       }
   
@@ -57,7 +57,7 @@ class UserController {
       UserController.sendMail(email.trim(), message)
       
       await Schema.User().create({
-        name: fullName.trim(),
+        name: fullname.trim(),
         email: email.trim(),
         password: bcrypt.hashSync(password.trim(), UserController.generateSalt()),
         phone,
