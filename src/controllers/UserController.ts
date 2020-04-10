@@ -20,7 +20,7 @@ var transporter = nodemailer.createTransport({
 class UserController {
 
 
-    // sign uo
+    // sign up
   static async signup (request: Request, response: Response) {
     const {
       fullname, email, password, phone, cpassword
@@ -201,7 +201,7 @@ class UserController {
  
       const msg = {
         to: email,
-        from: '"GEM" <no-reply@thegreenearthcomp.com>',
+        from: '"Hawk" <no-reply@thegreenearthcomp.com>',
         subject,
         html: `<p> ${message} </p>`
       };
