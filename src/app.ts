@@ -43,6 +43,13 @@ app.post('/api/v1/resend-otp', UserController.resendOtp);
 app.post('/api/v1/forgot-password', UserController.forgotPassword);
 app.post('/api/v1/change-password', UserController.changePassword);
 app.post('/api/v1/image', upload.single('image'), ArtisanController.uploadimage);
+//Artisan controller
+app.post('/api/v1/signup-artisan', Middleware.signupMiddleware, ArtisanController.signup);
+app.post('/api/v1/signin-artisan', Middleware.signinMiddleware, ArtisanController.signin);
+app.post('/api/v1/confirmation-artisan', ArtisanController.confirm);
+app.post('/api/v1/resend-otp-artisan', ArtisanController.resendOtp);
+app.post('/api/v1/forgot-password-artisan', ArtisanController.forgotPassword);
+app.post('/api/v1/change-password-artisan', ArtisanController.changePassword);
 
 
 
