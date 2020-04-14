@@ -23,7 +23,7 @@ class ArtisanController {
     // sign up
   static async signup (request: Request, response: Response) {
     const {
-      fullname, email, password, phone, cpassword, bio, wage, category,
+      fullname, email, password, phone, cpassword
     } = request.body;
 
     console.log(request.body);
@@ -61,10 +61,8 @@ class ArtisanController {
         email: email.trim(),
         password: bcrypt.hashSync(password.trim(),ArtisanController.generateSalt()),
         phone,
-        bio: bio.trim(),
-        wage: wage,
-        category: category,
         confirmationCode,
+      
         isConfirmed: false
       });
 
@@ -80,6 +78,46 @@ class ArtisanController {
     }
   }
 
+  //continue signup
+  static async continueSignup (request: Request, response: Response) {
+    const {
+email, bio, wage, category,
+    } = request.body;
+
+    console.log(request.body);
+    const foundUser:any = await Schema.Artisan().findOne({email});
+
+    if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+        try {
+            await Schema.Artisan().updateOne({
+              _id: foundUser._id
+            }, {
+              $set: {
+                bio: bio,
+                wage: wage,
+                category: category
+              }
+            });
+    
+            
+            return   response.status(200).send({
+                message: 'User created successfully',
+                status: 201
+              });
+          } catch (error) {
+            console.log(error.toString());
+            response.status(500).send({
+              message: 'something went wrong'
+            });
+          }
+        }
+
+
+    }
+
+
+
 
   //upload images
     static uploadimage(req: Request, res: Response) {
@@ -89,9 +127,15 @@ class ArtisanController {
         res.json(req.file)
   }
 
-  static getimage(req:Request, res:Response) {
-      console.log(req.body)
-  }
+  static uploadDp(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
+}
+
+
+
 
 
   //send otp
@@ -327,7 +371,10 @@ class ArtisanController {
         message: 'Incorrect Username or Password'
       });
     }
-  }
+  
+
+}
+
 
   static generateSalt(): string | number {
     return bcrypt.genSaltSync(10);

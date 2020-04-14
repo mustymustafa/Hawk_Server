@@ -4,12 +4,21 @@ import Validator from '../validator/Validator';
 
 export default class MiddleWare {
   static signupMiddleware(req: Request, res: Response, next: NextFunction) {
-    let { email, password, fullname, cpassword, phone } = req.body;
+    let { email, password, fullname, cpassword, phone, bio, category, wage } = req.body;
 
     email = email.trim();
     phone=phone.trim();
     password = password.trim();
     fullname = fullname.trim();
+    //bio = bio.trim();
+    //category = category.trim();
+    //wage = wage.trim();
+
+
+
+
+
+
 
     let errors: {[error: string]: string}[] = []
     if (!Validator.validateEmail(email)) {
@@ -35,6 +44,26 @@ export default class MiddleWare {
         cpassword: 'Passwords do not match'
       }]
     }
+
+    if(bio !== bio){
+      errors = [...errors, {
+        bio: 'Please enter a bio'
+      }]
+    }
+
+
+    if(category !== category){
+      errors = [...errors, {
+        category: 'Please enter a category'
+      }]
+    }
+
+    if(wage !== wage){
+      errors = [...errors, {
+        wage: 'Please enter a wage'
+      }]
+    }
+
     if (fullname.trim().length < 2) {
       errors = [
         ...errors, {
