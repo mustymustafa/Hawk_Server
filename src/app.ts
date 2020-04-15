@@ -42,8 +42,12 @@ app.post('/api/v1/confirmation', UserController.confirm);
 app.post('/api/v1/resend-otp', UserController.resendOtp);
 app.post('/api/v1/forgot-password', UserController.forgotPassword);
 app.post('/api/v1/change-password', UserController.changePassword);
+
 app.post('/api/v1/image', upload.single('image'), ArtisanController.uploadimage);
 app.post('/api/v1/dp', upload.single('image'), ArtisanController.uploadDp);
+
+app.post('/api/v1/setid', ArtisanController.setId);
+
 //Artisan controller
 app.post('/api/v1/signup-artisan', Middleware.signupMiddleware, ArtisanController.signup);
 app.post('/api/v1/continue-signup-artisan', ArtisanController.continueSignup);

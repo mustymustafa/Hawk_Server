@@ -20,7 +20,8 @@ export const upload = multer({
     bucket:  process.env.AWS_S3_BUCKET,
     acl: 'public-read',
     metadata(req:any, file:any, cb:any) {
-     console.log(file)
+      console.log(cb)
+      console.log(file)
       cb(null, {fieldName: file.fieldname});
     },
     key(req:any, file:any, cb:any) {

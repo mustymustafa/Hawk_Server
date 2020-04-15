@@ -80,6 +80,7 @@ class ArtisanController {
 
   //continue signup
   static async continueSignup (request: Request, response: Response) {
+      
     const {
 email, bio, wage, category,
     } = request.body;
@@ -133,6 +134,51 @@ email, bio, wage, category,
     console.log(find)
     res.json(req.file)
 }
+
+//set images
+static async setId( request: Request, res: Response) {
+     
+  
+    console.log(request.body)
+        try {
+         const email = request.body.email
+         const image = request.body.image
+           console.log(email)
+           console.log(image)
+        
+        
+         
+
+        const foundUser:any = await Schema.Artisan().findOne({email});
+    
+        if (foundUser && Object.keys(foundUser).length > 0) {
+            console.log(foundUser);
+         
+                await Schema.Artisan().updateOne({
+                  _id: foundUser._id
+                }, {
+                  $set: {
+                    idCard: image
+                   
+                  }
+                });
+    
+                
+                return  res.status(200).send("image set")
+                } 
+              } catch (error) {
+                console.log(error.toString());
+                res.status(500).send({
+                  message: 'something went wrong'
+                });
+              }
+        
+    
+
+
+
+            }
+
 
 
 

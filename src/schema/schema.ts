@@ -26,7 +26,7 @@ class Schema {
             bio: String,
             category: String,
             wage: String,
-            id: String,
+            idCard: String,
             confirmationCode: String,
             isConfirmed: Boolean,
             isActivated: Boolean
