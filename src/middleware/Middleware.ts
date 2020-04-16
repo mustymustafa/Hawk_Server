@@ -64,13 +64,21 @@ export default class MiddleWare {
       }]
     }
 
-    if (fullname.trim().length < 2) {
-      errors = [
+    if(!( (/^[a-z][a-z]+\s[a-z][a-z]+$/.test(fullname.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(fullname.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(fullname.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(fullname.trim())) )  ){
+      errors =[
         ...errors, {
-          fullname: 'Full name is too short'
+        errorMessage: 'Please enter your full name',
         }
-      ]
+     ]
     }
+
+
+  
+
+
+  
+
+
     if (errors.length) {
       return res.status(400).send({
         errors

@@ -47,6 +47,7 @@ app.post('/api/v1/image', upload.single('image'), ArtisanController.uploadimage)
 app.post('/api/v1/dp', upload.single('image'), ArtisanController.uploadDp);
 
 app.post('/api/v1/setid', ArtisanController.setId);
+app.post('/api/v1/setdp', ArtisanController.setDp);
 
 //Artisan controller
 app.post('/api/v1/signup-artisan', Middleware.signupMiddleware, ArtisanController.signup);
