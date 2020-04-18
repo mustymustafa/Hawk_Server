@@ -51,18 +51,14 @@ class ArtisanController {
           message: 'Please enter a valid  number',
         });
       }
-  
-      const confirmationCode = String(Date.now()).slice(9, 13);
-      const message = `Verification code: ${confirmationCode}`
-     ArtisanController.sendMail(email.trim(), message)
+
+
       
       await Schema.Artisan().create({
         name: fullname.trim(),
         email: email.trim(),
         password: bcrypt.hashSync(password.trim(),ArtisanController.generateSalt()),
         phone,
-        confirmationCode,
-      
         isConfirmed: false
       });
 
@@ -231,7 +227,7 @@ static async setId( request: Request, res: Response) {
 
 
   //send otp
-  static async resendOtp(request: Request, response: Response) {
+  static async sendOtp(request: Request, response: Response) {
     const {
       email
     } = request.body;
@@ -430,8 +426,10 @@ static async setId( request: Request, res: Response) {
     const {
       email, confirmationCode
     } = request.body;
+    console.log(confirmationCode)
 
     const foundUser:any = await Schema.Artisan().findOne({email});
+    console.log(foundUser.confirmationCode)
 
     if (foundUser && Object.keys(foundUser).length > 0) {
       if (foundUser.confirmationCode !== confirmationCode) {
