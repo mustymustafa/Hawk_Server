@@ -484,6 +484,36 @@ static async setId( request: Request, res: Response) {
       process.env.SECRET, { expiresIn: 100 * 60 * 60 }
     );
   }
+
+  //GET USER DETAILS
+
+  static async userDetails(request: Request, response: Response){
+
+    const {uid} = request.params;
+    console.log(uid)
+
+    try {
+      const user = await Schema.Artisan().findOne({_id: uid});
+      console.log(user)
+      if (user && Object.keys(user).length) {
+        
+        response.status(200).send({
+          user
+        });
+        console.log(user)
+      } else {
+        response.status(404).send({
+          message: 'Cannot find details for this user'
+        });
+        console.log("not found")
+      }
+    } catch (error) {
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
+    }
+  }
+
 }
 
 export default ArtisanController;
