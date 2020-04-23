@@ -514,6 +514,42 @@ static async setId( request: Request, res: Response) {
     }
   }
 
+
+  //location
+  static async storeLocation(request: Request, response: Response){
+    const {lat, long} = request.body;
+    const {uid} = request.params;
+
+    const user = await Schema.Artisan().findOne({_id: uid});
+    if (!user) {
+      return response.status(404).send({
+        message: 'User does not exist'
+      });
+    }
+ 
+    try {
+      await Schema.Artisan()
+        .updateOne({
+          _id: user._id,
+        }, {
+        $set: {
+          lat: lat,
+          long: long
+        }
+      });
+      return response.status(200).send({
+        token:ArtisanController.generateToken(user)
+      });
+    } catch (error) {
+        console.log(error.toString(), "========")
+        return response.status(500).send({
+          message: 'Something went wrong'
+        })
+    }
+
+
+  } 
+
 }
 
 export default ArtisanController;

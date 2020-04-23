@@ -4,7 +4,7 @@ const {Schema: MongooseSchema} = mongoose;
 class Schema {
     static User() {
         const UserSchema = new mongoose.Schema({
-            fullname: String,
+            name: String,
             email: String,
             phone: String,
             password: String,
@@ -27,6 +27,8 @@ class Schema {
             category: String,
             wage: String,
             idCard: String,
+            lat: String,
+            long: String,
             confirmationCode: String,
             isConfirmed: Boolean,
             isActivated: Boolean

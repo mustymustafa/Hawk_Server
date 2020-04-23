@@ -330,6 +330,34 @@ class UserController {
       process.env.SECRET, { expiresIn: 100 * 60 * 60 }
     );
   }
+
+  static async userDetails(request: Request, response: Response){
+
+    const {uid} = request.params;
+    console.log(uid)
+
+    try {
+      const user = await Schema.User().findOne({_id: uid});
+      console.log(user)
+      if (user && Object.keys(user).length) {
+        
+        response.status(200).send({
+          user
+        });
+        console.log(user)
+      } else {
+        response.status(404).send({
+          message: 'Cannot find details for this user'
+        });
+        console.log("not found")
+      }
+    } catch (error) {
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
+    }
+  }
+
 }
 
 export default UserController;

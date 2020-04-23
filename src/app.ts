@@ -49,6 +49,8 @@ app.post('/api/v1/dp', upload.single('image'), ArtisanController.uploadDp);
 app.post('/api/v1/setid', ArtisanController.setId);
 app.post('/api/v1/setdp', ArtisanController.setDp);
 
+app.get('/api/v1/user/:uid', UserController.userDetails);
+
 //Artisan controller
 app.post('/api/v1/signup-artisan', Middleware.signupMiddleware, ArtisanController.signup);
 app.post('/api/v1/continue-signup-artisan', ArtisanController.continueSignup);
@@ -59,6 +61,7 @@ app.post('/api/v1/send-otp', ArtisanController.sendOtp);
 app.post('/api/v1/forgot-password-artisan', ArtisanController.forgotPassword);
 app.post('/api/v1/change-password-artisan', ArtisanController.changePassword);
 app.get('/api/v1/artisan/:uid', ArtisanController.userDetails);
+app.post('/api/v1/location/:uid', ArtisanController.storeLocation);
 
 
 
