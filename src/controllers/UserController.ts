@@ -8,6 +8,7 @@ import Schema from '../schema/Schema';
 import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
+import { Expo } from "expo-server-sdk";
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -355,6 +356,38 @@ class UserController {
       return response.status(500).send({
         message: 'Something went wrong'
       })
+    }
+  }
+
+  static async savePushToken(request: Request, response: Response){
+    const {uid} = request.body.params;
+    const token = request.body.token
+
+    //check token
+    if(!Expo.isE)
+
+    const user = await Schema.User().findOne({_id: uid});
+    if (!user) {
+      return response.status(404).send({
+        message: 'User does not exist'
+      });
+    }
+ 
+    try {
+      await Schema.User()
+        .updateOne({
+          _id: user._id,
+        }, {
+        $set: {
+          pushToken: token,
+        }
+      });
+      return response.status(200).send("token saved");
+    } catch (error) {
+        console.log(error.toString(), "========")
+        return response.status(500).send({
+          message: 'Something went wrong'
+        })
     }
   }
 

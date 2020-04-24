@@ -8,6 +8,7 @@ class Schema {
             email: String,
             phone: String,
             password: String,
+            pushToken: String,
             confirmationCode: String,
             isConfirmed: Boolean
 
@@ -30,6 +31,7 @@ class Schema {
             lat: String,
             long: String,
             confirmationCode: String,
+            pushToken: String,
             isConfirmed: Boolean,
             isActivated: Boolean
 

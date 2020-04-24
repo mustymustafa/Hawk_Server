@@ -51,6 +51,11 @@ app.post('/api/v1/setdp', ArtisanController.setDp);
 
 app.get('/api/v1/user/:uid', UserController.userDetails);
 
+//push notification
+app.post('/api/v1/token/:uid', UserController.savePushToken);
+
+
+
 //Artisan controller
 app.post('/api/v1/signup-artisan', Middleware.signupMiddleware, ArtisanController.signup);
 app.post('/api/v1/continue-signup-artisan', ArtisanController.continueSignup);
@@ -62,6 +67,8 @@ app.post('/api/v1/forgot-password-artisan', ArtisanController.forgotPassword);
 app.post('/api/v1/change-password-artisan', ArtisanController.changePassword);
 app.get('/api/v1/artisan/:uid', ArtisanController.userDetails);
 app.post('/api/v1/location/:uid', ArtisanController.storeLocation);
+//push notification
+app.post('/api/v1/aToken/:uid', ArtisanController.savePushToken);
 
 
 

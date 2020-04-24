@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from "express";
 
+const { Expo } = require("expo-server-sdk");
+
 
 
 import Schema from '../schema/Schema';
@@ -537,9 +539,7 @@ static async setId( request: Request, res: Response) {
           long: long
         }
       });
-      return response.status(200).send({
-        token:ArtisanController.generateToken(user)
-      });
+      return response.status(200).send("location saved");
     } catch (error) {
         console.log(error.toString(), "========")
         return response.status(500).send({
@@ -549,6 +549,47 @@ static async setId( request: Request, res: Response) {
 
 
   } 
+
+  static async savePushToken(request: Request, response: Response){
+    const {uid} = request.body.params;
+    const token = request.body.token
+
+    console.log(token)
+
+    //check token
+    if(!Expo.isExpoPushToken(token)){
+      console.log("invalid token")
+      return response.status(404).send({
+        message: "invalid token"
+      })
+
+    }
+
+    const user = await Schema.Artisan().findOne({_id: uid});
+    if (!user) {
+      return response.status(404).send({
+        message: 'User does not exist'
+      });
+    }
+ 
+    try {
+      await Schema.Artisan()
+        .updateOne({
+          _id: user._id,
+        }, {
+        $set: {
+          pushToken: token,
+        }
+      });
+      return response.status(200).send("token saved");
+    } catch (error) {
+        console.log(error.toString(), "========")
+        return response.status(500).send({
+          message: 'Something went wrong'
+        })
+    }
+  }
+
 
 }
 
