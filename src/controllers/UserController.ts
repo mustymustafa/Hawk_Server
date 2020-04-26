@@ -9,6 +9,7 @@ import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
 import { Expo } from "expo-server-sdk";
+const expo = new Expo();
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -403,6 +404,79 @@ class UserController {
           message: 'Something went wrong'
         })
     }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //JOB REQUEST//
+  static async jobRequest(request:Request, response:Response){
+    const {category} = request.body;
+    let savedTokens;
+    let notifications = []
+    //...
+
+    try{
+      const artisan = await Schema.Artisan().find({category: category});
+      const artis = artisan.map(art => {
+        return art.pushToken
+      })
+      savedTokens = artis;
+      
+      console.log(artis)
+      if (!artisan) {
+        return response.status(404).send({
+          message: 'No artisans found'
+        });
+      }
+      //savedTokens.push()
+
+
+
+      //send notification
+     
+        notifications.push({
+        to: savedTokens,
+        sound: "default",
+        title: "Job Request",
+        body: "A Mechanic is needed. Please respond if you are free for the Job",
+        data: {}
+      });
+        let chunks = expo.chunkPushNotifications(notifications);
+
+  (async () => {
+    for (let chunk of chunks) {
+      try {
+        let receipts = await expo.sendPushNotificationsAsync(chunk);
+        console.log(receipts);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  })();
+
+  
+ 
+      
+     return response.status(200).send("job requested");
+
+
+    } catch(error){
+      console.log(error)
+    }
+
+
   }
 
 }

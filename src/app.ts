@@ -53,6 +53,7 @@ app.get('/api/v1/user/:uid', UserController.userDetails);
 
 //push notification
 app.post('/api/v1/token/:uid', UserController.savePushToken);
+app.post('/api/v1/jobrequest', UserController.jobRequest);
 
 
 

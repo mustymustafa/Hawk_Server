@@ -30,6 +30,7 @@ class Schema {
             idCard: String,
             lat: String,
             long: String,
+            location: String,
             confirmationCode: String,
             pushToken: String,
             isConfirmed: Boolean,

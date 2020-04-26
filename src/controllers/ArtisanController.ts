@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response } from "express";
 
 const { Expo } = require("expo-server-sdk");
+const expo = new Expo();
 
 
 
@@ -576,7 +577,7 @@ static async setId( request: Request, res: Response) {
         });
       }
       if(user.pushToken === token){
-        console.log("token exists alread")
+        console.log("token exists already")
         return response.status(404).send({
           message: 'token exists already'
         });
