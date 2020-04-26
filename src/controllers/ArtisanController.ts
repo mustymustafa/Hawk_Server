@@ -551,7 +551,8 @@ static async setId( request: Request, res: Response) {
   } 
 
   static async savePushToken(request: Request, response: Response){
-    const {uid} = request.body.params;
+
+    const {uid} = request.params;
     const token = request.body.token
 
     console.log(token)
@@ -565,14 +566,21 @@ static async setId( request: Request, res: Response) {
 
     }
 
-    const user = await Schema.Artisan().findOne({_id: uid});
-    if (!user) {
-      return response.status(404).send({
-        message: 'User does not exist'
-      });
-    }
+   
  
     try {
+      const user = await Schema.Artisan().findOne({_id: uid});
+      if (!user) {
+        return response.status(404).send({
+          message: 'User does not exist'
+        });
+      }
+      if(user.pushToken === token){
+        console.log("token exists alread")
+        return response.status(404).send({
+          message: 'token exists already'
+        });
+      }
       await Schema.Artisan()
         .updateOne({
           _id: user._id,

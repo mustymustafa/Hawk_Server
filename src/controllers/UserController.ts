@@ -360,20 +360,34 @@ class UserController {
   }
 
   static async savePushToken(request: Request, response: Response){
-    const {uid} = request.body.params;
+    const {uid} = request.params;
     const token = request.body.token
 
-    //check token
-    if(!Expo.isE)
+    console.log(token)
 
-    const user = await Schema.User().findOne({_id: uid});
-    if (!user) {
+    //check token
+    if(!Expo.isExpoPushToken(token)){
+      console.log("invalid token")
       return response.status(404).send({
-        message: 'User does not exist'
-      });
-    }
+        message: "invalid token"
+      })
+
+    } 
  
     try {
+      const user = await Schema.User().findOne({_id: uid});
+      if (!user) {
+        return response.status(404).send({
+          message: 'User does not exist'
+        });
+      }
+
+      if(user.pushToken === token){
+        console.log("token exists already")
+        return response.status(404).send({
+          message: 'token exists already'
+        });
+      }
       await Schema.User()
         .updateOne({
           _id: user._id,
