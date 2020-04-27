@@ -9,6 +9,7 @@ import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
 import { Expo } from "expo-server-sdk";
+import { isArray } from 'util';
 const expo = new Expo();
 
 var transporter = nodemailer.createTransport({
@@ -424,14 +425,15 @@ class UserController {
   static async jobRequest(request:Request, response:Response){
     const {category} = request.body;
     let savedTokens;
-    let notifications = []
+
     //...
 
-    try{
+    try {
       const artisan = await Schema.Artisan().find({category: category});
       const artis = artisan.map(art => {
         return art.pushToken
       })
+
       savedTokens = artis;
       
       console.log(artis)
@@ -440,32 +442,35 @@ class UserController {
           message: 'No artisans found'
         });
       }
-      //savedTokens.push()
-
+     
+      
 
 
       //send notification
-     
-        notifications.push({
-        to: savedTokens,
-        sound: "default",
-        title: "Job Request",
-        body: "A Mechanic is needed. Please respond if you are free for the Job",
-        data: {}
-      });
-        let chunks = expo.chunkPushNotifications(notifications);
+  
+      let chunks = expo.chunkPushNotifications([{
+        "to": savedTokens,
+        "sound": "default",
+        "title": "Job Request",
+        "body": "A Mechanic is needed."
+      }]);
+      let tickets = [];
+      (async () => {
+        for (let chunk of chunks) {
+          try {
+            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+            console.log(ticketChunk);
+            tickets.push(...ticketChunk);
+         
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      })();
 
-  (async () => {
-    for (let chunk of chunks) {
-      try {
-        let receipts = await expo.sendPushNotificationsAsync(chunk);
-        console.log(receipts);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  })();
+      
 
+      
   
  
       
