@@ -26,15 +26,51 @@ var transporter = nodemailer.createTransport({
 
 
   static async createJob (request:Request, response:Response){
-    const {category, uid, location, description} = request.body;
+    const {category, uid, location, description, area1, area2} = request.body;
+    console.log(category, uid,location, description, area2, area1)
     let savedTokens;
 
 
     try {
+        if(!category){
+            console.log("no desc")
+            return  response.status(409).send({
+                message: 'Please enter a description',
+              });
+        }
+        //find user{}
         const user = await Schema.User().findById({_id: uid})
-        .populate({path: 'user', model: Schema.Job(), select: ['name', 'phone'] })
+        .populate({path: 'user', model: Schema.Job() })
 
         console.log(user);
+
+        //create job
+        const dt = new Date()
+        const now = dt.setMinutes( dt.getMinutes());
+        const createdAt = dt.toLocaleDateString()
+        const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
+        console.log(createdAt)
+        console.log("end:" + endAt)
+        console.log("now:" + now)
+
+        await Schema.Job().create({
+            user: user,
+            category: category,
+            artisan: {},
+            location: location,
+            description: description,
+            status: 'active',
+            createdAt: createdAt,
+            endAt: endAt,
+            now: now,
+            active: true
+
+        })
+        response.status(201).send({
+            message: 'Job created successfully',
+            status: 201
+          });
+
 
 
         /** 
@@ -87,7 +123,10 @@ var transporter = nodemailer.createTransport({
 */
 
     } catch(error){
-      console.log(error)
+        console.log(error.toString());
+        response.status(500).send({
+          message: "Somenthing went wrong"
+        })
     }
 
 
