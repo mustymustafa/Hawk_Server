@@ -421,69 +421,7 @@ class UserController {
 
 
 
-  //JOB REQUEST//
-  static async jobRequest(request:Request, response:Response){
-    const {category} = request.body;
-    let savedTokens;
-
-    //...
-
-    try {
-      const artisan = await Schema.Artisan().find({category: category});
-      const artis = artisan.map(art => {
-        return art.pushToken
-      })
-
-      savedTokens = artis;
-      
-      console.log(artis)
-      if (!artisan) {
-        return response.status(404).send({
-          message: 'No artisans found'
-        });
-      }
-     
-      
-
-
-      //send notification
   
-      let chunks = expo.chunkPushNotifications([{
-        "to": savedTokens,
-        "sound": "default",
-        "title": "Job Request",
-        "body": "A Mechanic is needed."
-      }]);
-      let tickets = [];
-      (async () => {
-        for (let chunk of chunks) {
-          try {
-            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-            console.log(ticketChunk);
-            tickets.push(...ticketChunk);
-         
-          } catch (error) {
-            console.error(error);
-          }
-        }
-      })();
-
-      
-
-      
-  
- 
-      
-     return response.status(200).send("job requested");
-
-
-    } catch(error){
-      console.log(error)
-    }
-
-
-  }
-
 }
 
 export default UserController;

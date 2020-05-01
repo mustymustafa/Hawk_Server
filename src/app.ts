@@ -12,6 +12,7 @@ import Middleware from './middleware/Middleware';
 import UserController from './controllers/UserController'
 import ArtisanController from './controllers/ArtisanController'
  import {upload} from './util'
+import JobController from './controllers/JobController';
 
 
 //database 
@@ -53,7 +54,8 @@ app.get('/api/v1/user/:uid', UserController.userDetails);
 
 //push notification
 app.post('/api/v1/token/:uid', UserController.savePushToken);
-app.post('/api/v1/jobrequest', UserController.jobRequest);
+
+app.post('/api/v1/jobrequest', JobController.createJob);
 
 
 
