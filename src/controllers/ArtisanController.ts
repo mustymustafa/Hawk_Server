@@ -520,7 +520,7 @@ static async setId( request: Request, res: Response) {
 
   //location
   static async storeLocation(request: Request, response: Response){
-    const {lat, long, location, area} = request.body;
+    const {lat, long, location, area1, area2} = request.body;
     const {uid} = request.params;
 
     const user = await Schema.Artisan().findOne({_id: uid});
@@ -539,7 +539,8 @@ static async setId( request: Request, res: Response) {
           lat: lat,
           long: long,
           location: location,
-          area: area
+          area1: area1,
+          area2: area2
         }
       });
       return response.status(200).send("location saved");
