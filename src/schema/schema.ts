@@ -46,21 +46,22 @@ class Schema {
 
     static Job() {
         const JobSchema = new mongoose.Schema({
-            category:  String,
+            category: String,
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
             artisan: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
             location:  String,
             description: String,
             price: String,
             status: String,
-            createdAt: Date,
-            endAt: Date,
-            active: {type: Boolean, default: false}
+            createdAt: String,
+            now: Number,
+            endAt: Number,
+            active: Boolean
 
             
         })
-        const Job = mongoose.models.Job || mongoose.model(' Job', JobSchema)
-        return  Job;
+        const Job = mongoose.models.Job || mongoose.model('Job', JobSchema)
+        return Job;
     }
 
 }

@@ -32,17 +32,24 @@ var transporter = nodemailer.createTransport({
 
 
     try {
-        if(!category){
+        if(!description){
             console.log("no desc")
             return  response.status(409).send({
                 message: 'Please enter a description',
               });
-        }
-        //find user{}
-        const user = await Schema.User().findById({_id: uid})
-        .populate({path: 'user', model: Schema.Job() })
-
-        console.log(user);
+        } 
+        if(!location){
+            console.log("no loc")
+            return  response.status(409).send({
+                message: 'Please enter a location',
+              });
+        } 
+       
+                 //find user{}
+//                 const user = await Schema.User().findById({_id: uid})
+  //               .populate({path: 'user', model: Schema.Job() }).exec()
+     
+       // console.log(user);
 
         //create job
         const dt = new Date()
@@ -54,9 +61,8 @@ var transporter = nodemailer.createTransport({
         console.log("now:" + now)
 
         await Schema.Job().create({
-            user: user,
+            user: uid,
             category: category,
-            artisan: {},
             location: location,
             description: description,
             status: 'active',
@@ -66,6 +72,7 @@ var transporter = nodemailer.createTransport({
             active: true
 
         })
+ 
         response.status(201).send({
             message: 'Job created successfully',
             status: 201
@@ -121,7 +128,7 @@ var transporter = nodemailer.createTransport({
       
      return response.status(200).send("job requested");
 */
-
+    
     } catch(error){
         console.log(error.toString());
         response.status(500).send({
