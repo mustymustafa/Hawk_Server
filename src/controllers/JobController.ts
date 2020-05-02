@@ -27,7 +27,11 @@ var transporter = nodemailer.createTransport({
 
   static async createJob (request:Request, response:Response){
     const {category, uid, location, description, area1, area2} = request.body;
-    console.log(category, uid,location, description, area2, area1)
+    console.log(category, uid,location, description)
+    console.log("area1:" + area1);
+    console.log("area2:" + area2);
+    
+
     let savedTokens;
 
 
@@ -66,6 +70,8 @@ var transporter = nodemailer.createTransport({
             location: location,
             description: description,
             status: 'active',
+            area1: area1,
+            area2: area2,
             createdAt: createdAt,
             endAt: endAt,
             now: now,
@@ -136,6 +142,15 @@ var transporter = nodemailer.createTransport({
         })
     }
 
+
+  }
+
+  static async displayJobs(request:Request, response:Response) {
+      const {category, area1, area2} = request.body; 
+      // find artisan
+    const job = await Schema.Job().find({category: category,  $or:[{area1: area1}, {area2: area2}]})
+
+    console.log(job)
 
   }
 
