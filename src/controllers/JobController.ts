@@ -188,7 +188,7 @@ var transporter = nodemailer.createTransport({
         {
             $set: {
                 artisan: uid,
-                status: 'pending',
+                status: 'in-progress',
                 price: price
             }
         }
@@ -213,18 +213,33 @@ var transporter = nodemailer.createTransport({
 
   static async artisanJobs(request:Request, response:Response) {
     const {uid} = request.body; 
-    console.log(uid);
+    console.log("artisan:" + uid);
     
     
-    // find artisan
+    // find artisan and hirer
     try {
 
     
-  const job = await Schema.Job().findById({artisan: mongoose.Types.ObjectId(uid)})
+  const job = await Schema.Job().find({artisan: uid})
 
   console.log(job)
-  return response.status(200).send({job})
+
+  //get hirer id
+  const user = job.map(usr => {
+      return usr.user
+  })
+
+  const hirer = await Schema.User().findOne({_id: user});
+  console.log("hirer:" + hirer)
+
+  return response.status(200).send(
+      {
+          job: job,
+          hirer: hirer
+      }
+  )
     } catch (error) {
+        console.log(error)
         return response.status(404).send("An error occured")
     }
 }
