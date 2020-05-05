@@ -497,13 +497,13 @@ static async setId( request: Request, res: Response) {
 
     try {
       const user = await Schema.Artisan().findOne({_id: uid});
-      console.log(user)
+      //console.log(user)
       if (user && Object.keys(user).length) {
         
         response.status(200).send({
           user
         });
-        console.log(user)
+       // console.log(user)
       } else {
         response.status(404).send({
           message: 'Cannot find details for this user'

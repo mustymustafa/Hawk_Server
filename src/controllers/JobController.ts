@@ -9,7 +9,8 @@ import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
 import { Expo } from "expo-server-sdk";
-import { isArray } from 'util';
+
+import mongoose from 'mongoose';
 const expo = new Expo();
 
 var transporter = nodemailer.createTransport({
@@ -147,13 +148,87 @@ var transporter = nodemailer.createTransport({
 
   static async displayJobs(request:Request, response:Response) {
       const {category, area1, area2} = request.body; 
+      console.log(category);
+      console.log("area1:" + area1);
+      console.log("area2:" + area2);
+      
       // find artisan
     const job = await Schema.Job().find({category: category,  $or:[{area1: area1}, {area2: area2}]})
 
     console.log(job)
+    return response.status(200).send({job})
 
   }
 
+
+  static async acceptJob(request:Request, response:Response){
+
+    const {uid, job_id, price} = request.body
+    console.log("uid" + uid, "job_id" + job_id)
+    
+
+
+    const job = await Schema.Job().findOne({_id: job_id})
+    console.log("job found:" + job);
+
+       const hirer = await Schema.User().findOne({_id: job.user});
+       console.log("hirer:" + hirer)
+
+    
+    if (!job && !hirer) {
+        return response.status(404).send({
+          message: 'Job does not exist'
+        });
+      }
+   
+    try {
+        await Schema.Job().updateOne({
+            _id: job_id
+        },
+        {
+            $set: {
+                artisan: uid,
+                status: 'pending',
+                price: price
+            }
+        }
+        );
+
+
+       return response.status(200).send({hirer: hirer.name, number: hirer.phone})
+       
+
+
+
+
+    } catch(error) {
+        console.log(error)
+        return response.status(404).send("an error occured")
+    }
+  
+
+
+
+  }
+
+  static async artisanJobs(request:Request, response:Response) {
+    const {uid} = request.body; 
+    console.log(uid);
+    
+    
+    // find artisan
+    try {
+
+    
+  const job = await Schema.Job().findById({artisan: mongoose.Types.ObjectId(uid)})
+
+  console.log(job)
+  return response.status(200).send({job})
+    } catch (error) {
+        return response.status(404).send("An error occured")
+    }
+}
+  
 
 
  }

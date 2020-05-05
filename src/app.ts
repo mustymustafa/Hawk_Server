@@ -74,6 +74,12 @@ app.post('/api/v1/location/:uid', ArtisanController.storeLocation);
 app.post('/api/v1/aToken/:uid', ArtisanController.savePushToken);
 
 
+//jobs 
+app.post('/api/v1/jobs', JobController.displayJobs);
+app.post('/api/v1/job/:job_id/accept', JobController.acceptJob);
+app.post('/api/v1/:uid/jobs', JobController.artisanJobs);
+
+
 
 
 
