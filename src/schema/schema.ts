@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { type } from 'os';
+
 const {Schema: MongooseSchema} = mongoose;
 
 class Schema {
@@ -32,11 +32,13 @@ class Schema {
             lat: String,
             long: String,
             location: String,
-            Rating: Number,
+            rating: [Number],
+            comments: [String],
             area1: String,
             area2: String,
             confirmationCode: String,
             pushToken: String,
+            rated: {type: Boolean, default: false},
             isConfirmed: Boolean,
             isActivated: Boolean
 

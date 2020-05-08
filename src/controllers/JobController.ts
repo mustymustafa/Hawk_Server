@@ -393,6 +393,97 @@ try {
 }
 
 
+// Job Rating
+
+static async checkRating(request: Request, response: Response){
+    const {uid} = request.body;
+    console.log("user:" + uid)
+
+
+    const job =  await Schema.Job().findOne({user: uid}).where('rated').equals(false).where('status').equals('completed')
+    console.log(job);
+
+    const artisan = await Schema.Artisan().findOne({_id: job.artisan});
+    try {
+        if(job && artisan){
+            return response.status(201).send({
+                job: job,
+                artisan: artisan
+            })
+        }
+        
+
+    } catch(error) {
+        console.log(error)
+        return response.status(400).send({
+            message: "error"
+        })
+    }
+   
+ 
+    
+}
+
+
+static async rateArtisan(request: Request, response: Response){
+    const { uid, rate, comment} = request.body;
+    console.log("user:" + uid)
+    
+    if (!rate || rate < 0 || rate > 10) {
+       
+        return response.status(409).send({
+          message: 'Please enter a valid number between 0-10',
+        });
+      }
+
+    const job =  await Schema.Job().findOne({user: uid}).where('rated').equals(false).where('status').equals('completed')
+    console.log(job);
+
+    const artisan = await Schema.Artisan().findOne({_id: job.artisan});
+    try {
+        if(job && artisan){
+            await Schema.Artisan().updateOne({
+                _id: artisan._id
+            },
+            {
+                $push: {
+                    rating: rate,
+                    comments: comment
+                }
+            }
+            )
+       
+            await Schema.Job().updateOne({
+                _id: job.job_id
+            },
+            {
+                $set: {
+                    rated: true
+                }
+            }
+            )
+            return response.status(201).send({
+                message: "Artisan rated"
+            })
+
+        }
+        
+
+    } catch(error) {
+        console.log(error)
+        return response.status(400).send({
+            message: "error"
+        })
+    }
+   
+ 
+    
+}
+
+
+
+
+
 
  }
 
