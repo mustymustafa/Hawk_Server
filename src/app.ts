@@ -77,8 +77,11 @@ app.post('/api/v1/aToken/:uid', ArtisanController.savePushToken);
 //jobs 
 app.post('/api/v1/jobs', JobController.displayJobs);
 app.post('/api/v1/job/:job_id/accept', JobController.acceptJob);
-app.post('/api/v1/:uid/jobs', JobController.artisanJobs);
+app.post('/api/v1/job/:job_id/cancel', JobController.cancelJob);
+app.post('/api/v1/job/:job_id/complete', JobController.completeJob);
 
+app.post('/api/v1/:uid/jobs', JobController.artisanJobs);
+app.post('/api/v1/:uid/job/artisan', JobController.getArtisan);
 
 
 

@@ -153,7 +153,7 @@ var transporter = nodemailer.createTransport({
       console.log("area2:" + area2);
       
       // find artisan
-    const job = await Schema.Job().find({category: category,  $or:[{area1: area1}, {area2: area2}]})
+    const job = await Schema.Job().find({category: category,  $or:[{area1: area1}, {area2: area2}], $and: [{status: 'active'}]})
 
     console.log(job)
     return response.status(200).send({job})
@@ -188,7 +188,7 @@ var transporter = nodemailer.createTransport({
         {
             $set: {
                 artisan: uid,
-                status: 'in-progress',
+                status: 'accepted',
                 price: price
             }
         }
@@ -211,6 +211,103 @@ var transporter = nodemailer.createTransport({
 
   }
 
+  static async cancelJob(request:Request, response:Response){
+
+    const {uid, job_id} = request.body
+    console.log("job_id" + job_id)
+    
+
+
+    const job = await Schema.Job().findOne({_id: job_id})
+    console.log("job found:" + job);
+
+       const hirer = await Schema.User().findOne({_id: job.user});
+       console.log("hirer:" + hirer)
+       
+
+
+    
+    if (!job && !hirer) {
+        return response.status(404).send({
+          message: 'Job does not exist'
+        });
+      }
+   
+    try {
+        await Schema.Job().deleteOne({_id: job_id});
+
+        console.log("deleted");
+        response.status(201).send({
+            message: 'Task Cancelled successfully',
+            status: 201
+          });
+       
+
+
+
+
+    } catch(error) {
+        console.log(error)
+        return response.status(404).send("an error occured")
+    }
+  
+
+
+
+  }
+
+  static async completeJob(request:Request, response:Response){
+
+    const {job_id,} = request.body
+    console.log( "job_id" + job_id)
+    
+
+
+    const job = await Schema.Job().findOne({_id: job_id})
+    console.log("job found:" + job);
+
+       
+    
+    if (!job) {
+        return response.status(404).send({
+          message: 'Job does not exist'
+        });
+      }
+   
+    try {
+        await Schema.Job().updateOne({
+            _id: job_id
+        },
+        {
+            $set: {
+                status: 'completed'
+            }
+        }
+        );
+
+
+       return response.status(201).send({
+           message: "Completed",
+           status: 201
+       })
+       
+
+
+
+
+    } catch(error) {
+        console.log(error)
+        return response.status(404).send("an error occured")
+    }
+  
+
+
+
+  }
+
+  
+
+
   static async artisanJobs(request:Request, response:Response) {
     const {uid} = request.body; 
     console.log("artisan:" + uid);
@@ -220,7 +317,7 @@ var transporter = nodemailer.createTransport({
     try {
 
     
-  const job = await Schema.Job().find({artisan: uid})
+  const job = await Schema.Job().find({artisan: uid, $and:[{status: 'accepted'}]})
 
   console.log(job)
 
@@ -243,7 +340,58 @@ var transporter = nodemailer.createTransport({
         return response.status(404).send("An error occured")
     }
 }
+
+//get artisan
+static async getArtisan(request:Request, response:Response) {
+    const {uid, name} = request.body; 
+
+    console.log("category" + name);
+    console.log("user:" + uid);
+    
+    // find artisan
+  const job = await Schema.Job().find({user: uid,  $and: [{category: name}]}).where('status').equals('accepted')
+  //get artisan id
+  const getId = job.map(art => {
+      return art.artisan
+  })
+
+ 
+  const findArtisan = await Schema.Artisan().find({_id: getId})
+  console.log(findArtisan)
+
+  if(!findArtisan){
+      console.log("No Artisan Available")
+      return response.status(400).send({notFound: "No Artisan is available at the moment"})
+
+  }
+
+try {
+
+
+  const artisan = findArtisan.map(artis => {
+ 
   
+    const jb = job.map(get => {
+
+        console.log(artis)
+        return response.status(200).send({artisan: artis, job: get})
+      
+    })
+
+  })
+  
+} catch(error) {
+
+    console.log(error);
+    response.status(404).send("something went wrong")
+
+}
+
+
+ 
+
+}
+
 
 
  }
