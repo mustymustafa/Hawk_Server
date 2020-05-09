@@ -491,6 +491,8 @@ static async setId( request: Request, res: Response) {
   //GET USER DETAILS
 
   static async userDetails(request: Request, response: Response){
+     
+    var total = 0;
 
     const {uid} = request.params;
     console.log(uid)
@@ -499,9 +501,19 @@ static async setId( request: Request, res: Response) {
       const user = await Schema.Artisan().findOne({_id: uid});
       //console.log(user)
       if (user && Object.keys(user).length) {
-        
+
+         const getRating = user.rating
+    console.log(getRating.length);
+
+    for(var i = 0; i < getRating.length; i++){
+        total += getRating[i]
+    }
+    var rate = Math.round(total / getRating.length);
+    console.log("rating:" + rate)
+
         response.status(200).send({
-          user
+          user,
+          rating: rate
         });
        // console.log(user)
       } else {

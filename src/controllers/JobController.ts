@@ -168,13 +168,21 @@ var transporter = nodemailer.createTransport({
     
     let savedTokens;
 
+  
+
     const job = await Schema.Job().findOne({_id: job_id})
     console.log("job found:" + job);
 
        const hirer = await Schema.User().findOne({_id: job.user});
        console.log("hirer:" + hirer)
-
+const artisan = await Schema.Artisan().findOne({_id: uid});
     
+       if(!price || price > artisan.wage){
+        return response.status(404).send({
+            message: `Please enter a price between (₦)0-${artisan.wage}`
+          });
+       }
+
     if (!job && !hirer) {
         return response.status(404).send({
           message: 'Job does not exist'
@@ -212,7 +220,7 @@ console.log(savedTokens)
 let chunks = expo.chunkPushNotifications([{
   "to": savedTokens,
   "sound": "default",
-  "title": "Artisan Found!",
+  "title": "Request Accepted!",
   "body": `A/an ${job.category} has accepted your request.`
 }]);
 let tickets = [];
@@ -362,6 +370,16 @@ let tickets = [];
         }
         );
 
+        await Schema.Artisan().updateOne({
+            _id: artisan._id
+        },
+        {
+            $inc: {
+                completed: 1
+            }
+        }
+        );
+
 
         response.status(201).send({
            message: "Completed",
@@ -454,20 +472,27 @@ let tickets = [];
 
 //get artisan
 static async getArtisan(request:Request, response:Response) {
+    var total = 0;
+
+
     const {uid, name} = request.body; 
+
+    let savedTokens;
 
     console.log("category" + name);
     console.log("user:" + uid);
+
+    const user = await Schema.User().findOne({_id: uid});
     
     // find artisan
-  const job = await Schema.Job().find({user: uid,  $and: [{category: name}]}).where('status').equals('accepted')
-  //get artisan id
-  const getId = job.map(art => {
-      return art.artisan
-  })
+  const job = await Schema.Job().findOne({user: uid,  $and: [{category: name}]}).where('status').equals('accepted')
+ 
+
+    console.log(job);
+
 
  
-  const findArtisan = await Schema.Artisan().find({_id: getId})
+  const findArtisan = await Schema.Artisan().findOne({_id: job.artisan})
   console.log(findArtisan)
 
   if(!findArtisan){
@@ -479,17 +504,56 @@ static async getArtisan(request:Request, response:Response) {
 try {
 
 
-  const artisan = findArtisan.map(artis => {
  
-  
-    const jb = job.map(get => {
+ 
+    const getRating = findArtisan.rating
+    console.log(getRating.length);
 
-        console.log(artis)
-        return response.status(200).send({artisan: artis, job: get})
+    for(var i = 0; i < getRating.length; i++){
+        total += getRating[i]
+    }
+    var rate = Math.round(total / getRating.length);
+    console.log("rating:" + rate)
+
+
+         response.status(200).send({artisan: findArtisan, job: job, rating: rate})
       
-    })
+  
+     
+// send notification
 
-  })
+
+savedTokens = user.pushToken;
+
+console.log(savedTokens)
+
+
+
+
+//send notification
+
+let chunks = expo.chunkPushNotifications([{
+  "to": savedTokens,
+  "sound": "default",
+  "title": "Artisan Found!",
+  "body": `Yay! We have found your nearest ${job.category}`
+}]);
+let tickets = [];
+(async () => {
+  for (let chunk of chunks) {
+    try {
+      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+      console.log(ticketChunk);
+      tickets.push(...ticketChunk);
+   
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})();
+
+
+  
   
 } catch(error) {
 
