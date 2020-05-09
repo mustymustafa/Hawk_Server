@@ -38,7 +38,6 @@ class Schema {
             area2: String,
             confirmationCode: String,
             pushToken: String,
-            rated: Boolean,
             isConfirmed: Boolean,
             isActivated: Boolean
 
@@ -59,6 +58,7 @@ class Schema {
             price: String,
             status: String,
             createdAt: String,
+            rated: Boolean,
             now: Number,
             endAt: Number,
             active: Boolean

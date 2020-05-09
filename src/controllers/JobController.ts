@@ -276,7 +276,7 @@ var transporter = nodemailer.createTransport({
       }
    
     try {
-        await Schema.Job().findByIdAndUpdate({
+        await Schema.Job().updateOne({
             _id: job_id
         },
         {
@@ -291,7 +291,9 @@ var transporter = nodemailer.createTransport({
            message: "Completed",
            status: 201
        })
+    
        
+            
 
 
 
@@ -404,24 +406,38 @@ static async checkRating(request: Request, response: Response){
     const job =  await Schema.Job().findOne({user: uid}).where('rated').equals(false).where('status').equals('completed')
     console.log(job);
 
+if(job){
+
+
     const artisan = await Schema.Artisan().findOne({_id: job.artisan});
+
+    
+    if(artisan){
+
     try {
-        if(job && artisan){
+
+   
             return response.status(201).send({
                 job: job,
                 artisan: artisan
             })
-        }
-        
-
-    } catch(error) {
+            
+        } catch(error) {
         console.log(error)
         return response.status(400).send({
             message: "error"
         })
     }
-   
- 
+} else {
+    return response.status(400).send({
+        message: "No Artisan to rate"
+    })
+}
+} else {
+    return response.status(400).send({
+        message: "No Job to rate"
+    })
+}
     
 }
 
@@ -457,7 +473,7 @@ static async rateArtisan(request: Request, response: Response){
     try {
        
          
-            await Schema.Job().findByIdAndUpdate({
+            await Schema.Job().updateOne({
                 _id: job._id
             },
             {
