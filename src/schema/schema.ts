@@ -32,6 +32,7 @@ class Schema {
             lat: String,
             long: String,
             location: String,
+            complted: Number,
             rating: [Number],
             comments: [String],
             area1: String,

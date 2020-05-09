@@ -88,8 +88,8 @@ var transporter = nodemailer.createTransport({
 
 
 
-        /** 
-               const artisan = await Schema.Artisan().find({category: category});
+        
+     const artisan = await Schema.Artisan().find({category: category});
       const artis = artisan.map(art => {
         return art.pushToken
       })
@@ -112,7 +112,7 @@ var transporter = nodemailer.createTransport({
         "to": savedTokens,
         "sound": "default",
         "title": "Job Request",
-        "body": "A Mechanic is needed."
+        "body": `A ${category} is needed.`
       }]);
       let tickets = [];
       (async () => {
@@ -134,8 +134,7 @@ var transporter = nodemailer.createTransport({
   
  
       
-     return response.status(200).send("job requested");
-*/
+  
     
     } catch(error){
         console.log(error.toString());
@@ -167,7 +166,7 @@ var transporter = nodemailer.createTransport({
     const {uid, job_id, price} = request.body
     console.log("uid" + uid, "job_id" + job_id)
     
-
+    let savedTokens;
 
     const job = await Schema.Job().findOne({_id: job_id})
     console.log("job found:" + job);
@@ -196,8 +195,39 @@ var transporter = nodemailer.createTransport({
         );
 
 
-       return response.status(200).send({hirer: hirer.name, number: hirer.phone})
+        response.status(200).send({hirer: hirer.name, number: hirer.phone})
        
+// send notification
+
+
+savedTokens = hirer.pushToken;
+
+console.log(savedTokens)
+
+
+
+
+//send notification
+
+let chunks = expo.chunkPushNotifications([{
+  "to": savedTokens,
+  "sound": "default",
+  "title": "Artisan Found!",
+  "body": `A/an ${job.category} has accepted your request.`
+}]);
+let tickets = [];
+(async () => {
+  for (let chunk of chunks) {
+    try {
+      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+      console.log(ticketChunk);
+      tickets.push(...ticketChunk);
+   
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})();
 
 
 
@@ -217,13 +247,19 @@ var transporter = nodemailer.createTransport({
     const {uid, job_id} = request.body
     console.log("job_id" + job_id)
     
-
+    let savedTokens = [];
 
     const job = await Schema.Job().findOne({_id: job_id})
     console.log("job found:" + job);
 
        const hirer = await Schema.User().findOne({_id: job.user});
        console.log("hirer:" + hirer)
+
+       
+       const artisan = await Schema.Artisan().findOne({_id: job.artisan});
+       console.log("artisan:" + artisan)
+
+       
        
 
 
@@ -245,6 +281,39 @@ var transporter = nodemailer.createTransport({
        
 
 
+savedTokens.push(hirer.pushToken);
+savedTokens.push(artisan.pushToken)
+
+console.log(savedTokens)
+
+
+
+
+//send notification
+
+let chunks = expo.chunkPushNotifications([{
+  "to": savedTokens,
+  "sound": "default",
+  "title": "Job Canceled!",
+  "body": 'Your Job was canceled.'
+}]);
+let tickets = [];
+(async () => {
+  for (let chunk of chunks) {
+    try {
+      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+      console.log(ticketChunk);
+      tickets.push(...ticketChunk);
+   
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})();
+
+
+          
+
 
 
     } catch(error) {
@@ -259,6 +328,7 @@ var transporter = nodemailer.createTransport({
 
   static async completeJob(request:Request, response:Response){
 
+    let savedTokens = [];
     const {job_id,} = request.body
     console.log( "job_id" + job_id)
     
@@ -266,6 +336,12 @@ var transporter = nodemailer.createTransport({
 
     const job = await Schema.Job().findOne({_id: job_id})
     console.log("job found:" + job);
+    const hirer = await Schema.User().findOne({_id: job.user});
+    console.log("hirer:" + hirer)
+
+    
+    const artisan = await Schema.Artisan().findOne({_id: job.artisan});
+    console.log("artisan:" + artisan)
 
        
     
@@ -287,12 +363,44 @@ var transporter = nodemailer.createTransport({
         );
 
 
-       return response.status(201).send({
+        response.status(201).send({
            message: "Completed",
            status: 201
        })
     
        
+
+savedTokens.push(hirer.pushToken);
+savedTokens.push(artisan.pushToken)
+
+console.log(savedTokens)
+
+
+
+
+//send notification
+
+let chunks = expo.chunkPushNotifications([{
+  "to": savedTokens,
+  "sound": "default",
+  "title": "Job Completed!",
+  "body": 'Yay! your Job is done.'
+}]);
+let tickets = [];
+(async () => {
+  for (let chunk of chunks) {
+    try {
+      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+      console.log(ticketChunk);
+      tickets.push(...ticketChunk);
+   
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})();
+
+
             
 
 
@@ -446,6 +554,7 @@ static async rateArtisan(request: Request, response: Response){
     const { uid, rate, comment} = request.body;
     console.log("user:" + uid)
     
+    let savedTokens;
     if (!rate || rate < 0 || rate > 10) {
        
         return response.status(409).send({
@@ -484,9 +593,37 @@ static async rateArtisan(request: Request, response: Response){
             );
        
             
-            return response.status(201).send({
+             response.status(201).send({
                 message: "Artisan rated"
             })
+
+
+//send notification
+
+savedTokens = artisan.pushToken;
+
+let chunks = expo.chunkPushNotifications([{
+    "to": savedTokens,
+    "sound": "default",
+    "title": "New Rating",
+    "body": 'You just got rated for your last job.'
+  }]);
+  let tickets = [];
+  (async () => {
+    for (let chunk of chunks) {
+      try {
+        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        console.log(ticketChunk);
+        tickets.push(...ticketChunk);
+     
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  })();
+  
+        
+     
 
         } catch(error) {
         console.log(error)
