@@ -71,6 +71,7 @@ var transporter = nodemailer.createTransport({
             location: location,
             description: description,
             status: 'active',
+            rated: false,
             area1: area1,
             area2: area2,
             createdAt: createdAt,
@@ -275,7 +276,7 @@ var transporter = nodemailer.createTransport({
       }
    
     try {
-        await Schema.Job().updateOne({
+        await Schema.Job().findByIdAndUpdate({
             _id: job_id
         },
         {
@@ -437,43 +438,48 @@ static async rateArtisan(request: Request, response: Response){
       }
 
     const job =  await Schema.Job().findOne({user: uid}).where('rated').equals(false).where('status').equals('completed')
-    console.log(job);
+
 
     const artisan = await Schema.Artisan().findOne({_id: job.artisan});
-    try {
-        if(job && artisan){
-            await Schema.Artisan().updateOne({
-                _id: artisan._id
-            },
-            {
-                $push: {
-                    rating: rate,
-                    comments: comment
-                }
+    if(job && artisan){
+        console.log("job:" + job._id)
+        await Schema.Artisan().updateOne({
+            _id: artisan._id
+        },
+        {
+            $push: {
+                rating: rate,
+                comments: comment
             }
-            )
+        }
+        )
+
+    try {
        
-            await Schema.Job().updateOne({
-                _id: job.job_id
+         
+            await Schema.Job().findByIdAndUpdate({
+                _id: job._id
             },
             {
                 $set: {
-                    rated: true
+                    rated: "true"
                 }
             }
-            )
+            );
+       
+            
             return response.status(201).send({
                 message: "Artisan rated"
             })
 
-        }
-        
-
-    } catch(error) {
+        } catch(error) {
         console.log(error)
         return response.status(400).send({
             message: "error"
         })
+    }
+
+
     }
    
  

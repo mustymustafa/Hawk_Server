@@ -38,7 +38,7 @@ class Schema {
             area2: String,
             confirmationCode: String,
             pushToken: String,
-            rated: {type: Boolean, default: false},
+            rated: Boolean,
             isConfirmed: Boolean,
             isActivated: Boolean
 
