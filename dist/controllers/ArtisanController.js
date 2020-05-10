@@ -16,7 +16,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const { Expo } = require("expo-server-sdk");
 const expo = new Expo();
-const Schema_1 = __importDefault(require("../schema/Schema"));
+const schema_1 = __importDefault(require("../schema/schema"));
 const Validator_1 = __importDefault(require("../validator/Validator"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 var transporter = nodemailer_1.default.createTransport({
@@ -33,7 +33,7 @@ class ArtisanController {
             const { fullname, email, password, phone, cpassword } = request.body;
             console.log(request.body);
             try {
-                const foundEmail = yield Schema_1.default.Artisan().find({ email: email.trim() });
+                const foundEmail = yield schema_1.default.Artisan().find({ email: email.trim() });
                 if (foundEmail && foundEmail.length > 0) {
                     console.log(foundEmail[0]);
                     return response.status(409).send({
@@ -51,7 +51,7 @@ class ArtisanController {
                         message: 'Please enter a valid  number',
                     });
                 }
-                yield Schema_1.default.Artisan().create({
+                yield schema_1.default.Artisan().create({
                     name: fullname.trim(),
                     email: email.trim(),
                     password: bcrypt_1.default.hashSync(password.trim(), ArtisanController.generateSalt()),
@@ -76,11 +76,11 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, bio, wage, category, } = request.body;
             console.log(request.body);
-            const foundUser = yield Schema_1.default.Artisan().findOne({ email });
+            const foundUser = yield schema_1.default.Artisan().findOne({ email });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 console.log(foundUser);
                 try {
-                    yield Schema_1.default.Artisan().updateOne({
+                    yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
                         $set: {
@@ -125,10 +125,10 @@ class ArtisanController {
                 const image = request.body.image;
                 console.log(email);
                 console.log(image);
-                const foundUser = yield Schema_1.default.Artisan().findOne({ email });
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
                     console.log(foundUser);
-                    yield Schema_1.default.Artisan().updateOne({
+                    yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
                         $set: {
@@ -154,10 +154,10 @@ class ArtisanController {
                 const image = request.body.image;
                 console.log(email);
                 console.log(image);
-                const foundUser = yield Schema_1.default.Artisan().findOne({ email });
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
                     console.log(foundUser);
-                    yield Schema_1.default.Artisan().updateOne({
+                    yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
                         $set: {
@@ -181,7 +181,7 @@ class ArtisanController {
             const { email } = request.body;
             const confirmationCode = String(Date.now()).slice(9, 13);
             try {
-                yield Schema_1.default.Artisan()
+                yield schema_1.default.Artisan()
                     .updateOne({
                     email,
                 }, {
@@ -213,7 +213,7 @@ class ArtisanController {
                     message: "Invalid email"
                 });
             }
-            const user = yield Schema_1.default.Artisan().findOne({ email: email.trim() });
+            const user = yield schema_1.default.Artisan().findOne({ email: email.trim() });
             if (!user) {
                 return response.status(404).send({
                     message: 'User does not exist'
@@ -221,7 +221,7 @@ class ArtisanController {
             }
             const confirmationCode = String(Date.now()).slice(9, 13);
             try {
-                yield Schema_1.default.Artisan()
+                yield schema_1.default.Artisan()
                     .updateOne({
                     _id: user._id,
                 }, {
@@ -258,7 +258,7 @@ class ArtisanController {
                     message: "Password is required"
                 });
             }
-            const user = yield Schema_1.default.Artisan().findOne({ email: email.trim() });
+            const user = yield schema_1.default.Artisan().findOne({ email: email.trim() });
             if (!user) {
                 return response.status(404).send({
                     message: 'User does not exist'
@@ -270,7 +270,7 @@ class ArtisanController {
                 });
             }
             try {
-                yield Schema_1.default.Artisan()
+                yield schema_1.default.Artisan()
                     .updateOne({
                     _id: user._id,
                 }, {
@@ -315,7 +315,7 @@ class ArtisanController {
     static signin(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = request.body;
-            const foundUser = yield Schema_1.default.Artisan().findOne({ email: email.trim() });
+            const foundUser = yield schema_1.default.Artisan().findOne({ email: email.trim() });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
                     return response.status(403).send({
@@ -337,7 +337,7 @@ class ArtisanController {
     static signinPhone(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = request.body;
-            const foundUser = yield Schema_1.default.Artisan().findOne({ email: email.trim() });
+            const foundUser = yield schema_1.default.Artisan().findOne({ email: email.trim() });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
                     return response.status(403).send({
@@ -360,7 +360,7 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, confirmationCode } = request.body;
             console.log(confirmationCode);
-            const foundUser = yield Schema_1.default.Artisan().findOne({ email });
+            const foundUser = yield schema_1.default.Artisan().findOne({ email });
             console.log(foundUser.confirmationCode);
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (foundUser.confirmationCode !== confirmationCode) {
@@ -369,7 +369,7 @@ class ArtisanController {
                     });
                 }
                 try {
-                    yield Schema_1.default.Artisan().updateOne({
+                    yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
                         $set: {
@@ -415,7 +415,7 @@ class ArtisanController {
             const { uid } = request.params;
             console.log(uid);
             try {
-                const user = yield Schema_1.default.Artisan().findOne({ _id: uid });
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                 //console.log(user)
                 if (user && Object.keys(user).length) {
                     const getRating = user.rating;
@@ -450,14 +450,14 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             const { lat, long, location, area1, area2 } = request.body;
             const { uid } = request.params;
-            const user = yield Schema_1.default.Artisan().findOne({ _id: uid });
+            const user = yield schema_1.default.Artisan().findOne({ _id: uid });
             if (!user) {
                 return response.status(404).send({
                     message: 'User does not exist'
                 });
             }
             try {
-                yield Schema_1.default.Artisan()
+                yield schema_1.default.Artisan()
                     .updateOne({
                     _id: user._id,
                 }, {
@@ -492,7 +492,7 @@ class ArtisanController {
                 });
             }
             try {
-                const user = yield Schema_1.default.Artisan().findOne({ _id: uid });
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                 if (!user) {
                     return response.status(404).send({
                         message: 'User does not exist'
@@ -504,7 +504,7 @@ class ArtisanController {
                         message: 'token exists already'
                     });
                 }
-                yield Schema_1.default.Artisan()
+                yield schema_1.default.Artisan()
                     .updateOne({
                     _id: user._id,
                 }, {
