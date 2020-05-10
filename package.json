@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node ./dist/app.js",
-    "dev": "nodemon ./src/app.ts",
-    "build": "tsc -w"
+    "start-dev": "nodemon ./dist/app.js",
+  
+    "build-dev": "tsc -w"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",

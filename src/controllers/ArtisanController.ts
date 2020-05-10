@@ -7,7 +7,7 @@ const expo = new Expo();
 
 
 
-import Schema from '../schema/Schema';
+import Schema from '../schema/schema';
 import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
