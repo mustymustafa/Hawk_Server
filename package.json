@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node ./dist/app.js",
-    "start-dev": "nodemon ./dist/app.js",
+    "start-dev": "yarn build-dev && nodemon ./dist/app.js",
   
-    "build-dev": "tsc -w"
+    "build-dev": "tsc -p ."
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
