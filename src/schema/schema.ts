@@ -27,7 +27,7 @@ class Schema {
             pic: String,
             bio: String,
             category: String,
-            wage: String,
+            wage: Number,
             idCard: String,
             lat: String,
             long: String,

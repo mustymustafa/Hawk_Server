@@ -176,7 +176,8 @@ var transporter = nodemailer.createTransport({
        const hirer = await Schema.User().findOne({_id: job.user});
        console.log("hirer:" + hirer)
 const artisan = await Schema.Artisan().findOne({_id: uid});
-    
+console.log(price);
+    console.log("wage " + artisan.wage)
        if(!price || price > artisan.wage){
         return response.status(404).send({
             message: `Please enter a price between (₦)0-${artisan.wage}`
