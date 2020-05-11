@@ -2,9 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from "express";
 
-
-
-import Schema from '../schema/Schema';
+import Schema from '../schema/schema';
 import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
@@ -89,10 +87,9 @@ var transporter = nodemailer.createTransport({
 
 
         
-     const artisan = await Schema.Artisan().find({category: category});
-      const artis = artisan.map(art => {
-        return art.pushToken
-      })
+     const artisan = await Schema.Artisan().findOne({category: category});
+     
+      const artis = artisan.pushToken;
 
       savedTokens = artis;
       
@@ -447,14 +444,12 @@ let tickets = [];
     try {
 
     
-  const job = await Schema.Job().find({artisan: uid, $and:[{status: 'accepted'}]})
+  const job = await Schema.Job().findOne({artisan: uid, $and:[{status: 'accepted'}]})
 
   console.log(job)
 
   //get hirer id
-  const user = job.map(usr => {
-      return usr.user
-  })
+  const user = job.user;
 
   const hirer = await Schema.User().findOne({_id: user});
   console.log("hirer:" + hirer)
