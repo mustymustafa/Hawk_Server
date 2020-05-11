@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "postinstall": "tsc",
-    "start": "node ./dist/app.js",
+    "start": "node ./src/app.js",
     "start-dev": "nodemon ./src/app.ts",
     "build-dev": "tsc"
   },
