@@ -3,7 +3,6 @@ import { access } from "fs";
 const multer = require('multer'),
   aws = require('aws-sdk'),
   multerS3 = require('multer-s3'),
-  { slugify, uniqueString } = require('iyasunday'),
   path = require('path');
 
 const s3 = new aws.S3({
