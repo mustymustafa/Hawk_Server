@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./dist/app.js",
+    "start": "yarn build-dev && node ./dist/app.js",
     "start-dev": "yarn build-dev && nodemon ./dist/app.js",
   
     "build-dev": "tsc"
