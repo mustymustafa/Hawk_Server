@@ -3,10 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./dist/app.js",
+    "start": "yarn build-dev && node ./dist/app.js",
     "start-dev": "nodemon ./dist/app.js",
-    "postinstall": "yarn build-dev",
-  
     "build-dev": "tsc"
   },
   "dependencies": {
