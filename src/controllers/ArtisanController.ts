@@ -2,7 +2,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from "express";
 
-const { Expo } = require("expo-server-sdk");
+import { Expo } from "expo-server-sdk";
+
 const expo = new Expo();
 
 
