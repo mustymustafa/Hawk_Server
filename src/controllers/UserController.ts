@@ -4,12 +4,12 @@ import { Request, Response } from "express";
 
 
 
-import Schema from '../schema/Schema';
+import Schema from '../schema/schema';
 import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
 import { Expo } from "expo-server-sdk";
-import { isArray } from 'util';
+
 const expo = new Expo();
 
 var transporter = nodemailer.createTransport({

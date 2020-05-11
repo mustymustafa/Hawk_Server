@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const { Expo } = require("expo-server-sdk");
-const expo = new Expo();
+const expo_server_sdk_1 = require("expo-server-sdk");
+const expo = new expo_server_sdk_1.Expo();
 const schema_1 = __importDefault(require("../schema/schema"));
 const Validator_1 = __importDefault(require("../validator/Validator"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
@@ -485,7 +485,7 @@ class ArtisanController {
             const token = request.body.token;
             console.log(token);
             //check token
-            if (!Expo.isExpoPushToken(token)) {
+            if (!expo_server_sdk_1.Expo.isExpoPushToken(token)) {
                 console.log("invalid token");
                 return response.status(404).send({
                     message: "invalid token"
