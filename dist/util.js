@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const multer = require('multer'), aws = require('aws-sdk'), multerS3 = require('multer-s3'), { slugify, uniqueString } = require('iyasunday'), path = require('path');
+const multer = require('multer'), aws = require('aws-sdk'), multerS3 = require('multer-s3'), path = require('path');
 const s3 = new aws.S3({
     accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_S3_SECRET_KEY_ID,
