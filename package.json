@@ -3,12 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "yarn run tsc",
-    "start": "node ./dist/app.js",
+    "start": "node dist/app.js",
     "start-dev": "nodemon ./src/app.ts",
-    "build": "tsc",
-    "tsc": "tsc",
-    "build-dev": "tsc -p"
+    "build-dev": "tsc"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
