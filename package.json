@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./src/app.ts",
+    "postinstall": "yarn build-dev",
+    "start": "node dist/app.js",
     "start-dev": "nodemon ./src/app.ts",
     "build-dev": "tsc"
   },
