@@ -434,7 +434,6 @@ let tickets = [];
 
   
 
-
   static async artisanJobs(request:Request, response:Response) {
     const {uid} = request.body; 
     console.log("artisan:" + uid);
@@ -444,12 +443,14 @@ let tickets = [];
     try {
 
     
-  const job = await Schema.Job().findOne({artisan: uid, $and:[{status: 'accepted'}]})
+  const job = await Schema.Job().find({artisan: uid, $and:[{status: 'accepted'}]})
 
   console.log(job)
 
   //get hirer id
-  const user = job.user;
+  const user = job.map(usr => {
+      return usr.user
+  })
 
   const hirer = await Schema.User().findOne({_id: user});
   console.log("hirer:" + hirer)
@@ -465,6 +466,7 @@ let tickets = [];
         return response.status(404).send("An error occured")
     }
 }
+
 
 //get artisan
 static async getArtisan(request:Request, response:Response) {
