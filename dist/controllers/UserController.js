@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const Schema_1 = __importDefault(require("../schema/Schema"));
+const schema_1 = __importDefault(require("../schema/schema"));
 const Validator_1 = __importDefault(require("../validator/Validator"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const expo_server_sdk_1 = require("expo-server-sdk");
@@ -33,7 +33,7 @@ class UserController {
             const { fullname, email, password, phone, cpassword } = request.body;
             console.log(request.body);
             try {
-                const foundEmail = yield Schema_1.default.User().find({ email: email.trim() });
+                const foundEmail = yield schema_1.default.User().find({ email: email.trim() });
                 if (foundEmail && foundEmail.length > 0) {
                     console.log(foundEmail[0]);
                     return response.status(409).send({
@@ -54,7 +54,7 @@ class UserController {
                 const confirmationCode = String(Date.now()).slice(9, 13);
                 const message = `Verification code: ${confirmationCode}`;
                 UserController.sendMail(email.trim(), message);
-                yield Schema_1.default.User().create({
+                yield schema_1.default.User().create({
                     name: fullname.trim(),
                     email: email.trim(),
                     password: bcrypt_1.default.hashSync(password.trim(), UserController.generateSalt()),
@@ -81,7 +81,7 @@ class UserController {
             const { email } = request.body;
             const confirmationCode = String(Date.now()).slice(9, 13);
             try {
-                yield Schema_1.default.User()
+                yield schema_1.default.User()
                     .updateOne({
                     email,
                 }, {
@@ -113,7 +113,7 @@ class UserController {
                     message: "Invalid email"
                 });
             }
-            const user = yield Schema_1.default.User().findOne({ email: email.trim() });
+            const user = yield schema_1.default.User().findOne({ email: email.trim() });
             if (!user) {
                 return response.status(404).send({
                     message: 'User does not exist'
@@ -121,7 +121,7 @@ class UserController {
             }
             const confirmationCode = String(Date.now()).slice(9, 13);
             try {
-                yield Schema_1.default.User()
+                yield schema_1.default.User()
                     .updateOne({
                     _id: user._id,
                 }, {
@@ -158,7 +158,7 @@ class UserController {
                     message: "Password is required"
                 });
             }
-            const user = yield Schema_1.default.User().findOne({ email: email.trim() });
+            const user = yield schema_1.default.User().findOne({ email: email.trim() });
             if (!user) {
                 return response.status(404).send({
                     message: 'User does not exist'
@@ -170,7 +170,7 @@ class UserController {
                 });
             }
             try {
-                yield Schema_1.default.User()
+                yield schema_1.default.User()
                     .updateOne({
                     _id: user._id,
                 }, {
@@ -215,7 +215,7 @@ class UserController {
     static signin(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = request.body;
-            const foundUser = yield Schema_1.default.User().findOne({ email: email.trim() });
+            const foundUser = yield schema_1.default.User().findOne({ email: email.trim() });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
                     return response.status(403).send({
@@ -237,7 +237,7 @@ class UserController {
     static signinPhone(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = request.body;
-            const foundUser = yield Schema_1.default.User().findOne({ email: email.trim() });
+            const foundUser = yield schema_1.default.User().findOne({ email: email.trim() });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
                     return response.status(403).send({
@@ -259,7 +259,7 @@ class UserController {
     static confirm(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, confirmationCode } = request.body;
-            const foundUser = yield Schema_1.default.User().findOne({ email });
+            const foundUser = yield schema_1.default.User().findOne({ email });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (foundUser.confirmationCode !== confirmationCode) {
                     return response.status(403).send({
@@ -267,7 +267,7 @@ class UserController {
                     });
                 }
                 try {
-                    yield Schema_1.default.User().updateOne({
+                    yield schema_1.default.User().updateOne({
                         _id: foundUser._id
                     }, {
                         $set: {
@@ -311,7 +311,7 @@ class UserController {
             const { uid } = request.params;
             console.log(uid);
             try {
-                const user = yield Schema_1.default.User().findOne({ _id: uid });
+                const user = yield schema_1.default.User().findOne({ _id: uid });
                 console.log(user);
                 if (user && Object.keys(user).length) {
                     response.status(200).send({
@@ -346,7 +346,7 @@ class UserController {
                 });
             }
             try {
-                const user = yield Schema_1.default.User().findOne({ _id: uid });
+                const user = yield schema_1.default.User().findOne({ _id: uid });
                 if (!user) {
                     return response.status(404).send({
                         message: 'User does not exist'
@@ -358,7 +358,7 @@ class UserController {
                         message: 'token exists already'
                     });
                 }
-                yield Schema_1.default.User()
+                yield schema_1.default.User()
                     .updateOne({
                     _id: user._id,
                 }, {

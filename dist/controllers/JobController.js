@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Schema_1 = __importDefault(require("../schema/Schema"));
+const schema_1 = __importDefault(require("../schema/schema"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
@@ -56,7 +56,7 @@ class JobController {
                 console.log(createdAt);
                 console.log("end:" + endAt);
                 console.log("now:" + now);
-                yield Schema_1.default.Job().create({
+                yield schema_1.default.Job().create({
                     user: uid,
                     category: category,
                     location: location,
@@ -74,10 +74,8 @@ class JobController {
                     message: 'Job created successfully',
                     status: 201
                 });
-                const artisan = yield Schema_1.default.Artisan().find({ category: category });
-                const artis = artisan.map(art => {
-                    return art.pushToken;
-                });
+                const artisan = yield schema_1.default.Artisan().findOne({ category: category });
+                const artis = artisan.pushToken;
                 savedTokens = artis;
                 console.log(artis);
                 if (!artisan) {
@@ -121,7 +119,7 @@ class JobController {
             console.log("area1:" + area1);
             console.log("area2:" + area2);
             // find artisan
-            const job = yield Schema_1.default.Job().find({ category: category, $or: [{ area1: area1 }, { area2: area2 }], $and: [{ status: 'active' }] });
+            const job = yield schema_1.default.Job().find({ category: category, $or: [{ area1: area1 }, { area2: area2 }], $and: [{ status: 'active' }] });
             console.log(job);
             return response.status(200).send({ job });
         });
@@ -131,11 +129,11 @@ class JobController {
             const { uid, job_id, price } = request.body;
             console.log("uid" + uid, "job_id" + job_id);
             let savedTokens;
-            const job = yield Schema_1.default.Job().findOne({ _id: job_id });
+            const job = yield schema_1.default.Job().findOne({ _id: job_id });
             console.log("job found:" + job);
-            const hirer = yield Schema_1.default.User().findOne({ _id: job.user });
+            const hirer = yield schema_1.default.User().findOne({ _id: job.user });
             console.log("hirer:" + hirer);
-            const artisan = yield Schema_1.default.Artisan().findOne({ _id: uid });
+            const artisan = yield schema_1.default.Artisan().findOne({ _id: uid });
             console.log(price);
             console.log("wage " + artisan.wage);
             if (!price || price > artisan.wage) {
@@ -149,7 +147,7 @@ class JobController {
                 });
             }
             try {
-                yield Schema_1.default.Job().updateOne({
+                yield schema_1.default.Job().updateOne({
                     _id: job_id
                 }, {
                     $set: {
@@ -194,11 +192,11 @@ class JobController {
             const { uid, job_id } = request.body;
             console.log("job_id" + job_id);
             let savedTokens = [];
-            const job = yield Schema_1.default.Job().findOne({ _id: job_id });
+            const job = yield schema_1.default.Job().findOne({ _id: job_id });
             console.log("job found:" + job);
-            const hirer = yield Schema_1.default.User().findOne({ _id: job.user });
+            const hirer = yield schema_1.default.User().findOne({ _id: job.user });
             console.log("hirer:" + hirer);
-            const artisan = yield Schema_1.default.Artisan().findOne({ _id: job.artisan });
+            const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             console.log("artisan:" + artisan);
             if (!job && !hirer) {
                 return response.status(404).send({
@@ -206,7 +204,7 @@ class JobController {
                 });
             }
             try {
-                yield Schema_1.default.Job().deleteOne({ _id: job_id });
+                yield schema_1.default.Job().deleteOne({ _id: job_id });
                 console.log("deleted");
                 response.status(201).send({
                     message: 'Task Cancelled successfully',
@@ -247,11 +245,11 @@ class JobController {
             let savedTokens = [];
             const { job_id, } = request.body;
             console.log("job_id" + job_id);
-            const job = yield Schema_1.default.Job().findOne({ _id: job_id });
+            const job = yield schema_1.default.Job().findOne({ _id: job_id });
             console.log("job found:" + job);
-            const hirer = yield Schema_1.default.User().findOne({ _id: job.user });
+            const hirer = yield schema_1.default.User().findOne({ _id: job.user });
             console.log("hirer:" + hirer);
-            const artisan = yield Schema_1.default.Artisan().findOne({ _id: job.artisan });
+            const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             console.log("artisan:" + artisan);
             if (!job) {
                 return response.status(404).send({
@@ -259,14 +257,14 @@ class JobController {
                 });
             }
             try {
-                yield Schema_1.default.Job().updateOne({
+                yield schema_1.default.Job().updateOne({
                     _id: job_id
                 }, {
                     $set: {
                         status: 'completed'
                     }
                 });
-                yield Schema_1.default.Artisan().updateOne({
+                yield schema_1.default.Artisan().updateOne({
                     _id: artisan._id
                 }, {
                     $inc: {
@@ -313,13 +311,11 @@ class JobController {
             console.log("artisan:" + uid);
             // find artisan and hirer
             try {
-                const job = yield Schema_1.default.Job().find({ artisan: uid, $and: [{ status: 'accepted' }] });
+                const job = yield schema_1.default.Job().findOne({ artisan: uid, $and: [{ status: 'accepted' }] });
                 console.log(job);
                 //get hirer id
-                const user = job.map(usr => {
-                    return usr.user;
-                });
-                const hirer = yield Schema_1.default.User().findOne({ _id: user });
+                const user = job.user;
+                const hirer = yield schema_1.default.User().findOne({ _id: user });
                 console.log("hirer:" + hirer);
                 return response.status(200).send({
                     job: job,
@@ -340,11 +336,11 @@ class JobController {
             let savedTokens;
             console.log("category" + name);
             console.log("user:" + uid);
-            const user = yield Schema_1.default.User().findOne({ _id: uid });
+            const user = yield schema_1.default.User().findOne({ _id: uid });
             // find artisan
-            const job = yield Schema_1.default.Job().findOne({ user: uid, $and: [{ category: name }] }).where('status').equals('accepted');
+            const job = yield schema_1.default.Job().findOne({ user: uid, $and: [{ category: name }] }).where('status').equals('accepted');
             console.log(job);
-            const findArtisan = yield Schema_1.default.Artisan().findOne({ _id: job.artisan });
+            const findArtisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             console.log(findArtisan);
             if (!findArtisan) {
                 console.log("No Artisan Available");
@@ -394,10 +390,10 @@ class JobController {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid } = request.body;
             console.log("user:" + uid);
-            const job = yield Schema_1.default.Job().findOne({ user: uid }).where('rated').equals(false).where('status').equals('completed');
+            const job = yield schema_1.default.Job().findOne({ user: uid }).where('rated').equals(false).where('status').equals('completed');
             console.log(job);
             if (job) {
-                const artisan = yield Schema_1.default.Artisan().findOne({ _id: job.artisan });
+                const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
                 if (artisan) {
                     try {
                         return response.status(201).send({
@@ -435,11 +431,11 @@ class JobController {
                     message: 'Please enter a valid number between 0-10',
                 });
             }
-            const job = yield Schema_1.default.Job().findOne({ user: uid }).where('rated').equals(false).where('status').equals('completed');
-            const artisan = yield Schema_1.default.Artisan().findOne({ _id: job.artisan });
+            const job = yield schema_1.default.Job().findOne({ user: uid }).where('rated').equals(false).where('status').equals('completed');
+            const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             if (job && artisan) {
                 console.log("job:" + job._id);
-                yield Schema_1.default.Artisan().updateOne({
+                yield schema_1.default.Artisan().updateOne({
                     _id: artisan._id
                 }, {
                     $push: {
@@ -448,7 +444,7 @@ class JobController {
                     }
                 });
                 try {
-                    yield Schema_1.default.Job().updateOne({
+                    yield schema_1.default.Job().updateOne({
                         _id: job._id
                     }, {
                         $set: {
