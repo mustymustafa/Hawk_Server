@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "yarn build",
+    "postinstall": "yarn tsc",
     "start": "node ./dist/app.js",
     "start-dev": "nodemon ./src/app.ts",
     "build": "tsc -p",
+    "tsc": "tsc",
     "build-dev": "tsc -p"
   },
   "dependencies": {
