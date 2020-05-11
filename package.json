@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "yarn build-dev",
+    "postinstall": "yarn build",
     "start": "node dist/app.js",
     "start-dev": "nodemon ./src/app.ts",
-    "build-dev": "tsc"
+    "build": "tsc",
+    "build-dev": "tsc -p"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
