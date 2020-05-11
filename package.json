@@ -6,7 +6,7 @@
     "postinstall": "yarn build",
     "start": "node ./dist/app.js",
     "start-dev": "nodemon ./src/app.ts",
-    "build": "tsc",
+    "build": "tsc -p .",
     "build-dev": "tsc -p"
   },
   "dependencies": {
