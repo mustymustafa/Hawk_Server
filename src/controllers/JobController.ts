@@ -277,20 +277,6 @@ let tickets = [];
       }
    
     try {
-        await Schema.Job().deleteOne({_id: job_id});
-
-        console.log("deleted");
-        response.status(201).send({
-            message: 'Task Cancelled successfully',
-            status: 201
-          });
-       
-
-
-
-
-
-
 
 //send notification
 
@@ -298,7 +284,7 @@ let chunks = expo.chunkPushNotifications([{
   "to":  artisan.pushToken,
   "sound": "default",
   "title": "Job Canceled!",
-  "body": 'The Request was canceled.'
+  "body": `${hirer.name} canceled his job request.`
 }]);
 let tickets = [];
 (async () => {
@@ -313,6 +299,22 @@ let tickets = [];
     }
   }
 })();
+
+
+        await Schema.Job().deleteOne({_id: job_id});
+
+        console.log("deleted");
+        response.status(201).send({
+            message: 'Task Cancelled successfully',
+            status: 201
+          });
+       
+
+
+
+
+
+
 
 
           
@@ -341,7 +343,8 @@ let tickets = [];
        const hirer = await Schema.User().findOne({_id: job.user});
        console.log("hirer:" + hirer)
 
-       
+       const artisan = await Schema.Artisan().findOne({_id: uid});
+       console.log("artisan:" + artisan)
        
        
 
@@ -354,22 +357,6 @@ let tickets = [];
       }
    
     try {
-        await Schema.Job().deleteOne({_id: job_id});
-
-        console.log("deleted");
-        response.status(201).send({
-            message: 'Task Cancelled successfully',
-            status: 201
-          });
-       
-
-
-
-
-
-console.log(hirer.pushToken)
-
-
 
 
 //send notification
@@ -378,7 +365,7 @@ let chunks = expo.chunkPushNotifications([{
   "to": hirer.pushToken,
   "sound": "default",
   "title": "Job Canceled!",
-  "body": 'The Artisan canceled the Job'
+  "body": `The Artisan,  ${artisan.name} canceled the Job`
 }]);
 let tickets = [];
 (async () => {
@@ -393,6 +380,24 @@ let tickets = [];
     }
   }
 })();
+
+
+
+
+        await Schema.Job().deleteOne({_id: job_id});
+
+        console.log("deleted");
+        response.status(201).send({
+            message: 'Task Cancelled successfully',
+            status: 201
+          });
+       
+
+
+
+
+
+console.log(hirer.pushToken)
 
 
           
