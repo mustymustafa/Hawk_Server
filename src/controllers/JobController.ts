@@ -298,7 +298,7 @@ console.log(savedTokens)
 //send notification
 
 let chunks = expo.chunkPushNotifications([{
-  "to": savedTokens,
+  "to": [hirer.pushToken, artisan.pushToken],
   "sound": "default",
   "title": "Job Canceled!",
   "body": 'Your Job was canceled.'
@@ -397,7 +397,7 @@ console.log(savedTokens)
 //send notification
 
 let chunks = expo.chunkPushNotifications([{
-  "to": savedTokens,
+  "to": [hirer.pushToken, artisan.pushToken],
   "sound": "default",
   "title": "Job Completed!",
   "body": 'Yay! your Job is done.'
