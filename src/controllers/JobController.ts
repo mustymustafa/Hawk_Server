@@ -330,6 +330,7 @@ let tickets = [];
 
 
   }
+  
   static async cancelArtisan(request:Request, response:Response){
 
     const {uid, job_id} = request.body
