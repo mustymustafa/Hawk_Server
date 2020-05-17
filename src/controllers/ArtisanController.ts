@@ -125,8 +125,8 @@ email, bio, wage, category,
       } = request.body;
   
       console.log(request.body);
-      const foundUser:any = await Schema.Artisan().findOne({uid});
-  
+      const foundUser:any = await Schema.Artisan().findOne({_id: uid});
+
       if (foundUser && Object.keys(foundUser).length > 0) {
           console.log(foundUser);
           if (!bio) {
