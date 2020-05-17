@@ -32,7 +32,8 @@ export default class MiddleWare {
       }]
     }
 
-    if (!phone) {
+    if (!phone || phone.length < 11 || phone.length > 11) {
+       
       errors = [...errors, {
         phone: 'incorrect phone number entered'
       }]

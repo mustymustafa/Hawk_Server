@@ -117,6 +117,76 @@ email, bio, wage, category,
 
     }
 
+    //update profile
+    static async updateArtisan (request: Request, response: Response) {
+      
+      const {
+  uid, bio, wage, phone, name
+      } = request.body;
+  
+      console.log(request.body);
+      const foundUser:any = await Schema.Artisan().findOne({uid});
+  
+      if (foundUser && Object.keys(foundUser).length > 0) {
+          console.log(foundUser);
+          if (!bio) {
+       
+            return response.status(409).send({
+              message: 'Please enter a bio',
+            });
+          }
+
+          if(!( (/^[a-z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())) )  ){
+     
+            return response.status(409).send({
+              message: 'Please enter a valid name',
+            });
+          }
+
+          if (!wage) {
+       
+            return response.status(409).send({
+              message: 'Please enter a wage',
+            });
+          }
+
+          if (!phone || phone.length < 11 || phone.length > 11) {
+       
+            return response.status(409).send({
+              message: 'Please enter a valid phone',
+            });
+          }
+          try {
+              await Schema.Artisan().updateOne({
+                _id: uid
+              }, {
+                $set: {
+                  bio: bio,
+                  wage: wage,
+                  phone: phone,
+                  name: name
+
+                }
+              });
+      
+              
+              return   response.status(200).send({
+                  message: 'User updated successfully',
+                  status: 201
+                });
+            } catch (error) {
+              console.log(error.toString());
+              response.status(500).send({
+                message: 'something went wrong'
+              });
+            }
+          }
+  
+  
+      }
+  
+  
+
 
 
 

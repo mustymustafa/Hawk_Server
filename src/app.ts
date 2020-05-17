@@ -64,6 +64,8 @@ app.post('/api/v1/signup-artisan', Middleware.signupMiddleware, ArtisanControlle
 app.post('/api/v1/continue-signup-artisan', ArtisanController.continueSignup);
 
 app.post('/api/v1/signin-artisan', Middleware.signinMiddleware, ArtisanController.signin);
+app.post('/api/v1/:uid/update',  ArtisanController.updateArtisan);
+
 app.post('/api/v1/confirmation-artisan', ArtisanController.confirm);
 app.post('/api/v1/send-otp', ArtisanController.sendOtp);
 app.post('/api/v1/forgot-password-artisan', ArtisanController.forgotPassword);
