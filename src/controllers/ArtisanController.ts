@@ -82,7 +82,7 @@ class ArtisanController {
   static async continueSignup (request: Request, response: Response) {
       
     const {
-email, bio, wage, category,
+email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone
     } = request.body;
 
     console.log(request.body);
@@ -97,7 +97,14 @@ email, bio, wage, category,
               $set: {
                 bio: bio,
                 wage: wage,
-                category: category
+                category: category,
+                id_expiry: id_expiry,
+                vl_expiry: vl_expiry,
+                vcolor: vcolor,
+                vmodel: vmodel,
+                plate: plate,
+                sname: sname,
+                sphone: sphone
               }
             });
     
@@ -205,6 +212,53 @@ email, bio, wage, category,
     res.json(req.file)
 }
 
+static uploadVl(req: Request, res: Response) {
+  const parts = req.file.originalname.split(' ')
+  const find = parts[0]
+  console.log(find)
+  res.json(req.file)
+}
+
+static uploadIns(req: Request, res: Response) {
+  const parts = req.file.originalname.split(' ')
+  const find = parts[0]
+  console.log(find)
+  res.json(req.file)
+}
+
+static uploadPoo(req: Request, res: Response) {
+  const parts = req.file.originalname.split(' ')
+  const find = parts[0]
+  console.log(find)
+  res.json(req.file)
+}
+
+static uploadVir(req: Request, res: Response) {
+  const parts = req.file.originalname.split(' ')
+  const find = parts[0]
+  console.log(find)
+  res.json(req.file)
+}
+
+static uploadVpic(req: Request, res: Response) {
+  const parts = req.file.originalname.split(' ')
+  const find = parts[0]
+  console.log(find)
+  res.json(req.file)
+}
+
+static uploadCert(req: Request, res: Response) {
+  const parts = req.file.originalname.split(' ')
+  const find = parts[0]
+  console.log(find)
+  res.json(req.file)
+}
+
+
+
+
+
+
 //set images
 static async setId( request: Request, res: Response) {
      
@@ -249,8 +303,7 @@ static async setId( request: Request, res: Response) {
 
             }
 
-
-            static async setDp( request: Request, res: Response) {
+ static async setDp( request: Request, res: Response) {
      
   
                 console.log(request.body)
@@ -292,9 +345,359 @@ static async setId( request: Request, res: Response) {
             
             
                         }
+       
+  static async setCert( request: Request, res: Response) {
+     
+  
+                          console.log(request.body)
+                              try {
+                               const email = request.body.email
+                               const image = request.body.image
+                                 console.log(email)
+                                 console.log(image)
+                              
+                              
+                               
+                      
+                              const foundUser:any = await Schema.Artisan().findOne({email});
+                          
+                              if (foundUser && Object.keys(foundUser).length > 0) {
+                                  console.log(foundUser);
+                               
+                                      await Schema.Artisan().updateOne({
+                                        _id: foundUser._id
+                                      }, {
+                                        $set: {
+                                          cert: image
+                                         
+                                        }
+                                      });
+                          
+                                      
+                                      return  res.status(200).send("image set")
+                                      } 
+                                    } catch (error) {
+                                      console.log(error.toString());
+                                      res.status(500).send({
+                                        message: 'something went wrong'
+                                      });
+                                    }
+                              
+                          
+                      
+                      
+                      
+                                  }
+                      
+  static async setVl( request: Request, res: Response) {
+     
+  
+                                    console.log(request.body)
+                                        try {
+                                         const email = request.body.email
+                                         const image = request.body.image
+                                           console.log(email)
+                                           console.log(image)
+                                        
+                                        
+                                         
+                                
+                                        const foundUser:any = await Schema.Artisan().findOne({email});
+                                    
+                                        if (foundUser && Object.keys(foundUser).length > 0) {
+                                            console.log(foundUser);
+                                         
+                                                await Schema.Artisan().updateOne({
+                                                  _id: foundUser._id
+                                                }, {
+                                                  $set: {
+                                                    vl: image
+                                                   
+                                                  }
+                                                });
+                                    
+                                                
+                                                return  res.status(200).send("image set")
+                                                } 
+                                              } catch (error) {
+                                                console.log(error.toString());
+                                                res.status(500).send({
+                                                  message: 'something went wrong'
+                                                });
+                                              }
+                                        
+                                    
+                                
+                                
+                                
+                                            }
+   static async setIns( request: Request, res: Response) {
+     
+  
+                                              console.log(request.body)
+                                                  try {
+                                                   const email = request.body.email
+                                                   const image = request.body.image
+                                                     console.log(email)
+                                                     console.log(image)
+                                                  
+                                                  
+                                                   
+                                          
+                                                  const foundUser:any = await Schema.Artisan().findOne({email});
+                                              
+                                                  if (foundUser && Object.keys(foundUser).length > 0) {
+                                                      console.log(foundUser);
+                                                   
+                                                          await Schema.Artisan().updateOne({
+                                                            _id: foundUser._id
+                                                          }, {
+                                                            $set: {
+                                                              insurance: image
+                                                             
+                                                            }
+                                                          });
+                                              
+                                                          
+                                                          return  res.status(200).send("image set")
+                                                          } 
+                                                        } catch (error) {
+                                                          console.log(error.toString());
+                                                          res.status(500).send({
+                                                            message: 'something went wrong'
+                                                          });
+                                                        }
+                                                  
+                                              
+                                          
+                                          
+                                          
+                                                      }
+                                          
+  static async setPoo( request: Request, res: Response) {
+     
+  
+                                                        console.log(request.body)
+                                                            try {
+                                                             const email = request.body.email
+                                                             const image = request.body.image
+                                                               console.log(email)
+                                                               console.log(image)
+                                                            
+                                                            
+                                                             
+                                                    
+                                                            const foundUser:any = await Schema.Artisan().findOne({email});
+                                                        
+                                                            if (foundUser && Object.keys(foundUser).length > 0) {
+                                                                console.log(foundUser);
+                                                             
+                                                                    await Schema.Artisan().updateOne({
+                                                                      _id: foundUser._id
+                                                                    }, {
+                                                                      $set: {
+                                                                        poo: image
+                                                                       
+                                                                      }
+                                                                    });
+                                                        
+                                                                    
+                                                                    return  res.status(200).send("image set")
+                                                                    } 
+                                                                  } catch (error) {
+                                                                    console.log(error.toString());
+                                                                    res.status(500).send({
+                                                                      message: 'something went wrong'
+                                                                    });
+                                                                  }
+                                                            
+                                                        
+                                                    
+                                                    
+                                                    
+                                                                }
+                                                    
+ static async setVir( request: Request, res: Response) {
+     
+  
+                console.log(request.body)
+                    try {
+                     const email = request.body.email
+                     const image = request.body.image
+                       console.log(email)
+                       console.log(image)
+                    
+                    
+                     
+            
+                    const foundUser:any = await Schema.Artisan().findOne({email});
+                
+                    if (foundUser && Object.keys(foundUser).length > 0) {
+                        console.log(foundUser);
+                     
+                            await Schema.Artisan().updateOne({
+                              _id: foundUser._id
+                            }, {
+                              $set: {
+                                vir: image
+                               
+                              }
+                            });
+                
+                            
+                            return  res.status(200).send("image set")
+                            } 
+                          } catch (error) {
+                            console.log(error.toString());
+                            res.status(500).send({
+                              message: 'something went wrong'
+                            });
+                          }
+                    
+                
             
             
             
+                        }
+            
+   static async setVpic( request: Request, res: Response) {
+     
+  
+                          console.log(request.body)
+                              try {
+                               const email = request.body.email
+                               const image = request.body.image
+                                 console.log(email)
+                                 console.log(image)
+                              
+                              
+                               
+                      
+                              const foundUser:any = await Schema.Artisan().findOne({email});
+                          
+                              if (foundUser && Object.keys(foundUser).length > 0) {
+                                  console.log(foundUser);
+                               
+                                      await Schema.Artisan().updateOne({
+                                        _id: foundUser._id
+                                      }, {
+                                        $set: {
+                                          vpic: image
+                                         
+                                        }
+                                      });
+                          
+                                      
+                                      return  res.status(200).send("image set")
+                                      } 
+                                    } catch (error) {
+                                      console.log(error.toString());
+                                      res.status(500).send({
+                                        message: 'something went wrong'
+                                      });
+                                    }
+                              
+                          
+                      
+                      
+                      
+                                  }
+         
+                                                                                                                  
+            //set id_expiry
+            static async idExpiry (request: Request, response: Response) {
+      
+              const {
+          email,  id_expiry,
+              } = request.body;
+          
+              console.log(request.body);
+              const foundUser:any = await Schema.Artisan().findOne({email});
+          
+              if (foundUser && Object.keys(foundUser).length > 0) {
+                  console.log(foundUser);
+                  try {
+                      await Schema.Artisan().updateOne({
+                        _id: foundUser._id
+                      }, {
+                        $set: {
+                          id_expiry: id_expiry,
+                        
+                        }
+                      });
+              
+                      
+                      return   response.status(200).send({
+                          message: 'User updated successfully',
+                          status: 201
+                        });
+                    } catch (error) {
+                      console.log(error.toString());
+                      response.status(500).send({
+                        message: 'something went wrong'
+                      });
+                    }
+                  }
+          
+          
+              }
+          
+  //set vehicle details
+   //continue signup
+   static async vehicleDetails (request: Request, response: Response) {
+      
+    const {
+email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
+    } = request.body;
+
+    console.log(request.body);
+    const foundUser:any = await Schema.Artisan().findOne({email});
+
+    if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+        try {
+            await Schema.Artisan().updateOne({
+              _id: foundUser._id
+            }, {
+              $set: {
+                vl_expiry: vl_expiry,
+                vcolor: vcolor,
+                vmodel: vmodel,
+                plate: plate,
+                sname: sname,
+                sphone: sphone
+              }
+            });
+    
+            
+            return   response.status(200).send({
+                message: 'User updated successfully',
+                status: 201
+              });
+          } catch (error) {
+            console.log(error.toString());
+            response.status(500).send({
+              message: 'something went wrong'
+            });
+          }
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

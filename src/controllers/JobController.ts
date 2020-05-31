@@ -143,6 +143,84 @@ var transporter = nodemailer.createTransport({
 
   }
 
+  static async driverRequest (request:Request, response:Response){
+    const {category, uid, location, area1, area2, lat, long, destLat, destLong, to, from} = request.body;
+    console.log(category, uid,location)
+    console.log("area1:" + area1);
+    console.log("area2:" + area2);
+    console.log("lat:" + lat);
+    console.log("long:" + long)
+    console.log("destLat:" + destLat);
+    console.log("destLong:" + destLong);
+    console.log("to:" + to);
+    console.log("from:" + from);
+    
+
+    let savedTokens;
+
+
+    try {
+
+
+        //create job
+        const dt = new Date()
+        const now = dt.setMinutes( dt.getMinutes());
+        const createdAt = dt.toLocaleDateString()
+        const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
+        console.log(createdAt)
+        console.log("end:" + endAt)
+        console.log("now:" + now)
+
+        await Schema.Job().create({
+            user: uid,
+            category: category,
+            location: location,
+            status: 'active',
+            rated: false,
+            area1: area1,
+            area2: area2,
+            to: to,
+            from: from,
+            lat: lat,
+            long: long,
+            destLat: destLat,
+            destLong: destLong,
+            createdAt: createdAt,
+            endAt: endAt,
+            now: now,
+            active: true
+
+        })
+ 
+        response.status(201).send({
+            message: 'Job created successfully',
+            status: 201
+          });
+
+
+
+        
+     const artisan = await Schema.Artisan().findOne({category: category});
+     
+
+     console.log(artisan)
+     
+  
+ 
+      
+  
+    
+    } catch(error){
+        console.log(error.toString());
+        response.status(500).send({
+          message: "Somenthing went wrong"
+        })
+    }
+
+
+  }
+
+
   static async displayJobs(request:Request, response:Response) {
       const {category, area1, area2} = request.body; 
       console.log(category);
