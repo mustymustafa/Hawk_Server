@@ -144,7 +144,7 @@ var transporter = nodemailer.createTransport({
   }
 
   static async driverRequest (request:Request, response:Response){
-    const {category, uid, location, area1, area2, lat, long, destLat, destLong, to, from} = request.body;
+    const {category, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance} = request.body;
     console.log(category, uid,location)
     console.log("area1:" + area1);
     console.log("area2:" + area2);
@@ -154,6 +154,8 @@ var transporter = nodemailer.createTransport({
     console.log("destLong:" + destLong);
     console.log("to:" + to);
     console.log("from:" + from);
+    console.log("time:" + time);
+    console.log("distance:" + distance);
     
 
     let savedTokens;
@@ -185,6 +187,8 @@ var transporter = nodemailer.createTransport({
             long: long,
             destLat: destLat,
             destLong: destLong,
+            time: time,
+            distance: distance,
             createdAt: createdAt,
             endAt: endAt,
             now: now,
@@ -204,6 +208,45 @@ var transporter = nodemailer.createTransport({
      
 
      console.log(artisan)
+     
+     const artis = artisan.pushToken;
+
+     savedTokens = artis;
+     
+     console.log(artis)
+     if (!artisan) {
+       return response.status(404).send({
+         message: 'No artisans found'
+       });
+     }
+    
+     
+
+
+     //send notification
+ 
+     let chunks = expo.chunkPushNotifications([{
+       "to": savedTokens,
+       "sound": "default",
+       "title": "Job Request",
+       "body": `A ${category} is needed.`
+     }]);
+     let tickets = [];
+     (async () => {
+       for (let chunk of chunks) {
+         try {
+           let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+           console.log(ticketChunk);
+           tickets.push(...ticketChunk);
+        
+         } catch (error) {
+           console.error(error);
+         }
+       }
+     })();
+
+     
+
      
   
  
@@ -642,6 +685,7 @@ static async getArtisan(request:Request, response:Response) {
     console.log("user:" + uid);
 
     const user = await Schema.User().findOne({_id: uid});
+    //console.log(user)
     
     // find artisan
   const job = await Schema.Job().findOne({user: uid,  $and: [{category: name}]}).where('status').equals('accepted')

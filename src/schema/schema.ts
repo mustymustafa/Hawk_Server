@@ -70,6 +70,13 @@ class Schema {
             location:  String,
             to: String, 
             from: String,
+            lat: String,
+            long: String,
+            destLat: String,
+            destLong: String,
+            distance:  String,
+            time: String,
+
             area1: String,
             area2: String,
             description: String,
