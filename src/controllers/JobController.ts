@@ -274,9 +274,18 @@ var transporter = nodemailer.createTransport({
     const job = await Schema.Job().find({category: category,  $or:[{area1: area1}, {area2: area2}], $and: [{status: 'active'}]})
 
     console.log(job)
-    return response.status(200).send({job})
+
+    //get hirer id
+  const user = job.map(usr => {
+    return usr.user
+})
+
+const hirer = await Schema.User().findOne({_id: user});
+console.log("hirer:" + hirer)
+    return response.status(200).send({job: job, hirer:hirer})
 
   }
+
 
 
   static async acceptJob(request:Request, response:Response){
@@ -322,7 +331,7 @@ console.log(price);
         );
 
 
-        response.status(200).send({hirer: hirer.name, number: hirer.phone})
+        response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job})
        
 // send notification
 
@@ -649,7 +658,7 @@ let tickets = [];
     
   const job = await Schema.Job().find({artisan: uid, $and:[{status: 'accepted'}]})
 
-  console.log(job)
+  //console.log(job)
 
   //get hirer id
   const user = job.map(usr => {
