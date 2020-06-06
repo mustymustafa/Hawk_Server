@@ -305,12 +305,14 @@ console.log("hirer:" + hirer)
 const artisan = await Schema.Artisan().findOne({_id: uid});
 console.log(price);
     console.log("wage " + artisan.wage)
+
+    
        if(!price || price > artisan.wage){
         return response.status(404).send({
             message: `Please enter a price between (₦)0-${artisan.wage}`
           });
        }
-
+   
     if (!job && !hirer) {
         return response.status(404).send({
           message: 'Job does not exist'
@@ -377,6 +379,140 @@ let tickets = [];
 
 
   }
+
+
+  static async acceptTaxi(request:Request, response:Response){
+
+    const {uid, job_id, price} = request.body
+    console.log("uid" + uid, "job_id" + job_id)
+    
+    let savedTokens;
+
+  
+
+    const job = await Schema.Job().findOne({_id: job_id})
+    console.log("job found:" + job);
+
+       const hirer = await Schema.User().findOne({_id: job.user});
+       console.log("hirer:" + hirer)
+const artisan = await Schema.Artisan().findOne({_id: uid});
+console.log(price);
+    console.log("wage " + artisan.wage)
+
+    
+     
+   
+    if (!job && !hirer) {
+        return response.status(404).send({
+          message: 'Job does not exist'
+        });
+      }
+   
+    try {
+        await Schema.Job().updateOne({
+            _id: job_id
+        },
+        {
+            $set: {
+                artisan: uid,
+                status: 'accepted',
+                price: price
+            }
+        }
+        );
+
+
+        response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job})
+       
+// send notification
+
+
+savedTokens = hirer.pushToken;
+
+console.log(savedTokens)
+
+
+
+
+//send notification
+
+let chunks = expo.chunkPushNotifications([{
+  "to": savedTokens,
+  "sound": "default",
+  "title": "Request Accepted!",
+  "body": `Your ${job.category} has accepted your request and is on his way.`
+}]);
+let tickets = [];
+(async () => {
+  for (let chunk of chunks) {
+    try {
+      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+      console.log(ticketChunk);
+      tickets.push(...ticketChunk);
+   
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})();
+
+
+
+
+    } catch(error) {
+        console.log(error)
+        return response.status(404).send("an error occured")
+    }
+  
+
+
+
+  }
+
+  
+
+  static async showJob(request:Request, response:Response){
+
+    const {uid, job_id} = request.body
+    console.log("uid" + uid, "job_id" + job_id)
+    
+ 
+
+  
+
+    const job = await Schema.Job().findOne({_id: job_id})
+    console.log("job found:" + job);
+
+       const hirer = await Schema.User().findOne({_id: job.user});
+       console.log("hirer:" + hirer)
+const artisan = await Schema.Artisan().findOne({_id: uid});
+
+
+  
+    if (!job && !hirer) {
+        return response.status(404).send({
+          message: 'Job does not exist'
+        });
+      }
+   
+
+
+    try {
+     
+      response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job})
+
+
+
+    } catch(error) {
+        console.log(error)
+        return response.status(404).send("an error occured")
+    }
+  
+
+
+
+  }
+
 
   static async cancelJob(request:Request, response:Response){
 

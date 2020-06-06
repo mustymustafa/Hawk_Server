@@ -113,6 +113,11 @@ app.post('/api/v1/aToken/:uid', ArtisanController.savePushToken);
 //jobs 
 app.post('/api/v1/jobs', JobController.displayJobs);
 app.post('/api/v1/job/:job_id/accept', JobController.acceptJob);
+app.post('/api/v1/job/:job_id/accepttaxi', JobController.acceptTaxi);
+app.post('/api/v1/job/:job_id/show', JobController.showJob);
+
+
+
 app.post('/api/v1/job/:job_id/cancel', JobController.cancelJob);
 app.post('/api/v1/job/:job_id/cancel-artisan', JobController.cancelArtisan);
 
