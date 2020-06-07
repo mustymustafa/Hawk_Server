@@ -1045,7 +1045,7 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
     const {lat, long} = request.body;
     const {uid} = request.params;
 
-    console.log(lat, long)
+
 
     const user = await Schema.Artisan().findOne({_id: uid});
     if (!user) {
@@ -1064,7 +1064,7 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
           long: long
         }
       });
-      console.log('location updated')
+
       return response.status(200).send("location saved");
     } catch (error) {
         console.log(error.toString(), "========")
@@ -1075,6 +1075,37 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
 
 
   } 
+
+
+  //get artisan  lat and long
+  static async artisanLoc(request: Request, response: Response){
+
+    const {uid} = request.params;
+    //console.log("uid" + uid)
+
+    try {
+      const user = await Schema.Artisan().findOne({_id: uid});
+      //console.log(user)
+      if (user) {
+
+        response.status(200).send({
+          lat: user.lat,
+          long: user.long
+        });
+       // console.log(user)
+      } else {
+        response.status(404).send({
+          message: 'Cannot find details for this user'
+        });
+        console.log("not found")
+      }
+    } catch (error) {
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
+    }
+  }
+
 
 
 
