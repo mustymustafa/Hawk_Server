@@ -106,6 +106,8 @@ app.post('/api/v1/forgot-password-artisan', ArtisanController.forgotPassword);
 app.post('/api/v1/change-password-artisan', ArtisanController.changePassword);
 app.get('/api/v1/artisan/:uid', ArtisanController.userDetails);
 app.post('/api/v1/location/:uid', ArtisanController.storeLocation);
+app.post('/api/v1/movinglocation/:uid', ArtisanController.updateLocation);
+
 //push notification
 app.post('/api/v1/aToken/:uid', ArtisanController.savePushToken);
 

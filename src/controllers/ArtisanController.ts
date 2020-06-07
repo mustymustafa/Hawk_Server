@@ -192,7 +192,7 @@ email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, 
   
       }
   
-  
+  //update artisan location
 
 
 
@@ -1039,6 +1039,46 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
 
 
   } 
+
+  //update lat and long while moving
+  static async updateLocation(request: Request, response: Response){
+    const {lat, long} = request.body;
+    const {uid} = request.params;
+
+    console.log(lat, long)
+
+    const user = await Schema.Artisan().findOne({_id: uid});
+    if (!user) {
+      return response.status(404).send({
+        message: 'User does not exist'
+      });
+    }
+ 
+    try {
+      await Schema.Artisan()
+        .updateOne({
+          _id: uid,
+        }, {
+        $set: {
+          lat: lat,
+          long: long
+        }
+      });
+      console.log('location updated')
+      return response.status(200).send("location saved");
+    } catch (error) {
+        console.log(error.toString(), "========")
+        return response.status(500).send({
+          message: 'Something went wrong'
+        })
+    }
+
+
+  } 
+
+
+
+  
 
   static async savePushToken(request: Request, response: Response){
 
