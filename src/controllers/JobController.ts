@@ -1051,6 +1051,89 @@ let chunks = expo.chunkPushNotifications([{
     
 }
 
+// start job
+
+static async startJob(request:Request, response:Response){
+
+  const {job_id} = request.body
+
+  
+  let savedTokens;
+
+
+
+  const job = await Schema.Job().findOne({_id: job_id})
+  console.log("job found:" + job);
+
+     const hirer = await Schema.User().findOne({_id: job.user});
+     console.log("hirer:" + hirer)
+
+  
+ 
+  if (!job && !hirer) {
+      return response.status(404).send({
+        message: 'Job does not exist'
+      });
+    }
+ 
+  try {
+      await Schema.Job().updateOne({
+          _id: job_id
+      },
+      {
+          $set: {
+            start: true
+          }
+      }
+      );
+
+console.log('job started')
+      response.status(200).send('job started')
+     
+// send notification
+
+
+savedTokens = hirer.pushToken;
+
+console.log(savedTokens)
+
+
+
+
+//send notification
+
+let chunks = expo.chunkPushNotifications([{
+"to": savedTokens,
+"sound": "default",
+"title": "Request Accepted!",
+"body": `Your driver has started the trip.`
+}]);
+let tickets = [];
+(async () => {
+for (let chunk of chunks) {
+  try {
+    let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+    console.log(ticketChunk);
+    tickets.push(...ticketChunk);
+ 
+  } catch (error) {
+    console.error(error);
+  }
+}
+})();
+
+
+
+
+  } catch(error) {
+      console.log(error)
+      return response.status(404).send("an error occured")
+  }
+
+
+
+
+}
 
 
 
