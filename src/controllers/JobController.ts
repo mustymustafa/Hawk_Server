@@ -1135,7 +1135,58 @@ for (let chunk of chunks) {
 
 }
 
+//check if job has started
+static async startedJob(request:Request, response:Response) {
 
+
+  const {uid, name} = request.body; 
+
+
+
+  const user = await Schema.User().findOne({_id: uid});
+  //console.log(user)
+  
+  // find artisan
+const job = await Schema.Job().findOne({user: uid,  $and: [{category: name}]}).where('status').equals('accepted')
+
+
+  console.log(job);
+
+
+
+const findArtisan = await Schema.Artisan().findOne({_id: job.artisan})
+console.log(findArtisan)
+
+if(!findArtisan){
+    console.log("No Artisan Available")
+    return response.status(400).send({notFound: "No Artisan is available at the moment"})
+
+}
+
+try {
+
+
+
+
+
+
+       response.status(200).send({artisan: findArtisan.start})
+    
+
+   
+
+
+} catch(error) {
+
+  console.log(error);
+  response.status(404).send("something went wrong")
+
+}
+
+
+
+
+}
 
 
 
