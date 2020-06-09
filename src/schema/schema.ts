@@ -47,6 +47,7 @@ class Schema {
             lat: String,
             long: String,
             location: String,
+            start: {type: Boolean, default: false},
             completed: {type: Number, default: 0},
             rating: [Number],
             comments: [String],
@@ -76,7 +77,7 @@ class Schema {
             destLong: String,
             distance:  String,
             time: String,
-            start: {type: Boolean, default: false},
+           
 
             area1: String,
             area2: String,

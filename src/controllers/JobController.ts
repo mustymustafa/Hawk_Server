@@ -1077,8 +1077,8 @@ static async startJob(request:Request, response:Response){
     }
  
   try {
-      await Schema.Job().updateOne({
-          _id: job_id
+      await Schema.Artisan().updateOne({
+          _id: job.artisan
       },
       {
           $set: {
