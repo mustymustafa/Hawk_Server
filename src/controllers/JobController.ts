@@ -1105,7 +1105,7 @@ console.log(savedTokens)
 let chunks = expo.chunkPushNotifications([{
 "to": savedTokens,
 "sound": "default",
-"title": "Request Accepted!",
+"title": "Trip Started!",
 "body": `Your driver has started the trip.`
 }]);
 let tickets = [];
@@ -1116,6 +1116,82 @@ for (let chunk of chunks) {
     console.log(ticketChunk);
     tickets.push(...ticketChunk);
  
+  } catch (error) {
+    console.error(error);
+  }
+}
+})();
+
+
+
+
+  } catch(error) {
+      console.log(error)
+      return response.status(404).send("an error occured")
+  }
+
+
+
+
+}
+
+
+
+
+
+// driver arrived
+static async driverArrived(request:Request, response:Response){
+
+  const {job_id} = request.body
+
+  
+  let savedTokens;
+
+
+
+  const job = await Schema.Job().findOne({_id: job_id})
+  console.log("job found:" + job);
+
+     const hirer = await Schema.User().findOne({_id: job.user});
+     console.log("hirer:" + hirer)
+
+  
+ 
+  if (!job && !hirer) {
+      return response.status(404).send({
+        message: 'Job does not exist'
+      });
+    }
+ 
+  try {
+  
+     
+// send notification
+
+
+savedTokens = hirer.pushToken;
+
+console.log(savedTokens)
+
+
+
+
+//send notification
+
+let chunks = expo.chunkPushNotifications([{
+"to": savedTokens,
+"sound": "default",
+"title": "Driver Arrival!",
+"body": `Your driver has arrived.`
+}]);
+let tickets = [];
+(async () => {
+for (let chunk of chunks) {
+  try {
+    let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+    console.log(ticketChunk);
+    tickets.push(...ticketChunk);
+    response.status(200).send('driver arrived')
   } catch (error) {
     console.error(error);
   }
