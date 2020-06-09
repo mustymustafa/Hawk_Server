@@ -119,6 +119,8 @@ app.post('/api/v1/aToken/:uid', ArtisanController.savePushToken);
 app.post('/api/v1/jobs', JobController.displayJobs);
 app.post('/api/v1/job/:job_id/accept', JobController.acceptJob);
 app.post('/api/v1/job/:job_id/start', JobController.startJob);
+app.post('/api/v1/job/:job_id/arrive', JobController.driverArrived);
+
 
 app.post('/api/v1/job/:job_id/accepttaxi', JobController.acceptTaxi);
 app.post('/api/v1/job/:job_id/show', JobController.showJob);
