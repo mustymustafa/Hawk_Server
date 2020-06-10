@@ -144,7 +144,7 @@ var transporter = nodemailer.createTransport({
   }
 
   static async driverRequest (request:Request, response:Response){
-    const {category, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance} = request.body;
+    const {category, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price} = request.body;
     console.log(category, uid,location)
     console.log("area1:" + area1);
     console.log("area2:" + area2);
@@ -156,6 +156,8 @@ var transporter = nodemailer.createTransport({
     console.log("from:" + from);
     console.log("time:" + time);
     console.log("distance:" + distance);
+    console.log("price:" + price);
+    
     
 
     let savedTokens;
@@ -188,6 +190,7 @@ var transporter = nodemailer.createTransport({
             destLat: destLat,
             destLong: destLong,
             time: time,
+            price: price,
             distance: distance,
             createdAt: createdAt,
             endAt: endAt,
