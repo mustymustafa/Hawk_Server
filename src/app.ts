@@ -84,6 +84,10 @@ app.post('/api/v1/vehicledetails', ArtisanController.vehicleDetails);
 
 app.get('/api/v1/user/:uid', UserController.userDetails);
 
+//get drivers
+
+app.get('/api/v1/drivers', ArtisanController.getDrivers);
+
 //push notification
 app.post('/api/v1/token/:uid', UserController.savePushToken);
 

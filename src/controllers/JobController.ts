@@ -715,7 +715,8 @@ console.log(hirer.pushToken)
         },
         {
             $set: {
-                status: 'completed'
+                status: 'completed',
+                start: false
             }
         }
         );

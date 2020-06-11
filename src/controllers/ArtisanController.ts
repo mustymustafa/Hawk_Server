@@ -1107,6 +1107,38 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
   }
 
 
+  //get all drivers
+  static async getDrivers(request: Request, response: Response){
+
+    
+
+    try {
+      const user = await Schema.Artisan().find({category: 'driver'});
+     
+
+      if (user) {
+   
+          console.log(user)
+          return response.status(200).send({user});
+ 
+        
+
+
+  
+
+ 
+      } else {
+        response.status(404).send({
+          message: 'Cannot find details for this user'
+        });
+        console.log("not found")
+      }
+    } catch (error) {
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
+    }
+  }
 
 
   
