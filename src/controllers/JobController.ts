@@ -716,7 +716,8 @@ console.log(hirer.pushToken)
         {
             $set: {
                 status: 'completed',
-                start: false
+                start: false,
+                arrived:false
             }
         }
         );
@@ -1207,6 +1208,10 @@ static async driverArrived(request:Request, response:Response){
   const job = await Schema.Job().findOne({_id: job_id})
   console.log("job found:" + job);
 
+  const driver = await Schema.User().findOne({_id: job.artisan});
+  console.log("driver:" + driver)
+
+
      const hirer = await Schema.User().findOne({_id: job.user});
      console.log("hirer:" + hirer)
 
@@ -1218,48 +1223,63 @@ static async driverArrived(request:Request, response:Response){
       });
     }
  
-  try {
+    if(driver.arrived === false){
+      try {
   
-     
-// send notification
-
-
-savedTokens = hirer.pushToken;
-
-console.log(savedTokens)
-
-
-
-
-//send notification
-
-let chunks = expo.chunkPushNotifications([{
-"to": savedTokens,
-"sound": "default",
-"title": "Driver Arrival!",
-"body": `Your driver has arrived.`
-}]);
-let tickets = [];
-(async () => {
-for (let chunk of chunks) {
-  try {
-    let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-    console.log(ticketChunk);
-    tickets.push(...ticketChunk);
-    response.status(200).send('driver arrived')
-  } catch (error) {
-    console.error(error);
-  }
-}
-})();
-
-
-
-
-  } catch(error) {
-      console.log(error)
-      return response.status(404).send("an error occured")
-  }
+        await Schema.Artisan().updateOne({
+          _id: job.artisan
+      },
+      {
+          $set: {
+            arrived: true
+          }
+      }
+      );
+         
+    // send notification
+    
+    
+    
+    savedTokens = hirer.pushToken;
+    
+    console.log(savedTokens)
+    
+    
+    
+    
+    //send notification
+    
+    let chunks = expo.chunkPushNotifications([{
+    "to": savedTokens,
+    "sound": "default",
+    "title": "Driver Arrival!",
+    "body": `Your driver has arrived.`
+    }]);
+    let tickets = [];
+    (async () => {
+    for (let chunk of chunks) {
+      try {
+        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        console.log(ticketChunk);
+        tickets.push(...ticketChunk);
+        response.status(200).send('driver arrived')
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    })();
+    
+    
+    
+    
+      } catch(error) {
+          console.log(error)
+          return response.status(404).send("an error occured")
+      }
+    
+    } else {
+      response.status(200).send('Already Notified')
+    }
 
 
 

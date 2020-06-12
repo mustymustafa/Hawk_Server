@@ -48,6 +48,8 @@ class Schema {
             long: String,
             location: String,
             start: {type: Boolean, default: false},
+            arrived: {type: Boolean, default: false},
+            
             completed: {type: Number, default: 0},
             rating: [Number],
             comments: [String],
