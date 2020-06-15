@@ -49,6 +49,7 @@ class Schema {
             location: String,
             start: {type: Boolean, default: false},
             arrived: {type: Boolean, default: false},
+            timeout: {type: Number, default: 60},
             
             completed: {type: Number, default: 0},
             rating: [Number],
