@@ -49,7 +49,8 @@ class Schema {
             location: String,
             start: {type: Boolean, default: false},
             arrived: {type: Boolean, default: false},
-            timeout: {type: Number, default: 60},
+            
+
             
             completed: {type: Number, default: 0},
             rating: [Number],
@@ -59,7 +60,8 @@ class Schema {
             confirmationCode: String,
             pushToken: String,
             isConfirmed: Boolean,
-            isActivated: Boolean
+            isActivated: Boolean,
+             
 
         })
         const Artisan = mongoose.models.Artisan || mongoose.model('Artisan', ArtisanSchema)
@@ -80,6 +82,7 @@ class Schema {
             destLong: String,
             distance:  String,
             time: String,
+            expires: {type: Date, default: Date.now(),  expires: 60},
            
 
             area1: String,
