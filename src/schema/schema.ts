@@ -82,7 +82,7 @@ class Schema {
             destLong: String,
             distance:  String,
             time: String,
-            expires: {type: Date, default: Date.now(),  expires: 60},
+
            
 
             area1: String,

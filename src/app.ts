@@ -132,6 +132,8 @@ app.post('/api/v1/job/:job_id/show', JobController.showJob);
 
 
 app.post('/api/v1/job/:job_id/cancel', JobController.cancelJob);
+app.post('/api/v1/job/:job_id/delete', JobController.deleteJob);
+
 app.post('/api/v1/job/:job_id/cancel-artisan', JobController.cancelArtisan);
 
 app.post('/api/v1/job/:job_id/complete', JobController.completeJob);

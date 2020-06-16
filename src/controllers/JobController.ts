@@ -175,7 +175,7 @@ var transporter = nodemailer.createTransport({
         console.log("end:" + endAt)
         console.log("now:" + now)
 
-        await Schema.Job().create({
+      const job =  await Schema.Job().create({
             user: uid,
             category: category,
             location: location,
@@ -198,8 +198,12 @@ var transporter = nodemailer.createTransport({
             active: true
 
         })
+
+        console.log("job id!!!!" + job.id)
  
         response.status(201).send({
+
+            job_id: job.id,
             message: 'Job created successfully',
             status: 201
           });
@@ -517,6 +521,8 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
   }
 
 
+
+
   static async cancelJob(request:Request, response:Response){
 
     const {uid, job_id} = request.body
@@ -599,6 +605,60 @@ let tickets = [];
 
 
   }
+
+  static async deleteJob(request:Request, response:Response){
+
+    const {job_id} = request.body
+    console.log("job_id" + job_id)
+    
+
+
+    const job = await Schema.Job().findOne({_id: job_id})
+    console.log("job found:" + job);
+
+       
+       
+
+
+    
+    if (!job) {
+        return response.status(404).send({
+          message: 'Job does not exist'
+        });
+      }
+   
+    try {
+
+        await Schema.Job().deleteOne({_id: job_id});
+
+        console.log("deleted");
+        response.status(201).send({
+            message: 'Task Cancelled successfully',
+            status: 201
+          });
+       
+
+
+
+
+
+
+
+
+          
+
+
+
+    } catch(error) {
+        console.log(error)
+        return response.status(404).send("an error occured")
+    }
+  
+
+
+
+  }
+  
   
   static async cancelArtisan(request:Request, response:Response){
 
