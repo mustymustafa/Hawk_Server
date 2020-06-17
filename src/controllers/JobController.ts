@@ -235,8 +235,137 @@ var transporter = nodemailer.createTransport({
      let chunks = expo.chunkPushNotifications([{
        "to": savedTokens,
        "sound": "default",
-       "title": "Job Request",
+       "title": "Driver Request",
        "body": `A ${category} is needed.`
+     }]);
+     let tickets = [];
+     (async () => {
+       for (let chunk of chunks) {
+         try {
+           let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+           console.log(ticketChunk);
+           tickets.push(...ticketChunk);
+        
+         } catch (error) {
+           console.error(error);
+         }
+       }
+     })();
+
+     
+
+     
+  
+ 
+      
+  
+    
+    } catch(error){
+        console.log(error.toString());
+        response.status(500).send({
+          message: "Somenthing went wrong"
+        })
+    }
+
+
+  }
+
+  static async logRequest (request:Request, response:Response){
+    const {category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price} = request.body;
+  
+  
+    let savedTokens;
+
+
+    try {
+
+
+        //create job
+        const dt = new Date()
+        const now = dt.setMinutes( dt.getMinutes());
+        const createdAt = dt.toLocaleDateString()
+        const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
+        console.log(createdAt)
+        console.log("end:" + endAt)
+        console.log("now:" + now)
+
+      const job =  await Schema.Job().create({
+            user: uid,
+            category: 'log',
+            location: location,
+            status: 'active',
+            rated: false,
+           
+            to: to,
+            to2: to2,
+            to3: to3,
+            to4: to4,
+            to5: to5,
+
+            from: from,
+            lat: lat,
+            long: long,
+
+            destLat: destLat,
+            destLat2: destLat2,
+            destLat3: destLat3,
+            destLat4: destLat4,
+            destLat5: destLat5,
+
+            destLong: destLong,
+            destLong2: destLong2,
+            destLong3: destLong3,
+            destLong4: destLong4,
+            destLong5: destLong5,
+
+            time: time,
+            price: price,
+            distance: distance,
+            createdAt: createdAt,
+            endAt: endAt,
+            now: now,
+            active: true
+
+        })
+
+        console.log("job id!!!!" + job.id)
+ 
+        response.status(201).send({
+
+            job_id: job.id,
+            message: 'Job created successfully',
+            status: 201
+          });
+
+
+
+        
+     const artisan = await Schema.Artisan().findOne({category: 'log'});
+     
+
+     console.log(artisan)
+     
+     const artis = artisan.pushToken;
+
+     savedTokens = artis;
+     
+     console.log(artis)
+     if (!artisan) {
+       return response.status(404).send({
+         message: 'No artisans found'
+       });
+     }
+    
+     
+
+
+     //send notification
+ 
+     let chunks = expo.chunkPushNotifications([{
+       "to": savedTokens,
+       "sound": "default",
+       "title": "New Request",
+       "body": `A Dispatch Rider is needed.`
      }]);
      let tickets = [];
      (async () => {
@@ -576,9 +705,19 @@ let tickets = [];
 })();
 
 
-        await Schema.Job().deleteOne({_id: job_id});
+        await Schema.Job().updateOne({
+          _id: job_id
+        },
+          {
+            $set: {
+              status: 'cancelled'
+            }
+         
+          }
+          
+          );
 
-        console.log("deleted");
+        console.log("cancelled");
         response.status(201).send({
             message: 'Task Cancelled successfully',
             status: 201
@@ -695,7 +834,7 @@ let chunks = expo.chunkPushNotifications([{
   "to": hirer.pushToken,
   "sound": "default",
   "title": "Job Canceled!",
-  "body": `The Artisan,  ${artisan.name} canceled the Job`
+  "body": `The ${artisan.category},  ${artisan.name} canceled the Job`
 }]);
 let tickets = [];
 (async () => {
@@ -714,7 +853,18 @@ let tickets = [];
 
 
 
-        await Schema.Job().deleteOne({_id: job_id});
+
+        await Schema.Job().updateOne({
+          _id: job_id
+        },
+          {
+            $set: {
+              status: 'cancelled'
+            }
+         
+          }
+          
+          );
 
         console.log("deleted");
         response.status(201).send({
@@ -1346,6 +1496,33 @@ static async driverArrived(request:Request, response:Response){
 
 }
 
+
+
+
+
+
+//job history 
+static async getHistory(request:Request, response:Response){
+  const {uid} = request.body;
+
+  //get user 
+  const user = await Schema.User().findOne({_id: uid})
+  console.log(user)
+  //get user jobs
+  const job = await Schema.Job().find({user: uid})
+  console.log(job)
+
+  if(user){
+    return response.status(200).send({
+      job: job
+    })
+  } else {
+    console.log('no user')
+    response.status(404).send('no user found')
+  }
+
+
+}
 
 
 

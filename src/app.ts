@@ -44,6 +44,9 @@ app.post('/api/v1/resend-otp', UserController.resendOtp);
 app.post('/api/v1/forgot-password', UserController.forgotPassword);
 app.post('/api/v1/change-password', UserController.changePassword);
 
+app.post('/api/v1/:uid/jobs', JobController.getHistory);
+
+
 app.post('/api/v1/image', upload.single('image'), ArtisanController.uploadimage);
 app.post('/api/v1/dp', upload.single('image'), ArtisanController.uploadDp);
 //certificate
@@ -93,6 +96,8 @@ app.post('/api/v1/token/:uid', UserController.savePushToken);
 
 app.post('/api/v1/jobrequest', JobController.createJob);
 app.post('/api/v1/driverrequest', JobController.driverRequest);
+app.post('/api/v1/logrequest', JobController.logRequest);
+
 
 
 

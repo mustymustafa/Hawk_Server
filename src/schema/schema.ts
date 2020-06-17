@@ -75,11 +75,27 @@ class Schema {
             artisan: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
             location:  String,
             to: String, 
+            to2: String, 
+            to3: String, 
+            to4: String, 
+            to5: String, 
+            
             from: String,
             lat: String,
             long: String,
+
             destLat: String,
+            destLat2: String,
+            destLat3: String,
+            destLat4: String,
+            destLat5: String,
+
             destLong: String,
+            destLong2: String,
+            destLong3: String,
+            destLong4: String,
+            destLong5: String,
+
             distance:  String,
             time: String,
 
