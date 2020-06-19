@@ -272,7 +272,7 @@ var transporter = nodemailer.createTransport({
 
   static async logRequest (request:Request, response:Response){
     const {category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price} = request.body;
-  
+  console.log(category)
   
     let savedTokens;
 
@@ -291,7 +291,7 @@ var transporter = nodemailer.createTransport({
 
       const job =  await Schema.Job().create({
             user: uid,
-            category: 'log',
+            category: category,
             location: location,
             status: 'active',
             rated: false,
