@@ -462,6 +462,7 @@ console.log(price);
         {
             $set: {
                 artisan: uid,
+                artisan_name: artisan.name,
                 status: 'accepted',
                 price: price
             }

@@ -44,7 +44,7 @@ app.post('/api/v1/resend-otp', UserController.resendOtp);
 app.post('/api/v1/forgot-password', UserController.forgotPassword);
 app.post('/api/v1/change-password', UserController.changePassword);
 
-app.post('/api/v1/:uid/jobs', JobController.getHistory);
+app.post('/api/v1/:uid/history', JobController.getHistory);
 
 
 app.post('/api/v1/image', upload.single('image'), ArtisanController.uploadimage);
