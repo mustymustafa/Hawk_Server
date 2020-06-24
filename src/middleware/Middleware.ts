@@ -59,11 +59,6 @@ export default class MiddleWare {
       }]
     }
 
-    if(wage !== wage){
-      errors = [...errors, {
-        wage: 'Please enter a wage'
-      }]
-    }
 
     if(!( (/^[a-z][a-z]+\s[a-z][a-z]+$/.test(fullname.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(fullname.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(fullname.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(fullname.trim())) )  ){
      

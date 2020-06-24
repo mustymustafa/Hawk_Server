@@ -12,6 +12,7 @@ import Schema from '../schema/schema';
 import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
+import { create } from 'domain';
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -20,6 +21,18 @@ var transporter = nodemailer.createTransport({
          pass: process.env.PASS
      }
  });
+
+
+ function addMonths(date: any, months: any) {
+   console.log(date)
+  const d = date.getDate();
+  date.setMonth(date.getMonth() + +months);
+  if (date.getDate() != d) {
+    date.setDate(0);
+  }
+  console.log(date)
+  return date;
+}
 
 class ArtisanController {
 
@@ -78,6 +91,8 @@ class ArtisanController {
     }
   }
 
+ 
+
   //continue signup
   static async continueSignup (request: Request, response: Response) {
       
@@ -91,12 +106,22 @@ email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, 
     if (foundUser && Object.keys(foundUser).length > 0) {
         console.log(foundUser);
         try {
-            await Schema.Artisan().updateOne({
+          const dt = new Date();
+          const createdAt = dt.toLocaleDateString();
+    
+          const expire =  addMonths(new Date(), 1).toLocaleDateString();
+    
+          console.log(createdAt)
+        
+          console.log(expire)
+    
+
+  await Schema.Artisan().updateOne({
               _id: foundUser._id
             }, {
               $set: {
                 bio: bio,
-                wage: wage,
+              //  wage: wage,
                 category: category,
                 id_expiry: id_expiry,
                 vl_expiry: vl_expiry,
@@ -104,7 +129,10 @@ email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, 
                 vmodel: vmodel,
                 plate: plate,
                 sname: sname,
-                sphone: sphone
+                sphone: sphone,
+                active: true,
+                createdAt: createdAt,
+                expireAt: expire
               }
             });
     
@@ -123,6 +151,8 @@ email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, 
 
 
     }
+
+
 
     //update profile
     static async updateArtisan (request: Request, response: Response) {
