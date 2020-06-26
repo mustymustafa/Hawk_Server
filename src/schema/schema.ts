@@ -61,8 +61,8 @@ class Schema {
             pushToken: String,
             isConfirmed: Boolean,
             isActivated: Boolean,
-            createdAt: Number,
-            expireAt: Number,
+            createdAt: String,
+            expireAt: String,
             active: {type: Boolean, default: false}
              
 
