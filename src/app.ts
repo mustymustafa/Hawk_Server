@@ -6,8 +6,12 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import http from 'http';
 
+import cron from 'node-cron';
 
 import seedUser, {seedArtisan} from './schema/seed';
+
+import Schema from './schema/schema';
+
 import Middleware from './middleware/Middleware';
 import UserController from './controllers/UserController'
 import ArtisanController from './controllers/ArtisanController'
@@ -155,6 +159,13 @@ app.post('/api/v1/job/:uid/rate', JobController.rateArtisan);
 
 
 
+//check for unfinished registration and delete
+cron.schedule("00 00 * * *", function() {
+  console.log("registration deletion after a day");
+//find accounts
+ Schema.Artisan().deleteMany({isConfirmed: false})
+
+});
 
 
 
@@ -170,5 +181,3 @@ server.listen(port, ()=> {
 });
 
 
-//seedUser();
-//seedArtisan();

@@ -32,33 +32,70 @@ app.post('/api/v1/confirmation', UserController_1.default.confirm);
 app.post('/api/v1/resend-otp', UserController_1.default.resendOtp);
 app.post('/api/v1/forgot-password', UserController_1.default.forgotPassword);
 app.post('/api/v1/change-password', UserController_1.default.changePassword);
+app.post('/api/v1/:uid/history', JobController_1.default.getHistory);
 app.post('/api/v1/image', util_1.upload.single('image'), ArtisanController_1.default.uploadimage);
 app.post('/api/v1/dp', util_1.upload.single('image'), ArtisanController_1.default.uploadDp);
+//certificate
+app.post('/api/v1/cert', util_1.upload.single('image'), ArtisanController_1.default.uploadCert);
+//set images
 app.post('/api/v1/setid', ArtisanController_1.default.setId);
 app.post('/api/v1/setdp', ArtisanController_1.default.setDp);
+app.post('/api/v1/setcert', ArtisanController_1.default.setCert);
+//vehicle papers start
+app.post('/api/v1/vl', util_1.upload.single('image'), ArtisanController_1.default.uploadVl);
+app.post('/api/v1/insurance', util_1.upload.single('image'), ArtisanController_1.default.uploadIns);
+app.post('/api/v1/poo', util_1.upload.single('image'), ArtisanController_1.default.uploadPoo);
+app.post('/api/v1/vir', util_1.upload.single('image'), ArtisanController_1.default.uploadVir);
+app.post('/api/v1/vpic', util_1.upload.single('image'), ArtisanController_1.default.uploadVpic);
+//set vehicle papers
+app.post('/api/v1/setvl', ArtisanController_1.default.setVl);
+app.post('/api/v1/setinsurance', ArtisanController_1.default.setIns);
+app.post('/api/v1/setpoo', ArtisanController_1.default.setPoo);
+app.post('/api/v1/setvir', ArtisanController_1.default.setVir);
+app.post('/api/v1/setvpic', ArtisanController_1.default.setVpic);
+//end
+//set id card expiry
+app.post('/api/v1/idexpiry', ArtisanController_1.default.idExpiry);
+//set vehicle details
+app.post('/api/v1/vehicledetails', ArtisanController_1.default.vehicleDetails);
 app.get('/api/v1/user/:uid', UserController_1.default.userDetails);
+//get drivers
+app.get('/api/v1/drivers', ArtisanController_1.default.getDrivers);
 //push notification
 app.post('/api/v1/token/:uid', UserController_1.default.savePushToken);
 app.post('/api/v1/jobrequest', JobController_1.default.createJob);
+app.post('/api/v1/driverrequest', JobController_1.default.driverRequest);
+app.post('/api/v1/logrequest', JobController_1.default.logRequest);
 //Artisan controller
 app.post('/api/v1/signup-artisan', Middleware_1.default.signupMiddleware, ArtisanController_1.default.signup);
 app.post('/api/v1/continue-signup-artisan', ArtisanController_1.default.continueSignup);
 app.post('/api/v1/signin-artisan', Middleware_1.default.signinMiddleware, ArtisanController_1.default.signin);
+app.post('/api/v1/:uid/update', ArtisanController_1.default.updateArtisan);
 app.post('/api/v1/confirmation-artisan', ArtisanController_1.default.confirm);
 app.post('/api/v1/send-otp', ArtisanController_1.default.sendOtp);
 app.post('/api/v1/forgot-password-artisan', ArtisanController_1.default.forgotPassword);
 app.post('/api/v1/change-password-artisan', ArtisanController_1.default.changePassword);
 app.get('/api/v1/artisan/:uid', ArtisanController_1.default.userDetails);
+app.post('/api/v1/artisan/:uid/activate', ArtisanController_1.default.activateAccount);
+app.post('/api/v1/artisan/:uid/loc', ArtisanController_1.default.artisanLoc);
 app.post('/api/v1/location/:uid', ArtisanController_1.default.storeLocation);
+app.post('/api/v1/movinglocation/:uid', ArtisanController_1.default.updateLocation);
 //push notification
 app.post('/api/v1/aToken/:uid', ArtisanController_1.default.savePushToken);
 //jobs 
 app.post('/api/v1/jobs', JobController_1.default.displayJobs);
 app.post('/api/v1/job/:job_id/accept', JobController_1.default.acceptJob);
+app.post('/api/v1/job/:job_id/start', JobController_1.default.startJob);
+app.post('/api/v1/job/:job_id/arrive', JobController_1.default.driverArrived);
+app.post('/api/v1/job/:job_id/accepttaxi', JobController_1.default.acceptTaxi);
+app.post('/api/v1/job/:job_id/show', JobController_1.default.showJob);
 app.post('/api/v1/job/:job_id/cancel', JobController_1.default.cancelJob);
+app.post('/api/v1/job/:job_id/delete', JobController_1.default.deleteJob);
+app.post('/api/v1/job/:job_id/cancel-artisan', JobController_1.default.cancelArtisan);
 app.post('/api/v1/job/:job_id/complete', JobController_1.default.completeJob);
 app.post('/api/v1/:uid/jobs', JobController_1.default.artisanJobs);
 app.post('/api/v1/:uid/job/artisan', JobController_1.default.getArtisan);
+app.post('/api/v1/:uid/job/artisan/start', JobController_1.default.startedJob);
 app.post('/api/v1/job/:uid/lastjob', JobController_1.default.checkRating);
 app.post('/api/v1/job/:uid/rate', JobController_1.default.rateArtisan);
 //server

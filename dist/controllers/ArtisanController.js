@@ -26,6 +26,16 @@ var transporter = nodemailer_1.default.createTransport({
         pass: process.env.PASS
     }
 });
+function addMonths(date, months) {
+    console.log(date);
+    const d = date.getDate();
+    date.setMonth(date.getMonth() + +months);
+    if (date.getDate() != d) {
+        date.setDate(0);
+    }
+    console.log(date);
+    return date;
+}
 class ArtisanController {
     // sign up
     static signup(request, response) {
@@ -74,19 +84,33 @@ class ArtisanController {
     //continue signup
     static continueSignup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, bio, wage, category, } = request.body;
+            const { email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone } = request.body;
             console.log(request.body);
             const foundUser = yield schema_1.default.Artisan().findOne({ email });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 console.log(foundUser);
                 try {
+                    const dt = new Date();
+                    const createdAt = dt.toLocaleDateString();
+                    const expire = addMonths(new Date(), 1).toLocaleDateString();
+                    console.log(createdAt);
+                    console.log(expire);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
                         $set: {
                             bio: bio,
-                            wage: wage,
-                            category: category
+                            //  wage: wage,
+                            category: category,
+                            id_expiry: id_expiry,
+                            vl_expiry: vl_expiry,
+                            vcolor: vcolor,
+                            vmodel: vmodel,
+                            plate: plate,
+                            sname: sname,
+                            sphone: sphone,
+                            createdAt: createdAt,
+                            expireAt: expire
                         }
                     });
                     return response.status(200).send({
@@ -103,6 +127,60 @@ class ArtisanController {
             }
         });
     }
+    //update profile
+    static updateArtisan(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid, bio, wage, phone, name } = request.body;
+            console.log(request.body);
+            const foundUser = yield schema_1.default.Artisan().findOne({ _id: uid });
+            if (foundUser && Object.keys(foundUser).length > 0) {
+                console.log(foundUser);
+                if (!bio) {
+                    return response.status(409).send({
+                        message: 'Please enter a bio',
+                    });
+                }
+                if (!((/^[a-z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())))) {
+                    return response.status(409).send({
+                        message: 'Please enter a valid name',
+                    });
+                }
+                if (!wage) {
+                    return response.status(409).send({
+                        message: 'Please enter a wage',
+                    });
+                }
+                if (!phone || phone.length < 11 || phone.length > 11) {
+                    return response.status(409).send({
+                        message: 'Please enter a valid phone',
+                    });
+                }
+                try {
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: uid
+                    }, {
+                        $set: {
+                            bio: bio,
+                            wage: wage,
+                            phone: phone,
+                            name: name
+                        }
+                    });
+                    return response.status(200).send({
+                        message: 'User updated successfully',
+                        status: 201
+                    });
+                }
+                catch (error) {
+                    console.log(error.toString());
+                    response.status(500).send({
+                        message: 'something went wrong'
+                    });
+                }
+            }
+        });
+    }
+    //update artisan location
     //upload images
     static uploadimage(req, res) {
         const parts = req.file.originalname.split(' ');
@@ -111,6 +189,42 @@ class ArtisanController {
         res.json(req.file);
     }
     static uploadDp(req, res) {
+        const parts = req.file.originalname.split(' ');
+        const find = parts[0];
+        console.log(find);
+        res.json(req.file);
+    }
+    static uploadVl(req, res) {
+        const parts = req.file.originalname.split(' ');
+        const find = parts[0];
+        console.log(find);
+        res.json(req.file);
+    }
+    static uploadIns(req, res) {
+        const parts = req.file.originalname.split(' ');
+        const find = parts[0];
+        console.log(find);
+        res.json(req.file);
+    }
+    static uploadPoo(req, res) {
+        const parts = req.file.originalname.split(' ');
+        const find = parts[0];
+        console.log(find);
+        res.json(req.file);
+    }
+    static uploadVir(req, res) {
+        const parts = req.file.originalname.split(' ');
+        const find = parts[0];
+        console.log(find);
+        res.json(req.file);
+    }
+    static uploadVpic(req, res) {
+        const parts = req.file.originalname.split(' ');
+        const find = parts[0];
+        console.log(find);
+        res.json(req.file);
+    }
+    static uploadCert(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
         console.log(find);
@@ -172,6 +286,246 @@ class ArtisanController {
                 res.status(500).send({
                     message: 'something went wrong'
                 });
+            }
+        });
+    }
+    static setCert(request, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(request.body);
+            try {
+                const email = request.body.email;
+                const image = request.body.image;
+                console.log(email);
+                console.log(image);
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
+                if (foundUser && Object.keys(foundUser).length > 0) {
+                    console.log(foundUser);
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            cert: image
+                        }
+                    });
+                    return res.status(200).send("image set");
+                }
+            }
+            catch (error) {
+                console.log(error.toString());
+                res.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    static setVl(request, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(request.body);
+            try {
+                const email = request.body.email;
+                const image = request.body.image;
+                console.log(email);
+                console.log(image);
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
+                if (foundUser && Object.keys(foundUser).length > 0) {
+                    console.log(foundUser);
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            vl: image
+                        }
+                    });
+                    return res.status(200).send("image set");
+                }
+            }
+            catch (error) {
+                console.log(error.toString());
+                res.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    static setIns(request, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(request.body);
+            try {
+                const email = request.body.email;
+                const image = request.body.image;
+                console.log(email);
+                console.log(image);
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
+                if (foundUser && Object.keys(foundUser).length > 0) {
+                    console.log(foundUser);
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            insurance: image
+                        }
+                    });
+                    return res.status(200).send("image set");
+                }
+            }
+            catch (error) {
+                console.log(error.toString());
+                res.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    static setPoo(request, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(request.body);
+            try {
+                const email = request.body.email;
+                const image = request.body.image;
+                console.log(email);
+                console.log(image);
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
+                if (foundUser && Object.keys(foundUser).length > 0) {
+                    console.log(foundUser);
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            poo: image
+                        }
+                    });
+                    return res.status(200).send("image set");
+                }
+            }
+            catch (error) {
+                console.log(error.toString());
+                res.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    static setVir(request, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(request.body);
+            try {
+                const email = request.body.email;
+                const image = request.body.image;
+                console.log(email);
+                console.log(image);
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
+                if (foundUser && Object.keys(foundUser).length > 0) {
+                    console.log(foundUser);
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            vir: image
+                        }
+                    });
+                    return res.status(200).send("image set");
+                }
+            }
+            catch (error) {
+                console.log(error.toString());
+                res.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    static setVpic(request, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(request.body);
+            try {
+                const email = request.body.email;
+                const image = request.body.image;
+                console.log(email);
+                console.log(image);
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
+                if (foundUser && Object.keys(foundUser).length > 0) {
+                    console.log(foundUser);
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            vpic: image
+                        }
+                    });
+                    return res.status(200).send("image set");
+                }
+            }
+            catch (error) {
+                console.log(error.toString());
+                res.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    //set id_expiry
+    static idExpiry(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, id_expiry, } = request.body;
+            console.log(request.body);
+            const foundUser = yield schema_1.default.Artisan().findOne({ email });
+            if (foundUser && Object.keys(foundUser).length > 0) {
+                console.log(foundUser);
+                try {
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            id_expiry: id_expiry,
+                        }
+                    });
+                    return response.status(200).send({
+                        message: 'User updated successfully',
+                        status: 201
+                    });
+                }
+                catch (error) {
+                    console.log(error.toString());
+                    response.status(500).send({
+                        message: 'something went wrong'
+                    });
+                }
+            }
+        });
+    }
+    //set vehicle details
+    //continue signup
+    static vehicleDetails(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, vl_expiry, vcolor, vmodel, plate, sname, sphone } = request.body;
+            console.log(request.body);
+            const foundUser = yield schema_1.default.Artisan().findOne({ email });
+            if (foundUser && Object.keys(foundUser).length > 0) {
+                console.log(foundUser);
+                try {
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            vl_expiry: vl_expiry,
+                            vcolor: vcolor,
+                            vmodel: vmodel,
+                            plate: plate,
+                            sname: sname,
+                            sphone: sphone
+                        }
+                    });
+                    return response.status(200).send({
+                        message: 'User updated successfully',
+                        status: 201
+                    });
+                }
+                catch (error) {
+                    console.log(error.toString());
+                    response.status(500).send({
+                        message: 'something went wrong'
+                    });
+                }
             }
         });
     }
@@ -374,6 +728,7 @@ class ArtisanController {
                     }, {
                         $set: {
                             isConfirmed: true,
+                            active: true
                         }
                     });
                     foundUser.isConfirmed = true;
@@ -425,6 +780,18 @@ class ArtisanController {
                     }
                     var rate = Math.round(total / getRating.length);
                     console.log("rating:" + rate);
+                    const now = new Date().toLocaleDateString();
+                    //deactivate account if expired
+                    console.log("now" + now);
+                    console.log('expire' + user.expireAt);
+                    if (now === user.expireAt) {
+                        console.log('expired');
+                        yield schema_1.default.Artisan().updateOne({ _id: uid }, {
+                            $set: {
+                                active: false
+                            }
+                        });
+                    }
                     response.status(200).send({
                         user,
                         rating: rate
@@ -442,6 +809,35 @@ class ArtisanController {
                 return response.status(500).send({
                     message: 'Something went wrong'
                 });
+            }
+        });
+    }
+    //update status on payment
+    static activateAccount(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.params;
+            const expire = addMonths(new Date(), 1).toLocaleDateString();
+            try {
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                if (user) {
+                    yield schema_1.default.Artisan().updateOne({ _id: uid }, {
+                        $set: {
+                            active: true,
+                            expireAt: expire
+                        }
+                    });
+                    response.status(200).send({
+                        message: 'Account Activated!'
+                    });
+                }
+                else {
+                    response.status(404).send({
+                        message: 'Cannot find details for this user'
+                    });
+                }
+            }
+            catch (error) {
+                response.status(404).send({ error: 'could not complete your request at the moment' });
             }
         });
     }
@@ -473,6 +869,89 @@ class ArtisanController {
             }
             catch (error) {
                 console.log(error.toString(), "========");
+                return response.status(500).send({
+                    message: 'Something went wrong'
+                });
+            }
+        });
+    }
+    //update lat and long while moving
+    static updateLocation(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { lat, long } = request.body;
+            const { uid } = request.params;
+            const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+            if (!user) {
+                return response.status(404).send({
+                    message: 'User does not exist'
+                });
+            }
+            try {
+                yield schema_1.default.Artisan()
+                    .updateOne({
+                    _id: uid,
+                }, {
+                    $set: {
+                        lat: lat,
+                        long: long
+                    }
+                });
+                return response.status(200).send("location saved");
+            }
+            catch (error) {
+                console.log(error.toString(), "========");
+                return response.status(500).send({
+                    message: 'Something went wrong'
+                });
+            }
+        });
+    }
+    //get artisan  lat and long
+    static artisanLoc(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.params;
+            //console.log("uid" + uid)
+            try {
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                //console.log(user)
+                if (user) {
+                    response.status(200).send({
+                        lat: user.lat,
+                        long: user.long
+                    });
+                    // console.log(user)
+                }
+                else {
+                    response.status(404).send({
+                        message: 'Cannot find details for this user'
+                    });
+                    console.log("not found");
+                }
+            }
+            catch (error) {
+                return response.status(500).send({
+                    message: 'Something went wrong'
+                });
+            }
+        });
+    }
+    //get all drivers
+    static getDrivers(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield schema_1.default.Artisan().find({ category: 'driver' });
+                if (user) {
+                    console.log(user);
+                    return response.status(200).send({ user });
+                }
+                else {
+                    response.status(404).send({
+                        message: 'Cannot find details for this user'
+                    });
+                    console.log("not found");
+                }
+            }
+            catch (error) {
                 return response.status(500).send({
                     message: 'Something went wrong'
                 });
