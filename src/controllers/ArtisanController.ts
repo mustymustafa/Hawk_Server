@@ -1015,6 +1015,18 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
     var rate = Math.round(total / getRating.length);
     console.log("rating:" + rate)
 
+    const now = new Date().toLocaleDateString();
+    //deactivate account if expired
+    if( now === user.expiredAt){
+      Schema.Artisan().updateOne({_id: uid},
+       {
+         $set: {
+           active: false
+         }
+       }
+          
+        )
+    }
         response.status(200).send({
           user,
           rating: rate
@@ -1033,6 +1045,41 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
     }
   }
 
+  //update status on payment
+  static async activateAccount(request: Request, response: Response){
+    const {uid} = request.params
+    const expire =  addMonths(new Date(), 1).toLocaleDateString();
+    
+
+    try{
+      const user =  await Schema.Artisan().findOne({_id: uid})
+      if(user){
+
+        Schema.Artisan().updateOne({_id: uid},
+          {
+            $set: {
+              active: true,
+              expireAt: expire
+            }
+          }
+             
+           )
+
+           response.status(200).send({
+             message: 'Account Activated!'
+           })
+
+      } else {
+        response.status(404).send({
+          message: 'Cannot find details for this user'
+        });
+      }
+
+    } catch(error){
+      response.status(404).send({message: 'could not complete your request at the moment' })
+    }
+
+  }
 
   //location
   static async storeLocation(request: Request, response: Response){

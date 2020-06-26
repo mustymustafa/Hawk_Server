@@ -114,6 +114,8 @@ app.post('/api/v1/send-otp', ArtisanController.sendOtp);
 app.post('/api/v1/forgot-password-artisan', ArtisanController.forgotPassword);
 app.post('/api/v1/change-password-artisan', ArtisanController.changePassword);
 app.get('/api/v1/artisan/:uid', ArtisanController.userDetails);
+app.post('/api/v1/artisan/:uid/activate', ArtisanController.activateAccount);
+
 
 app.post('/api/v1/artisan/:uid/loc', ArtisanController.artisanLoc);
 
