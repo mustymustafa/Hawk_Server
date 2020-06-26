@@ -130,7 +130,6 @@ email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, 
                 plate: plate,
                 sname: sname,
                 sphone: sphone,
-                active: true,
                 createdAt: createdAt,
                 expireAt: expire
               }
@@ -950,6 +949,7 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
         }, {
           $set: {
             isConfirmed: true,
+            active: true
           }
         });
 
@@ -1017,8 +1017,11 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
 
     const now = new Date().toLocaleDateString();
     //deactivate account if expired
-    if( now === user.expiredAt){
-      Schema.Artisan().updateOne({_id: uid},
+     console.log("now" + now)
+     console.log('expire' + user.expireAt )
+    if( now === user.expireAt){
+      console.log('expired')
+     await Schema.Artisan().updateOne({_id: uid},
        {
          $set: {
            active: false
@@ -1027,10 +1030,10 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
           
         )
     }
-        response.status(200).send({
-          user,
-          rating: rate
-        });
+    response.status(200).send({
+      user,
+      rating: rate
+    });
        // console.log(user)
       } else {
         response.status(404).send({
@@ -1055,7 +1058,7 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
       const user =  await Schema.Artisan().findOne({_id: uid})
       if(user){
 
-        Schema.Artisan().updateOne({_id: uid},
+       await Schema.Artisan().updateOne({_id: uid},
           {
             $set: {
               active: true,
@@ -1076,7 +1079,7 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
       }
 
     } catch(error){
-      response.status(404).send({message: 'could not complete your request at the moment' })
+      response.status(404).send({error: 'could not complete your request at the moment' })
     }
 
   }
