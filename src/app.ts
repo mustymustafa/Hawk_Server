@@ -160,14 +160,24 @@ app.post('/api/v1/job/:uid/rate', JobController.rateArtisan);
 
 
 //check for unfinished registration and delete
-cron.schedule("00 00 * * *", function() {
+const task = cron.schedule("59 23 * * *", async () => {
   console.log("registration deletion after a day");
 //find accounts
- Schema.Artisan().deleteMany({isConfirmed: false})
+const accounts = await Schema.Artisan().find({isConfirmed: false})
+console.log(accounts);
+if(accounts.length > 1){
+  const delete_account = await Schema.Artisan().deleteMany({isConfirmed: false})
+}
+else {
+  console.log('no accounts found')
+}
 
-});
 
+},
+{scheduled: true}
+);
 
+task.start();
 
 
 
