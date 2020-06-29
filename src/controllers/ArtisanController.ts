@@ -43,7 +43,7 @@ class ArtisanController {
       fullname, email, password, phone, cpassword
     } = request.body;
 
-    console.log(request.body);
+    console.log(phone);
 
     try {
       const foundEmail = await Schema.Artisan().find({email: email.trim()});

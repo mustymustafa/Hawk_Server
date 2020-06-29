@@ -7,7 +7,7 @@ export default class MiddleWare {
     let { email, password, fullname, cpassword, phone, bio, category, wage } = req.body;
 
     email = email.trim();
-    phone=phone.trim();
+    phone=phone
     password = password.trim();
     fullname = fullname.trim();
     //bio = bio.trim();
@@ -32,7 +32,7 @@ export default class MiddleWare {
       }]
     }
 
-    if (!phone || phone.length < 11 || phone.length > 11) {
+    if (!phone) {
        
       errors = [...errors, {
         phone: 'incorrect phone number entered'
