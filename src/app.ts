@@ -115,6 +115,12 @@ app.post('/api/v1/:uid/update',  ArtisanController.updateArtisan);
 
 app.post('/api/v1/confirmation-artisan', ArtisanController.confirm);
 app.post('/api/v1/send-otp', ArtisanController.sendOtp);
+
+app.post('/api/v1/resend-otp', UserController.resendOtp);
+//app.post('/api/v1/resend-otp', UserController.resendOtp);
+
+
+
 app.post('/api/v1/forgot-password-artisan', ArtisanController.forgotPassword);
 app.post('/api/v1/change-password-artisan', ArtisanController.changePassword);
 app.get('/api/v1/artisan/:uid', ArtisanController.userDetails);

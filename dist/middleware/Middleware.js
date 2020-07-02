@@ -9,7 +9,7 @@ class MiddleWare {
     static signupMiddleware(req, res, next) {
         let { email, password, fullname, cpassword, phone, bio, category, wage } = req.body;
         email = email.trim();
-        phone = phone.trim();
+        phone = phone;
         password = password.trim();
         fullname = fullname.trim();
         //bio = bio.trim();
@@ -26,7 +26,7 @@ class MiddleWare {
                     password: 'Password is too short'
                 }];
         }
-        if (!phone || phone.length < 11 || phone.length > 11) {
+        if (!phone) {
             errors = [...errors, {
                     phone: 'incorrect phone number entered'
                 }];

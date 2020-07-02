@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,6 +20,8 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const http_1 = __importDefault(require("http"));
+const node_cron_1 = __importDefault(require("node-cron"));
+const schema_1 = __importDefault(require("./schema/schema"));
 const Middleware_1 = __importDefault(require("./middleware/Middleware"));
 const UserController_1 = __importDefault(require("./controllers/UserController"));
 const ArtisanController_1 = __importDefault(require("./controllers/ArtisanController"));
@@ -98,6 +109,20 @@ app.post('/api/v1/:uid/job/artisan', JobController_1.default.getArtisan);
 app.post('/api/v1/:uid/job/artisan/start', JobController_1.default.startedJob);
 app.post('/api/v1/job/:uid/lastjob', JobController_1.default.checkRating);
 app.post('/api/v1/job/:uid/rate', JobController_1.default.rateArtisan);
+//check for unfinished registration and delete
+const task = node_cron_1.default.schedule("59 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("registration deletion after a day");
+    //find accounts
+    const accounts = yield schema_1.default.Artisan().find({ isConfirmed: false });
+    console.log(accounts);
+    if (accounts.length > 1) {
+        const delete_account = yield schema_1.default.Artisan().deleteMany({ isConfirmed: false });
+    }
+    else {
+        console.log('no accounts found');
+    }
+}), { scheduled: true });
+task.start();
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
 app.set('port', port);
@@ -105,5 +130,3 @@ const server = http_1.default.createServer(app);
 server.listen(port, () => {
     console.log("server running.....");
 });
-//seedUser();
-//seedArtisan();

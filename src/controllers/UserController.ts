@@ -2,6 +2,10 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from "express";
 
+import twilio from 'twilio';
+const accountSid = process.env.TWILIO_SID; 
+const authToken = process.env.TWILIO_AUTH_TOKEN; 
+const client = twilio(accountSid, authToken); 
 
 
 import Schema from '../schema/schema';
@@ -12,6 +16,7 @@ import { Expo } from "expo-server-sdk";
 
 const expo = new Expo();
 
+/** 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -19,7 +24,7 @@ var transporter = nodemailer.createTransport({
          pass: process.env.PASS
      }
  });
-
+*/
 class UserController {
 
 
@@ -57,7 +62,14 @@ class UserController {
   
       const confirmationCode = String(Date.now()).slice(9, 13);
       const message = `Verification code: ${confirmationCode}`
-      UserController.sendMail(email.trim(), message)
+      //UserController.sendMail(email.trim(), message)
+      client.messages 
+      .create({ 
+         body: message, 
+         from: '+17076402854',       
+         to: phone 
+       }) 
+      .then(response => console.log(response.sid)) 
       
       await Schema.User().create({
         name: fullname.trim(),
@@ -83,21 +95,29 @@ class UserController {
   //send otp
   static async resendOtp(request: Request, response: Response) {
     const {
-      email
+      phone
     } = request.body;
+    console.log(phone)
 
     const confirmationCode = String(Date.now()).slice(9, 13);
     try {
       await Schema.User()
         .updateOne({
-          email,
+          phone,
         }, {
         $set: {
           confirmationCode
         }
       });
       const message = `Token: ${confirmationCode}`;
-      UserController.sendMail(email, message, 'Registration');
+      //UserController.sendMail(email, message, 'Registration');
+      client.messages 
+      .create({ 
+         body: message, 
+         from: '+17076402854',       
+         to: phone 
+       }) 
+      .then(response => console.log(response.sid)) 
       response.status(200).send({
         message: 'Please check your email for token'
       });
@@ -138,7 +158,14 @@ class UserController {
         }
       });
       const message = `Token: ${confirmationCode}`;
-      UserController.sendMail(user.email, message, 'Password change');
+     // UserController.sendMail(user.email, message, 'Password change');
+     client.messages 
+     .create({ 
+        body: message, 
+        from: '+17076402854',       
+        to: user.phone 
+      }) 
+     .then(response => console.log(response.sid)) 
       response.status(200).send({
         message: 'Please check your email for token'
       });
@@ -199,6 +226,7 @@ class UserController {
     }
   }
 
+/** 
   static sendMail (email: string, message: string, subject = 'Registration') {
     try{
  
@@ -220,7 +248,7 @@ class UserController {
       console.log(error.toString());
     }
   }
-
+*/
 
   
 

@@ -41,7 +41,7 @@ class ArtisanController {
     static signup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fullname, email, password, phone, cpassword } = request.body;
-            console.log(request.body);
+            console.log(phone);
             try {
                 const foundEmail = yield schema_1.default.Artisan().find({ email: email.trim() });
                 if (foundEmail && foundEmail.length > 0) {
