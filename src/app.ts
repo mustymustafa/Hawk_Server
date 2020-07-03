@@ -42,7 +42,7 @@ app.use(cookieParser());
 //routes
 
 app.post('/api/v1/signup', Middleware.signupMiddleware, UserController.signup);
-app.post('/api/v1/signin', Middleware.signinMiddleware, UserController.signin);
+app.post('/api/v1/signin', Middleware.signinPhoneMiddleware, UserController.signin);
 app.post('/api/v1/confirmation', UserController.confirm);
 app.post('/api/v1/resend-otp', UserController.resendOtp);
 app.post('/api/v1/forgot-password', UserController.forgotPassword);
@@ -110,7 +110,7 @@ app.post('/api/v1/logrequest', JobController.logRequest);
 app.post('/api/v1/signup-artisan', Middleware.signupMiddleware, ArtisanController.signup);
 app.post('/api/v1/continue-signup-artisan', ArtisanController.continueSignup);
 
-app.post('/api/v1/signin-artisan', Middleware.signinMiddleware, ArtisanController.signin);
+app.post('/api/v1/signin-artisan', Middleware.signinPhoneMiddleware, ArtisanController.signin);
 app.post('/api/v1/:uid/update',  ArtisanController.updateArtisan);
 
 app.post('/api/v1/confirmation-artisan', ArtisanController.confirm);

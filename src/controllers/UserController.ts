@@ -119,7 +119,7 @@ class UserController {
        }) 
       .then(response => console.log(response.sid)) 
       response.status(200).send({
-        message: 'Please check your email for token'
+        message: 'Please check your phone for token'
       });
       return;
     } catch (error) {
@@ -258,10 +258,11 @@ class UserController {
 //sign in
   static async signin (request: Request, response: Response) {
     const {
-      email, password
+      phone, password
     } = request.body;
+    console.log(phone)
 
-    const foundUser:any = await Schema.User().findOne({email: email.trim()});
+    const foundUser:any = await Schema.User().findOne({phone: phone.trim()});
 
     if (foundUser && Object.keys(foundUser).length > 0) {
       if (!bcrypt.compareSync(password, foundUser.password)) {

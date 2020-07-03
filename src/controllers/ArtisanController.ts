@@ -2,6 +2,11 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from "express";
 
+import twilio from 'twilio';
+const accountSid = process.env.TWILIO_SID; 
+const authToken = process.env.TWILIO_AUTH_TOKEN; 
+const client = twilio(accountSid, authToken); 
+
 import { Expo } from "expo-server-sdk";
 
 const expo = new Expo();
@@ -14,6 +19,7 @@ import Validator from '../validator/Validator';
 import nodemailer from "nodemailer";
 import { create } from 'domain';
 
+/** 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -21,7 +27,7 @@ var transporter = nodemailer.createTransport({
          pass: process.env.PASS
      }
  });
-
+*/
 
  function addMonths(date: any, months: any) {
    console.log(date)
@@ -676,7 +682,7 @@ static async setId( request: Request, res: Response) {
    static async vehicleDetails (request: Request, response: Response) {
       
     const {
-email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
+email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone
     } = request.body;
 
     console.log(request.body);
@@ -735,23 +741,30 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
   //send otp
   static async sendOtp(request: Request, response: Response) {
     const {
-      email
+      phone
     } = request.body;
 
     const confirmationCode = String(Date.now()).slice(9, 13);
     try {
       await Schema.Artisan()
         .updateOne({
-          email,
+          phone,
         }, {
         $set: {
           confirmationCode
         }
       });
       const message = `Token: ${confirmationCode}`;
-     ArtisanController.sendMail(email, message, 'Registration');
-      response.status(200).send({
-        message: 'Please check your email for token'
+     //ArtisanController.sendMail(email, message, 'Registration');
+     client.messages 
+     .create({ 
+        body: message, 
+        from: '+17076402854',       
+        to: phone 
+      }) 
+     .then(response => console.log(response.sid))  
+     response.status(200).send({
+        message: 'Please check your phone for token'
       });
       return;
     } catch (error) {
@@ -790,9 +803,16 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
         }
       });
       const message = `Token: ${confirmationCode}`;
-     ArtisanController.sendMail(user.email, message, 'Password change');
-      response.status(200).send({
-        message: 'Please check your email for token'
+     //ArtisanController.sendMail(user.email, message, 'Password change');
+     client.messages 
+     .create({ 
+        body: message, 
+        from: '+17076402854',       
+        to: user.phone 
+      }) 
+     .then(response => console.log(response.sid))  
+     response.status(200).send({
+        message: 'Please check your phone for token'
       });
       return;
     } catch (error) {
@@ -851,6 +871,7 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
     }
   }
 
+  /** 
   static sendMail (email: string, message: string, subject = 'Registration') {
     try{
  
@@ -873,7 +894,7 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
     }
   }
 
-
+*/
   
 
 
@@ -882,10 +903,10 @@ email,  vl_expiry, vcolor, vmodel, plate, sname, sphone
 //sign in
   static async signin (request: Request, response: Response) {
     const {
-      email, password
+      phone, password
     } = request.body;
-
-    const foundUser:any = await Schema.Artisan().findOne({email: email.trim()});
+    console.log(phone)
+    const foundUser:any = await Schema.Artisan().findOne({phone: phone.trim()});
 
     if (foundUser && Object.keys(foundUser).length > 0) {
       if (!bcrypt.compareSync(password, foundUser.password)) {
