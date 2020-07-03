@@ -14,18 +14,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const twilio_1 = __importDefault(require("twilio"));
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio_1.default(accountSid, authToken, {
+    lazyLoading: true
+});
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
 const schema_1 = __importDefault(require("../schema/schema"));
 const Validator_1 = __importDefault(require("../validator/Validator"));
-const nodemailer_1 = __importDefault(require("nodemailer"));
-var transporter = nodemailer_1.default.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'musty.mohammed1998@gmail.com',
-        pass: process.env.PASS
-    }
-});
+/**
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+         user: 'musty.mohammed1998@gmail.com',
+         pass: process.env.PASS
+     }
+ });
+*/
 function addMonths(date, months) {
     console.log(date);
     const d = date.getDate();
@@ -43,7 +50,7 @@ class ArtisanController {
             const { fullname, email, password, phone, cpassword } = request.body;
             console.log(phone);
             try {
-                const foundEmail = yield schema_1.default.Artisan().find({ email: email.trim() });
+                const foundEmail = yield schema_1.default.Artisan().find({ phone: phone.trim() });
                 if (foundEmail && foundEmail.length > 0) {
                     console.log(foundEmail[0]);
                     return response.status(409).send({
@@ -497,7 +504,7 @@ class ArtisanController {
     //continue signup
     static vehicleDetails(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, vl_expiry, vcolor, vmodel, plate, sname, sphone } = request.body;
+            const { email, phone, vl_expiry, vcolor, vmodel, plate, sname, sphone } = request.body;
             console.log(request.body);
             const foundUser = yield schema_1.default.Artisan().findOne({ email });
             if (foundUser && Object.keys(foundUser).length > 0) {
@@ -532,21 +539,28 @@ class ArtisanController {
     //send otp
     static sendOtp(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email } = request.body;
+            const { phone } = request.body;
             const confirmationCode = String(Date.now()).slice(9, 13);
             try {
                 yield schema_1.default.Artisan()
                     .updateOne({
-                    email,
+                    phone,
                 }, {
                     $set: {
                         confirmationCode
                     }
                 });
                 const message = `Token: ${confirmationCode}`;
-                ArtisanController.sendMail(email, message, 'Registration');
+                //ArtisanController.sendMail(email, message, 'Registration');
+                client.messages
+                    .create({
+                    body: message,
+                    from: '+17076402854',
+                    to: phone
+                })
+                    .then(response => console.log(response.sid));
                 response.status(200).send({
-                    message: 'Please check your email for token'
+                    message: 'Please check your phone for token'
                 });
                 return;
             }
@@ -584,9 +598,16 @@ class ArtisanController {
                     }
                 });
                 const message = `Token: ${confirmationCode}`;
-                ArtisanController.sendMail(user.email, message, 'Password change');
+                //ArtisanController.sendMail(user.email, message, 'Password change');
+                client.messages
+                    .create({
+                    body: message,
+                    from: '+17076402854',
+                    to: user.phone
+                })
+                    .then(response => console.log(response.sid));
                 response.status(200).send({
-                    message: 'Please check your email for token'
+                    message: 'Please check your phone for token'
                 });
                 return;
             }
@@ -644,32 +665,36 @@ class ArtisanController {
             }
         });
     }
-    static sendMail(email, message, subject = 'Registration') {
-        try {
-            const msg = {
-                to: email,
-                from: '"Hawk" <no-reply@thegreenearthcomp.com>',
-                subject,
-                html: `<p> ${message} </p>`
-            };
-            transporter.sendMail(msg, function (error, info) {
-                if (error) {
-                    console.log(error);
-                }
-                else {
-                    console.log('Email sent: ' + info.response);
-                }
-            });
-        }
-        catch (error) {
-            console.log(error.toString());
-        }
+    /**
+    static sendMail (email: string, message: string, subject = 'Registration') {
+      try{
+   
+        const msg = {
+          to: email,
+          from: '"Hawk" <no-reply@thegreenearthcomp.com>',
+          subject,
+          html: `<p> ${message} </p>`
+        };
+        transporter.sendMail(msg, function(error, info){
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+      
+      } catch (error) {
+        console.log(error.toString());
+      }
     }
+  
+  */
     //sign in
     static signin(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, password } = request.body;
-            const foundUser = yield schema_1.default.Artisan().findOne({ email: email.trim() });
+            const { phone, password } = request.body;
+            console.log(phone);
+            const foundUser = yield schema_1.default.Artisan().findOne({ phone: phone.trim() });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
                     return response.status(403).send({

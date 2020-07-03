@@ -38,7 +38,7 @@ app.use(cookie_parser_1.default());
 //app.use(express.static(path.join(__dirname, 'public')));
 //routes
 app.post('/api/v1/signup', Middleware_1.default.signupMiddleware, UserController_1.default.signup);
-app.post('/api/v1/signin', Middleware_1.default.signinMiddleware, UserController_1.default.signin);
+app.post('/api/v1/signin', Middleware_1.default.signinPhoneMiddleware, UserController_1.default.signin);
 app.post('/api/v1/confirmation', UserController_1.default.confirm);
 app.post('/api/v1/resend-otp', UserController_1.default.resendOtp);
 app.post('/api/v1/forgot-password', UserController_1.default.forgotPassword);
@@ -80,10 +80,12 @@ app.post('/api/v1/logrequest', JobController_1.default.logRequest);
 //Artisan controller
 app.post('/api/v1/signup-artisan', Middleware_1.default.signupMiddleware, ArtisanController_1.default.signup);
 app.post('/api/v1/continue-signup-artisan', ArtisanController_1.default.continueSignup);
-app.post('/api/v1/signin-artisan', Middleware_1.default.signinMiddleware, ArtisanController_1.default.signin);
+app.post('/api/v1/signin-artisan', Middleware_1.default.signinPhoneMiddleware, ArtisanController_1.default.signin);
 app.post('/api/v1/:uid/update', ArtisanController_1.default.updateArtisan);
 app.post('/api/v1/confirmation-artisan', ArtisanController_1.default.confirm);
 app.post('/api/v1/send-otp', ArtisanController_1.default.sendOtp);
+app.post('/api/v1/resend-otp', UserController_1.default.resendOtp);
+//app.post('/api/v1/resend-otp', UserController.resendOtp);
 app.post('/api/v1/forgot-password-artisan', ArtisanController_1.default.forgotPassword);
 app.post('/api/v1/change-password-artisan', ArtisanController_1.default.changePassword);
 app.get('/api/v1/artisan/:uid', ArtisanController_1.default.userDetails);

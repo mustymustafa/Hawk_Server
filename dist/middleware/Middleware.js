@@ -87,7 +87,7 @@ class MiddleWare {
         phone = phone.trim();
         password = password.trim();
         let errors = [];
-        if (!phone || phone < 10 || phone > 10) {
+        if (!phone) {
             errors = [...errors, {
                     phone: 'incorrect phone number entered'
                 }];

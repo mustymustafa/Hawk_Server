@@ -14,18 +14,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const twilio_1 = __importDefault(require("twilio"));
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio_1.default(accountSid, authToken, {
+    lazyLoading: true
+});
 const schema_1 = __importDefault(require("../schema/schema"));
 const Validator_1 = __importDefault(require("../validator/Validator"));
-const nodemailer_1 = __importDefault(require("nodemailer"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
-var transporter = nodemailer_1.default.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'musty.mohammed1998@gmail.com',
-        pass: process.env.PASS
-    }
-});
+/**
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+         user: 'musty.mohammed1998@gmail.com',
+         pass: process.env.PASS
+     }
+ });
+*/
 class UserController {
     // sign up
     static signup(request, response) {
@@ -33,7 +40,7 @@ class UserController {
             const { fullname, email, password, phone, cpassword } = request.body;
             console.log(request.body);
             try {
-                const foundEmail = yield schema_1.default.User().find({ email: email.trim() });
+                const foundEmail = yield schema_1.default.User().find({ phone: phone.trim() });
                 if (foundEmail && foundEmail.length > 0) {
                     console.log(foundEmail[0]);
                     return response.status(409).send({
@@ -53,7 +60,14 @@ class UserController {
                 }
                 const confirmationCode = String(Date.now()).slice(9, 13);
                 const message = `Verification code: ${confirmationCode}`;
-                UserController.sendMail(email.trim(), message);
+                //UserController.sendMail(email.trim(), message)
+                client.messages
+                    .create({
+                    body: message,
+                    from: '+17076402854',
+                    to: phone
+                })
+                    .then(response => console.log(response.sid));
                 yield schema_1.default.User().create({
                     name: fullname.trim(),
                     email: email.trim(),
@@ -78,21 +92,29 @@ class UserController {
     //send otp
     static resendOtp(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email } = request.body;
+            const { phone } = request.body;
+            console.log(phone);
             const confirmationCode = String(Date.now()).slice(9, 13);
             try {
                 yield schema_1.default.User()
                     .updateOne({
-                    email,
+                    phone,
                 }, {
                     $set: {
                         confirmationCode
                     }
                 });
                 const message = `Token: ${confirmationCode}`;
-                UserController.sendMail(email, message, 'Registration');
+                //UserController.sendMail(email, message, 'Registration');
+                client.messages
+                    .create({
+                    body: message,
+                    from: '+17076402854',
+                    to: phone
+                })
+                    .then(response => console.log(response.sid));
                 response.status(200).send({
-                    message: 'Please check your email for token'
+                    message: 'Please check your phone for token'
                 });
                 return;
             }
@@ -130,9 +152,16 @@ class UserController {
                     }
                 });
                 const message = `Token: ${confirmationCode}`;
-                UserController.sendMail(user.email, message, 'Password change');
+                // UserController.sendMail(user.email, message, 'Password change');
+                client.messages
+                    .create({
+                    body: message,
+                    from: '+17076402854',
+                    to: user.phone
+                })
+                    .then(response => console.log(response.sid));
                 response.status(200).send({
-                    message: 'Please check your email for token'
+                    message: 'Please check your phone for token'
                 });
                 return;
             }
@@ -190,32 +219,35 @@ class UserController {
             }
         });
     }
-    static sendMail(email, message, subject = 'Registration') {
-        try {
-            const msg = {
-                to: email,
-                from: '"Hawk" <no-reply@thegreenearthcomp.com>',
-                subject,
-                html: `<p> ${message} </p>`
-            };
-            transporter.sendMail(msg, function (error, info) {
-                if (error) {
-                    console.log(error);
-                }
-                else {
-                    console.log('Email sent: ' + info.response);
-                }
-            });
+    /**
+      static sendMail (email: string, message: string, subject = 'Registration') {
+        try{
+     
+          const msg = {
+            to: email,
+            from: '"Hawk" <no-reply@thegreenearthcomp.com>',
+            subject,
+            html: `<p> ${message} </p>`
+          };
+          transporter.sendMail(msg, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
+        
+        } catch (error) {
+          console.log(error.toString());
         }
-        catch (error) {
-            console.log(error.toString());
-        }
-    }
+      }
+    */
     //sign in
     static signin(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, password } = request.body;
-            const foundUser = yield schema_1.default.User().findOne({ email: email.trim() });
+            const { phone, password } = request.body;
+            console.log(phone);
+            const foundUser = yield schema_1.default.User().findOne({ phone: phone.trim() });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
                     return response.status(403).send({
