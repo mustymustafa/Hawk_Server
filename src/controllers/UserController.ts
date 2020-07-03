@@ -37,7 +37,7 @@ class UserController {
     console.log(request.body);
 
     try {
-      const foundEmail = await Schema.User().find({email: email.trim()});
+      const foundEmail = await Schema.User().find({phone: phone.trim()});
       if (foundEmail && foundEmail.length > 0) {
 
         console.log(foundEmail[0])
@@ -167,7 +167,7 @@ class UserController {
       }) 
      .then(response => console.log(response.sid)) 
       response.status(200).send({
-        message: 'Please check your email for token'
+        message: 'Please check your phone for token'
       });
       return;
     } catch (error) {

@@ -52,7 +52,7 @@ class ArtisanController {
     console.log(phone);
 
     try {
-      const foundEmail = await Schema.Artisan().find({email: email.trim()});
+      const foundEmail = await Schema.Artisan().find({phone: phone.trim()});
       if (foundEmail && foundEmail.length > 0) {
 
         console.log(foundEmail[0])
