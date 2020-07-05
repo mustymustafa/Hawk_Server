@@ -85,10 +85,17 @@ var transporter = nodemailer.createTransport({
           });
 
 
-
+let title;
         
-     const artisan = await Schema.Artisan().findOne({category: category});
+     const artisan = await Schema.Artisan().findOne({category: category})
      
+     if(category === 'driver'){
+       title = 'Ride Request'
+     }
+
+     if (category === 'log' || category === 'shop'){
+       title = 'Dispatch Rider Request'
+     }
       const artis = artisan.pushToken;
 
       savedTokens = artis;
@@ -108,8 +115,8 @@ var transporter = nodemailer.createTransport({
       let chunks = expo.chunkPushNotifications([{
         "to": savedTokens,
         "sound": "default",
-        "title": "Job Request",
-        "body": `A ${category} is needed.`
+        "title": title,
+        "body": "Open your Sleek App"
       }]);
       let tickets = [];
       (async () => {
@@ -210,10 +217,10 @@ var transporter = nodemailer.createTransport({
 
 
 
-        
-     const artisan = await Schema.Artisan().findOne({category: category});
+   
+     const artisan = await Schema.Artisan().findOne({category: category}).where({area1: area1,$or:[{area2: area2}]})  
      
-
+    
      console.log(artisan)
      
      const artis = artisan.pushToken;
@@ -235,8 +242,8 @@ var transporter = nodemailer.createTransport({
      let chunks = expo.chunkPushNotifications([{
        "to": savedTokens,
        "sound": "default",
-       "title": "Driver Request",
-       "body": `A ${category} is needed.`
+       "title": "Ride Request",
+       "body": "Open your Sleek App"
      }]);
      let tickets = [];
      (async () => {
@@ -407,8 +414,13 @@ var transporter = nodemailer.createTransport({
       console.log("area2:" + area2);
       
       // find artisan
-    const job = await Schema.Job().find({category: category,  $or:[{area1: area1}, {area2: area2}], $and: [{status: 'active'}]})
-
+      if(category === 'log'){
+        //later query based of state
+        const job = await Schema.Job().find({category: category});
+    
+      } else {
+    const job = await Schema.Job().find({category: category}).where({area1: area1,$or:[{area2: area2}], $and: [{status: 'active'}]})  
+ 
     console.log(job)
 
     //get hirer id
@@ -422,7 +434,7 @@ console.log("hirer:" + hirer)
 
   }
 
-
+  }
 
   static async acceptJob(request:Request, response:Response){
 
