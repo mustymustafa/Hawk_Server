@@ -178,8 +178,24 @@ else {
   console.log('no accounts found')
 }
 
-
+const now = new Date().toLocaleDateString();
+//deactivate account if expired
+ console.log("now" + now)
+const user = await Schema.Artisan().updateMany({expireAt: now}, 
+  {$set: {active: false}},
+  function(err, result){ 
+  if(err) {
+    console.log(err)
+  } else {
+    console.log('Expired users updated');
+    
+  }
+}
+  );
+console.log(user)
+  
 },
+
 {scheduled: true}
 );
 
