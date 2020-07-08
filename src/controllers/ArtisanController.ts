@@ -1038,21 +1038,6 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone
     var rate = Math.round(total / getRating.length);
     console.log("rating:" + rate)
 
-    const now = new Date().toLocaleDateString();
-    //deactivate account if expired
-     console.log("now" + now)
-     console.log('expire' + user.expireAt )
-    if( now === user.expireAt){
-      console.log('expired')
-     await Schema.Artisan().updateOne({_id: uid},
-       {
-         $set: {
-           active: false
-         }
-       }
-          
-        )
-    }
     response.status(200).send({
       user,
       rating: rate

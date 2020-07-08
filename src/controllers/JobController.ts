@@ -1020,7 +1020,7 @@ let tickets = [];
     try {
 
     
-  const job = await Schema.Job().find({artisan: uid, $and:[{status: 'accepted'}]})
+  const job = await Schema.Job().find({artisan: uid})
 
   //console.log(job)
 
@@ -1429,14 +1429,14 @@ static async driverArrived(request:Request, response:Response){
 
 
   const job = await Schema.Job().findOne({_id: job_id})
-  console.log("job found:" + job);
+  //console.log("job found:" + job);
 
-  const driver = await Schema.User().findOne({_id: job.artisan});
-  console.log("driver:" + driver)
+  const driver = await Schema.Artisan().findOne({_id: job.artisan});
+  //console.log("driver:" + driver)
 
 
      const hirer = await Schema.User().findOne({_id: job.user});
-     console.log("hirer:" + hirer)
+     //console.log("hirer:" + hirer)
 
   
  
@@ -1465,7 +1465,7 @@ static async driverArrived(request:Request, response:Response){
     
     savedTokens = hirer.pushToken;
     
-    console.log(savedTokens)
+    //console.log(savedTokens)
     
     
     
