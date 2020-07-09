@@ -634,6 +634,12 @@ let tickets = [];
 
        const hirer = await Schema.User().findOne({_id: job.user});
        console.log("hirer:" + hirer)
+
+        //find artisan
+
+  const arti = await Schema.Artisan().findOne({_id: job.artisan})
+  console.log("artisan found:" + arti);
+
 const artisan = await Schema.Artisan().findOne({_id: uid});
 
 
@@ -648,7 +654,7 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
 
     try {
      
-      response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job})
+      response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job, artisan: arti})
 
 
 
@@ -1292,6 +1298,8 @@ static async startJob(request:Request, response:Response){
 
   const job = await Schema.Job().findOne({_id: job_id})
   console.log("job found:" + job);
+  
+ 
 
      const hirer = await Schema.User().findOne({_id: job.user});
      console.log("hirer:" + hirer)
