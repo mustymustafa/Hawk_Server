@@ -452,7 +452,7 @@ console.log("hirer:" + hirer)
        console.log("hirer:" + hirer)
 const artisan = await Schema.Artisan().findOne({_id: uid});
 console.log(price);
-    console.log("wage " + artisan.wage)
+    console.log("artisan name " + artisan.name)
 
     
    
@@ -542,7 +542,7 @@ let tickets = [];
        console.log("hirer:" + hirer)
 const artisan = await Schema.Artisan().findOne({_id: uid});
 console.log(price);
-    console.log("wage " + artisan.wage)
+    console.log("artisan " + artisan.name)
 
     
      
@@ -561,6 +561,7 @@ console.log(price);
             $set: {
                 artisan: uid,
                 status: 'accepted',
+                artisan_name: artisan.name,
                 price: price
             }
         }
