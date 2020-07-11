@@ -77,7 +77,7 @@ class Schema {
             category: String,
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
             artisan: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
-            artisan_name: String,
+
             location:  String,
             to: String, 
             to2: String, 

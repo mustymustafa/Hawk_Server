@@ -455,11 +455,7 @@ console.log(price);
     console.log("wage " + artisan.wage)
 
     
-       if(!price || price > artisan.wage){
-        return response.status(404).send({
-            message: `Please enter a price between (₦)0-${artisan.wage}`
-          });
-       }
+   
    
     if (!job && !hirer) {
         return response.status(404).send({
@@ -474,7 +470,7 @@ console.log(price);
         {
             $set: {
                 artisan: uid,
-                artisan_name: artisan.name,
+  
                 status: 'accepted',
                 price: price
             }
@@ -482,7 +478,7 @@ console.log(price);
         );
 
 
-        response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job})
+        response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job, driver: artisan.name})
        
 // send notification
 
