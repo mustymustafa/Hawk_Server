@@ -940,9 +940,7 @@ console.log(hirer.pushToken)
         },
         {
             $set: {
-                status: 'completed',
-                start: false,
-                arrived:false
+                status: 'completed'
             }
         }
         );
@@ -951,6 +949,10 @@ console.log(hirer.pushToken)
             _id: artisan._id
         },
         {
+          $set: {
+            start: false,
+            arrived: false
+          },
             $inc: {
                 completed: 1
             },
