@@ -470,7 +470,7 @@ console.log(price);
         {
             $set: {
                 artisan: uid,
-  
+                artisan_name: artisan.name,
                 status: 'accepted',
                 price: price
             }
@@ -478,7 +478,7 @@ console.log(price);
         );
 
 
-        response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job, driver: artisan.name})
+        response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job})
        
 // send notification
 
