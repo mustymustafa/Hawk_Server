@@ -496,7 +496,7 @@ let chunks = expo.chunkPushNotifications([{
   "to": savedTokens,
   "sound": "default",
   "title": "Request Accepted!",
-  "body": `A/an ${job.category} has accepted your request.`
+  "body": `A driver has accepted your request.`
 }]);
 let tickets = [];
 (async () => {
@@ -585,7 +585,7 @@ let chunks = expo.chunkPushNotifications([{
   "to": savedTokens,
   "sound": "default",
   "title": "Request Accepted!",
-  "body": `Your ${job.category} has accepted your request and is on his way.`
+  "body": `A Driver has accepted your request and is on his way.`
 }]);
 let tickets = [];
 (async () => {
@@ -702,8 +702,8 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
 let chunks = expo.chunkPushNotifications([{
   "to":  artisan.pushToken,
   "sound": "default",
-  "title": "Job Canceled!",
-  "body": `${hirer.name} canceled his job request.`
+  "title": "Request Canceled!",
+  "body": `${hirer.name} canceled his  request.`
 }]);
 let tickets = [];
 (async () => {
@@ -848,8 +848,8 @@ let tickets = [];
 let chunks = expo.chunkPushNotifications([{
   "to": hirer.pushToken,
   "sound": "default",
-  "title": "Job Canceled!",
-  "body": `The ${artisan.category},  ${artisan.name} canceled the Job`
+  "title": "Request Canceled!",
+  "body": `${artisan.name} canceled the Request`
 }]);
 let tickets = [];
 (async () => {
@@ -981,8 +981,8 @@ console.log(hirer.pushToken)
 let chunks = expo.chunkPushNotifications([{
   "to": hirer.pushToken,
   "sound": "default",
-  "title": "Job Completed!",
-  "body": 'Yay! your Job is done.'
+  "title": "Ride Completed!",
+  "body": 'Yay! Ride completed'
 }]);
 let tickets = [];
 (async () => {
@@ -1521,6 +1521,7 @@ static async driverArrived(request:Request, response:Response){
 
 
 
+
 //job history 
 static async getHistory(request:Request, response:Response){
   const {uid} = request.body;
@@ -1544,6 +1545,8 @@ static async getHistory(request:Request, response:Response){
 
 }
 
+
+//Emergency Call
 
 
 

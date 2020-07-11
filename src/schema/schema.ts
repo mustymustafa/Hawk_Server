@@ -126,6 +126,29 @@ class Schema {
         return Job;
     }
 
+
+    static Emergency() {
+        const EmergencySchema = new mongoose.Schema({
+         
+            user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
+            artisan: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
+           
+            location:  String,
+        
+            lat: String,
+            long: String, 
+
+            area1: String,
+            area2: String,
+            
+            createdAt: {type: Date, default: Date.now},
+        
+            
+        })
+        const Emergency = mongoose.models.Emergency || mongoose.model('Emergency', EmergencySchema)
+        return Emergency;
+    }
+
 }
 
 export default Schema;
