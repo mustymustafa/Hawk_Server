@@ -54,6 +54,7 @@ class Schema {
             
             completed: {type: Number, default: 0},
             rating: [Number],
+            earnings: [Number],
             comments: [String],
             area1: String,
             area2: String,

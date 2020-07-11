@@ -957,7 +957,10 @@ console.log(hirer.pushToken)
         {
             $inc: {
                 completed: 1
-            }
+            },
+            $push: {
+             earnings: job.price
+          }
         }
         );
 

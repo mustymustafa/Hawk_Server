@@ -31,10 +31,11 @@ var transporter = nodemailer.createTransport({
  });
 */
 
- function addMonths(date: any, months: any) {
+ function addWeek(date: any, week: any) {
    console.log(date)
   const d = date.getDate();
-  date.setMonth(date.getMonth() + +months);
+
+  date.setDate(date.getDate() + +week);
   if (date.getDate() != d) {
     date.setDate(0);
   }
@@ -59,7 +60,7 @@ class ArtisanController {
 
         console.log(foundEmail[0])
         return response.status(409).send({
-          message: 'This email already exists',
+          message: 'This number already exists',
           isConfirmed: foundEmail[0].isConfirmed
         });
       }
@@ -86,7 +87,8 @@ class ArtisanController {
         phone,
         isConfirmed: false
       });
-
+     
+          
       response.status(201).send({
         message: 'User created successfully',
         status: 201
@@ -116,12 +118,12 @@ email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, 
         try {
           const dt = new Date();
           const createdAt = dt.toLocaleDateString();
-    
-          const expire =  addMonths(new Date(), 1).toLocaleDateString();
-    
           console.log(createdAt)
-        
-          console.log(expire)
+          var now = new Date();
+          
+          //after 7 days
+              const expire =  now.setDate(now.getDate()+7);
+        console.log(now.toLocaleDateString())
     
 
   await Schema.Artisan().updateOne({
@@ -139,7 +141,7 @@ email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, 
                 sname: sname,
                 sphone: sphone,
                 createdAt: createdAt,
-                expireAt: expire
+                expireAt: now.toLocaleDateString()
               }
             });
     
@@ -1020,6 +1022,7 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone
   static async userDetails(request: Request, response: Response){
      
     var total = 0;
+    var amount = 0;
 
     const {uid} = request.params;
     console.log(uid)
@@ -1029,18 +1032,39 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone
       //console.log(user)
       if (user && Object.keys(user).length) {
 
+        //get Rating
          const getRating = user.rating
     console.log(getRating.length);
 
+    //get Earnings
+    const getEarnings = user.earnings;
+    console.log(getEarnings);
+
+
+        // get rate
     for(var i = 0; i < getRating.length; i++){
         total += getRating[i]
     }
     var rate = Math.round(total / getRating.length);
     console.log("rating:" + rate)
 
+
+      //get total amount
+      for(var i = 0; i < getEarnings.length; i++){
+        amount += getEarnings[i]
+    }
+    console.log('amount:' + amount)
+        //amount to pay
+        var pay = Math.round(amount * 0.1);
+        console.log('pay' + pay)
+
+
     response.status(200).send({
       user,
-      rating: rate
+      rating: rate,
+      earning: amount,
+      pay: pay
+
     });
        // console.log(user)
       } else {
@@ -1059,7 +1083,13 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone
   //update status on payment
   static async activateAccount(request: Request, response: Response){
     const {uid} = request.params
-    const expire =  addMonths(new Date(), 1).toLocaleDateString();
+    //const expire =  addWeek(new Date(), 1).toLocaleDateString();
+    var now = new Date();
+          
+    //after 7 days
+        const expire =  now.setDate(now.getDate()+7);
+  console.log(now.toLocaleDateString())
+
     
 
     try{
@@ -1070,11 +1100,13 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone
           {
             $set: {
               active: true,
-              expireAt: expire
+              expireAt: now.toLocaleDateString()
             }
           }
              
            )
+
+           user.earnings.splice(0, user.earnings.length)
 
            response.status(200).send({
              message: 'Account Activated!'
