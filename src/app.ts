@@ -55,7 +55,7 @@ app.post('/api/v1/image', upload.single('image'), ArtisanController.uploadimage)
 app.post('/api/v1/dp', upload.single('image'), ArtisanController.uploadDp);
 //certificate
 app.post('/api/v1/cert', upload.single('image'), ArtisanController.uploadCert);
-app.post('/api/v1/cert', upload.single('image'), ArtisanController.uploadSchool);
+app.post('/api/v1/school', upload.single('image'), ArtisanController.uploadSchool);
 //set images
 app.post('/api/v1/setid', ArtisanController.setId);
 app.post('/api/v1/setdp', ArtisanController.setDp);
