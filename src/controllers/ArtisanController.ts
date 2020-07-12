@@ -293,6 +293,14 @@ static uploadCert(req: Request, res: Response) {
   res.json(req.file)
 }
 
+static uploadSchool(req: Request, res: Response) {
+  const parts = req.file.originalname.split(' ')
+  const find = parts[0]
+  console.log(find)
+  res.json(req.file)
+}
+
+
 
 
 
@@ -642,7 +650,49 @@ static async setId( request: Request, res: Response) {
                       
                                   }
          
-                                                                                                                  
+                                  static async setSchool( request: Request, res: Response) {
+     
+  
+                                    console.log(request.body)
+                                        try {
+                                         const email = request.body.email
+                                         const image = request.body.image
+                                           console.log(email)
+                                           console.log(image)
+                                        
+                                        
+                                         
+                                
+                                        const foundUser:any = await Schema.Artisan().findOne({email});
+                                    
+                                        if (foundUser && Object.keys(foundUser).length > 0) {
+                                            console.log(foundUser);
+                                         
+                                                await Schema.Artisan().updateOne({
+                                                  _id: foundUser._id
+                                                }, {
+                                                  $set: {
+                                                    school: image
+                                                   
+                                                  }
+                                                });
+                                    
+                                                
+                                                return  res.status(200).send("image set")
+                                                } 
+                                              } catch (error) {
+                                                console.log(error.toString());
+                                                res.status(500).send({
+                                                  message: 'something went wrong'
+                                                });
+                                              }
+                                        
+                                    
+                                
+                                
+                                
+                                            }
+                                                                                                         
             //set id_expiry
             static async idExpiry (request: Request, response: Response) {
       
