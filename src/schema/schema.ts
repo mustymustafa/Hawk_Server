@@ -11,7 +11,11 @@ class Schema {
             password: String,
             pushToken: String,
             confirmationCode: String,
-            isConfirmed: Boolean
+            isConfirmed: Boolean,
+            promo: {type: Boolean, default: false},
+            promo_code: String,
+            promo_date: String,
+            createdAt: String
 
         })
         const User = mongoose.models.User || mongoose.model('User', UserSchema)
