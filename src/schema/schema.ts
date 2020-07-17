@@ -13,7 +13,7 @@ class Schema {
             confirmationCode: String,
             isConfirmed: Boolean,
             promo: {type: Boolean, default: false},
-            promo_code: String,
+            next_promo: String,
             promo_date: String,
             createdAt: String
 
