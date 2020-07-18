@@ -184,6 +184,8 @@ let title;
 
       const job =  await Schema.Job().create({
             user: uid,
+          
+          
             category: category,
             location: location,
             status: 'active',
@@ -298,6 +300,8 @@ let title;
 
       const job =  await Schema.Job().create({
             user: uid,
+          
+          
             category: category,
             location: location,
             status: 'active',
@@ -1062,29 +1066,26 @@ static async getArtisan(request:Request, response:Response) {
 
     let savedTokens;
 
-    console.log("category" + name);
-    console.log("user:" + uid);
+    //console.log("category" + name);
+    //console.log("user:" + uid);
 
     const user = await Schema.User().findOne({_id: uid});
     //console.log(user)
     
     // find artisan
   const job = await Schema.Job().findOne({user: uid,  $and: [{category: name}]}).where('status').equals('accepted')
+
+  console.log('Job A' + job)
+ 
+    if(job){
+      const findArtisan = await Schema.Artisan().findOne({_id: job.artisan})
+      console.log(findArtisan)
+    
+
  
 
-    console.log(job);
-
-
+  
  
-  const findArtisan = await Schema.Artisan().findOne({_id: job.artisan})
-  console.log(findArtisan)
-
-  if(!findArtisan){
-      console.log("No Artisan Available")
-      return response.status(400).send({notFound: "No Artisan is available at the moment"})
-
-  }
-
 try {
 
 
@@ -1146,6 +1147,11 @@ let tickets = [];
 
 }
 
+  } else {
+    console.log("No Driver Available")
+    return response.status(400).send({notFound: "No Driver is available at the moment"})
+
+}
 
  
 
@@ -1391,29 +1397,14 @@ const job = await Schema.Job().findOne({user: uid,  $and: [{category: name}]}).w
   console.log(job);
 
 
-
+if(job){
 const findArtisan = await Schema.Artisan().findOne({_id: job.artisan})
-console.log(findArtisan)
+//console.log(findArtisan)
 
-if(!findArtisan){
-    console.log("No Artisan Available")
-    return response.status(400).send({notFound: "No Artisan is available at the moment"})
-
-}
 
 try {
-
-
-
-
-
-
        response.status(200).send({artisan: findArtisan.start})
     
-
-   
-
-
 } catch(error) {
 
   console.log(error);
@@ -1421,6 +1412,11 @@ try {
 
 }
 
+} else {
+  console.log("No Driver Available")
+  return response.status(400).send({notFound: "No Driver is available at the moment"})
+
+}
 
 
 
