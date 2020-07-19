@@ -151,19 +151,19 @@ let title;
   }
 
   static async driverRequest (request:Request, response:Response){
-    const {category, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price} = request.body;
-    console.log(category, uid,location)
-    console.log("area1:" + area1);
-    console.log("area2:" + area2);
-    console.log("lat:" + lat);
-    console.log("long:" + long)
-    console.log("destLat:" + destLat);
-    console.log("destLong:" + destLong);
-    console.log("to:" + to);
-    console.log("from:" + from);
-    console.log("time:" + time);
-    console.log("distance:" + distance);
-    console.log("price:" + price);
+    const {category, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price, to2, destLat2, destLong2} = request.body;
+    //console.log(category, uid,location)
+    //console.log("area1:" + area1);
+    //console.log("area2:" + area2);
+    //console.log("lat:" + lat);
+    //console.log("long:" + long)
+    //console.log("destLat:" + destLat);
+    //console.log("destLong:" + destLong);
+    //console.log("to:" + to);
+    //console.log("from:" + from);
+    //console.log("time:" + time);
+    //console.log("distance:" + distance);
+    //console.log("price:" + price);
     
     
 
@@ -178,9 +178,9 @@ let title;
         const now = dt.setMinutes( dt.getMinutes());
         const createdAt = dt.toLocaleDateString()
         const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
-        console.log(createdAt)
-        console.log("end:" + endAt)
-        console.log("now:" + now)
+       // console.log(createdAt)
+        //console.log("end:" + endAt)
+        //console.log("now:" + now)
 
       const job =  await Schema.Job().create({
             user: uid,
@@ -193,11 +193,18 @@ let title;
             area1: area1,
             area2: area2,
             to: to,
+            to2: to2,
+
             from: from,
             lat: lat,
             long: long,
+
             destLat: destLat,
+            destLat2: destLat2,
+
             destLong: destLong,
+            destLong2: destLong2,
+
             time: time,
             price: price,
             distance: distance,
@@ -281,7 +288,7 @@ let title;
 
   static async logRequest (request:Request, response:Response){
     const {category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price} = request.body;
-  console.log(category)
+  //console.log(category)
   
     let savedTokens;
 
@@ -294,9 +301,9 @@ let title;
         const now = dt.setMinutes( dt.getMinutes());
         const createdAt = dt.toLocaleDateString()
         const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
-        console.log(createdAt)
-        console.log("end:" + endAt)
-        console.log("now:" + now)
+        //console.log(createdAt)
+        //console.log("end:" + endAt)
+        //console.log("now:" + now)
 
       const job =  await Schema.Job().create({
             user: uid,
@@ -1066,11 +1073,11 @@ static async getArtisan(request:Request, response:Response) {
 
     let savedTokens;
 
-    //console.log("category" + name);
-    //console.log("user:" + uid);
+    console.log("category" + name);
+    console.log("user:" + uid);
 
     const user = await Schema.User().findOne({_id: uid});
-    //console.log(user)
+    console.log(user)
     
     // find artisan
   const job = await Schema.Job().findOne({user: uid,  $and: [{category: name}]}).where('status').equals('accepted')
@@ -1149,8 +1156,6 @@ let tickets = [];
 
   } else {
     console.log("No Driver Available")
-    return response.status(400).send({notFound: "No Driver is available at the moment"})
-
 }
 
  
@@ -1414,7 +1419,7 @@ try {
 
 } else {
   console.log("No Driver Available")
-  return response.status(400).send({notFound: "No Driver is available at the moment"})
+
 
 }
 
