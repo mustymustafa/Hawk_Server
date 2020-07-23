@@ -418,6 +418,7 @@ let title;
   }
 
 
+  //display requets
   static async displayJobs(request:Request, response:Response) {
       const {category, area1, area2} = request.body; 
       console.log(category);
@@ -446,6 +447,31 @@ console.log("hirer:" + hirer)
   }
 
   }
+
+  //display logistics requests
+  static async logRequests(request:Request, response:Response) {
+    const {category, area1, area2} = request.body; 
+    console.log(category);
+    //console.log("area1:" + area1);
+    //console.log("area2:" + area2);
+    
+  
+  const job = await Schema.Job().find({category: category}).where({status: 'active'})  
+
+  console.log(job)
+
+  //get hirer id
+const user = job.map(usr => {
+  return usr.user
+})
+
+const hirer = await Schema.User().findOne({_id: user});
+console.log("hirer:" + hirer)
+  return response.status(200).send({job: job, hirer:hirer})
+
+
+
+}
 
   static async acceptJob(request:Request, response:Response){
 

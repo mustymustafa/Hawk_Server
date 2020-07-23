@@ -141,6 +141,8 @@ app.post('/api/v1/aToken/:uid', ArtisanController.savePushToken);
 
 //jobs 
 app.post('/api/v1/jobs', JobController.displayJobs);
+app.post('/api/v1/logjobs', JobController.logRequests);
+
 app.post('/api/v1/job/:job_id/accept', JobController.acceptJob);
 app.post('/api/v1/job/:job_id/start', JobController.startJob);
 app.post('/api/v1/job/:job_id/arrive', JobController.driverArrived);
