@@ -418,19 +418,14 @@ let title;
   }
 
 
-  //display requets
+  //display requests
   static async displayJobs(request:Request, response:Response) {
       const {category, area1, area2} = request.body; 
       console.log(category);
       console.log("area1:" + area1);
       console.log("area2:" + area2);
       
-      // find artisan
-      if(category === 'log'){
-        //later query based of state
-        const job = await Schema.Job().find({category: category});
-    
-      } else {
+      
     const job = await Schema.Job().find({category: category}).where({area1: area1,$or:[{area2: area2}], $and: [{status: 'active'}]})  
  
     console.log(job)
@@ -446,11 +441,11 @@ console.log("hirer:" + hirer)
 
   }
 
-  }
+  
 
   //display logistics requests
   static async logRequests(request:Request, response:Response) {
-    const {category, area1, area2} = request.body; 
+    const {category} = request.body; 
     console.log(category);
     //console.log("area1:" + area1);
     //console.log("area2:" + area2);
