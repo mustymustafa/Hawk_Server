@@ -18,6 +18,8 @@ import ArtisanController from './controllers/ArtisanController'
  import {upload} from './util'
 import JobController from './controllers/JobController';
 
+import { Expo } from "expo-server-sdk";
+const expo = new Expo();
 
 //database 
  mongoose.connect(
@@ -201,7 +203,49 @@ console.log(user)
 {scheduled: true}
 );
 
+
+// send discount notification
+const discount = cron.schedule("00 23 * * *", async () => {
+  
+  console.log("discount notification initialized");
+//find accounts
+
+const now = new Date().toLocaleDateString();
+
+  const get_users = await Schema.User().find({next_promo: now})
+ // console.log("deleted:" + get_users)
+
+  get_users.map(users => {
+ 
+    console.log("tokens:" + users.pushToken)
+    let chunks = expo.chunkPushNotifications([{
+      "to": [users.pushToken],
+      "sound": "default",
+      "title": "You have 50% off discount today!",
+      "body": "Open your Sleek App"
+    }]);
+    let tickets = [];
+    (async () => {
+      for (let chunk of chunks) {
+        try {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+       
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    })();
+    })
+  
+},
+
+{scheduled: true}
+);
+
 task.start();
+discount.start();
 
 
 

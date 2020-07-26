@@ -221,48 +221,54 @@ let title;
 
 
    
-     const artisan = await Schema.Artisan().findOne({category: category}).where({area1: area1,$or:[{area2: area2}]})  
+     const artisan = await Schema.Artisan().find({category: category}).where({area1: area1,$or:[{area2: area2}]})  
      
-    
-     console.log(artisan)
-     
-     const artis = artisan.pushToken;
-
-     savedTokens = artis;
-     
-     console.log(artis)
      if (!artisan) {
-       return response.status(404).send({
-         message: 'No artisans found'
-       });
-     }
+      return response.status(404).send({
+        message: 'No driver found'
+      });
+    }
+     console.log(artisan)
+
+     artisan.map(artis => {
+
+      console.log(artis.pushToken);
+
+    
+      
+
     
      
-
-
-     //send notification
+      
  
-     let chunks = expo.chunkPushNotifications([{
-       "to": savedTokens,
-       "sound": "default",
-       "title": "Ride Request",
-       "body": "Open your Sleek App"
-     }]);
-     let tickets = [];
-     (async () => {
-       for (let chunk of chunks) {
-         try {
-           let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-           console.log(ticketChunk);
-           tickets.push(...ticketChunk);
-        
-         } catch (error) {
-           console.error(error);
-         }
-       }
-     })();
+ 
+      //send notification
+  
+      let chunks = expo.chunkPushNotifications([{
+        "to": [artis.pushToken],
+        "sound": "default",
+        "title": "Ride Request",
+        "body": "Open your Sleek App"
+      }]);
+      let tickets = [];
+      (async () => {
+        for (let chunk of chunks) {
+          try {
+            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+            console.log(ticketChunk);
+            tickets.push(...ticketChunk);
+         
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      })();
+ 
+      
 
+     })
      
+  
 
      
   
@@ -355,49 +361,52 @@ let title;
      const artisan = await Schema.Artisan().findOne({category: 'log'});
      
 
-     console.log(artisan)
-     
-     const artis = artisan.pushToken;
-
-     savedTokens = artis;
-     
-     console.log(artis)
      if (!artisan) {
-       return response.status(404).send({
-         message: 'No artisans found'
-       });
-     }
+      return response.status(404).send({
+        message: 'No riders found'
+      });
+    }
+     console.log(artisan)
+
+     artisan.map((artis:any) => {
+
+      console.log(artis.pushToken);
+
+    
+      
+
     
      
-
-
-     //send notification
+      
  
-     let chunks = expo.chunkPushNotifications([{
-       "to": savedTokens,
-       "sound": "default",
-       "title": "New Request",
-       "body": `A Dispatch Rider is needed.`
-     }]);
-     let tickets = [];
-     (async () => {
-       for (let chunk of chunks) {
-         try {
-           let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-           console.log(ticketChunk);
-           tickets.push(...ticketChunk);
-        
-         } catch (error) {
-           console.error(error);
-         }
-       }
-     })();
-
-     
-
-     
+ 
+      //send notification
   
+      let chunks = expo.chunkPushNotifications([{
+        "to": [artis.pushToken],
+        "sound": "default",
+        "title": "New Request",
+        "body": "A dispatch Rider is needed!"
+      }]);
+      let tickets = [];
+      (async () => {
+        for (let chunk of chunks) {
+          try {
+            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+            console.log(ticketChunk);
+            tickets.push(...ticketChunk);
+         
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      })();
  
+      
+
+     })
+     
+   
       
   
     
