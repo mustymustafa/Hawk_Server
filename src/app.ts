@@ -22,7 +22,7 @@ import JobController from './controllers/JobController';
 //database 
  mongoose.connect(
     `mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`,
-  { useNewUrlParser: true, useUnifiedTopology: true },
+  { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true },
 ).then(() =>   console.log('database connected.....'))
 .catch((error) => console.log(error.toString()));
 

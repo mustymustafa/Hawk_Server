@@ -89,6 +89,7 @@ class Schema {
             to3: String, 
             to4: String, 
             to5: String, 
+        
             
             from: String,
             lat: String,
@@ -120,7 +121,7 @@ class Schema {
             createdAt: String,
             rated: Boolean,
             now: Number,
-            endAt: Number,
+     
 
 
             active: Boolean

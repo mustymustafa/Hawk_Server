@@ -56,12 +56,10 @@ var transporter = nodemailer.createTransport({
 
         //create job
         const dt = new Date()
-        const now = dt.setMinutes( dt.getMinutes());
-        const createdAt = dt.toLocaleDateString()
-        const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
-        console.log(createdAt)
-        console.log("end:" + endAt)
-        console.log("now:" + now)
+        //const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
+        //console.log(createdAt)
+        //console.log("end:" + endAt)
+        //console.log("now:" + now)
 
         await Schema.Job().create({
             user: uid,
@@ -72,9 +70,8 @@ var transporter = nodemailer.createTransport({
             rated: false,
             area1: area1,
             area2: area2,
-            createdAt: createdAt,
-            endAt: endAt,
-            now: now,
+            createdAt: dt,
+            
             active: true
 
         })
@@ -175,9 +172,8 @@ let title;
 
         //create job
         const dt = new Date()
-        const now = dt.setMinutes( dt.getMinutes());
-        const createdAt = dt.toLocaleDateString()
-        const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
+      
+
        // console.log(createdAt)
         //console.log("end:" + endAt)
         //console.log("now:" + now)
@@ -208,9 +204,7 @@ let title;
             time: time,
             price: price,
             distance: distance,
-            createdAt: createdAt,
-            endAt: endAt,
-            now: now,
+            createdAt: dt,
             active: true
 
         })
@@ -426,7 +420,7 @@ let title;
       console.log("area2:" + area2);
       
       
-    const job = await Schema.Job().find({category: category}).where({area1: area1,$or:[{area2: area2}], $and: [{status: 'active'}]})  
+    const job = await Schema.Job().find({category: category}).where({area1: area1,$or:[{area2: area2}], $and: [{status: 'active'}]}).sort({'_id': -1})  
  
     console.log(job)
 
@@ -451,7 +445,7 @@ console.log("hirer:" + hirer)
     //console.log("area2:" + area2);
     
   
-  const job = await Schema.Job().find({category: category}).where({status: 'active'})  
+  const job = await Schema.Job().find({category: category}).where({status: 'active'}).sort({'_id': -1})    
 
   console.log(job)
 
@@ -1060,7 +1054,7 @@ let tickets = [];
     try {
 
     
-  const job = await Schema.Job().find({artisan: uid})
+  const job = await Schema.Job().find({artisan: uid}).sort({'_id': -1})  
 
   //console.log(job)
 
@@ -1177,6 +1171,7 @@ let tickets = [];
 
   } else {
     console.log("No Driver Available")
+    return response.status(404).send("no driver yet")
 }
 
  
@@ -1555,7 +1550,7 @@ static async getHistory(request:Request, response:Response){
   const user = await Schema.User().findOne({_id: uid})
   console.log(user)
   //get user jobs
-  const job = await Schema.Job().find({user: uid})
+  const job = await Schema.Job().find({user: uid}).sort({'_id': -1})  
   console.log(job)
 
   if(user){
