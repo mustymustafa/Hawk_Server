@@ -44,6 +44,7 @@ class Schema {
             poo: String,
             vcolor: String,
             vmodel: String,
+            vyear: String,
             plate: String,
             vpic: String,
             sname: String,

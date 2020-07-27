@@ -107,7 +107,7 @@ class ArtisanController {
   static async continueSignup (request: Request, response: Response) {
       
     const {
-email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone
+email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone, vyear
     } = request.body;
 
     console.log(request.body);
@@ -137,6 +137,7 @@ email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, 
                 vl_expiry: vl_expiry,
                 vcolor: vcolor,
                 vmodel: vmodel,
+                vyear: vyear,
                 plate: plate,
                 sname: sname,
                 sphone: sphone,
@@ -736,7 +737,7 @@ static async setId( request: Request, res: Response) {
    static async vehicleDetails (request: Request, response: Response) {
       
     const {
-email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone
+email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
     } = request.body;
 
     console.log(request.body);
@@ -752,6 +753,7 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone
                 vl_expiry: vl_expiry,
                 vcolor: vcolor,
                 vmodel: vmodel,
+                vyear: vyear,
                 plate: plate,
                 sname: sname,
                 sphone: sphone
