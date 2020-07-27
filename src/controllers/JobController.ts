@@ -358,7 +358,7 @@ let title;
 
 
         
-     const artisan = await Schema.Artisan().findOne({category: 'log'});
+     const artisan = await Schema.Artisan().find({category: 'log'});
      
 
      if (!artisan) {
