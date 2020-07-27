@@ -49,7 +49,7 @@ class UserController {
 
         console.log(foundEmail[0])
         return response.status(409).send({
-          message: 'This email already exists',
+          message: 'This number already exists',
           isConfirmed: foundEmail[0].isConfirmed
         });
       }
@@ -60,7 +60,7 @@ class UserController {
           message: 'The Password do not match'
         });
       }
-      if (!phone) {
+      if (!phone || phone.length < 14 || phone.length > 14 ) {
        
         return response.status(409).send({
           message: 'Please enter a valid  number',
