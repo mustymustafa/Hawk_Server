@@ -113,7 +113,7 @@ let title;
         "to": savedTokens,
         "sound": "default",
         "title": title,
-        "body": "Open your Sleek App"
+        "body": "Open your 247 App"
       }]);
       let tickets = [];
       (async () => {
@@ -1093,7 +1093,7 @@ static async getArtisan(request:Request, response:Response) {
     var total = 0;
 
 
-    const {uid, name} = request.body; 
+    const {uid, name, job_id} = request.body; 
 
     let savedTokens;
 
@@ -1104,7 +1104,7 @@ static async getArtisan(request:Request, response:Response) {
     console.log(user)
     
     // find artisan
-  const job = await Schema.Job().findOne({user: uid,  $and: [{category: name}]}).where('status').equals('accepted')
+  const job = await Schema.Job().findOne({_id: job_id,  $and: [{category: name}]}).where('status').equals('accepted')
 
   console.log('Job A' + job)
  
@@ -1151,8 +1151,8 @@ console.log(savedTokens)
 let chunks = expo.chunkPushNotifications([{
   "to": savedTokens,
   "sound": "default",
-  "title": "Artisan Found!",
-  "body": `Yay! We have found your nearest ${job.category}`
+  "title": "Yay! Driver Found",
+  "body": `Open your 247 App`
 }]);
 let tickets = [];
 (async () => {
