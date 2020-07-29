@@ -33,10 +33,10 @@ var transporter = nodemailer.createTransport({
      }
  });
 */
-function addMonths(date, months) {
+function addWeek(date, week) {
     console.log(date);
     const d = date.getDate();
-    date.setMonth(date.getMonth() + +months);
+    date.setDate(date.getDate() + +week);
     if (date.getDate() != d) {
         date.setDate(0);
     }
@@ -54,7 +54,7 @@ class ArtisanController {
                 if (foundEmail && foundEmail.length > 0) {
                     console.log(foundEmail[0]);
                     return response.status(409).send({
-                        message: 'This email already exists',
+                        message: 'This number already exists',
                         isConfirmed: foundEmail[0].isConfirmed
                     });
                 }
@@ -63,7 +63,7 @@ class ArtisanController {
                         message: 'The Password do not match'
                     });
                 }
-                if (!phone) {
+                if (!phone || phone.length < 14 || phone.length > 14) {
                     return response.status(409).send({
                         message: 'Please enter a valid  number',
                     });
@@ -91,7 +91,7 @@ class ArtisanController {
     //continue signup
     static continueSignup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone } = request.body;
+            const { email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone, vyear } = request.body;
             console.log(request.body);
             const foundUser = yield schema_1.default.Artisan().findOne({ email });
             if (foundUser && Object.keys(foundUser).length > 0) {
@@ -99,9 +99,11 @@ class ArtisanController {
                 try {
                     const dt = new Date();
                     const createdAt = dt.toLocaleDateString();
-                    const expire = addMonths(new Date(), 1).toLocaleDateString();
                     console.log(createdAt);
-                    console.log(expire);
+                    var now = new Date();
+                    //after 7 days
+                    const expire = now.setDate(now.getDate() + 7);
+                    console.log(now.toLocaleDateString());
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -113,11 +115,12 @@ class ArtisanController {
                             vl_expiry: vl_expiry,
                             vcolor: vcolor,
                             vmodel: vmodel,
+                            vyear: vyear,
                             plate: plate,
                             sname: sname,
                             sphone: sphone,
                             createdAt: createdAt,
-                            expireAt: expire
+                            expireAt: now.toLocaleDateString()
                         }
                     });
                     return response.status(200).send({
@@ -232,6 +235,12 @@ class ArtisanController {
         res.json(req.file);
     }
     static uploadCert(req, res) {
+        const parts = req.file.originalname.split(' ');
+        const find = parts[0];
+        console.log(find);
+        res.json(req.file);
+    }
+    static uploadSchool(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
         console.log(find);
@@ -470,6 +479,35 @@ class ArtisanController {
             }
         });
     }
+    static setSchool(request, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(request.body);
+            try {
+                const email = request.body.email;
+                const image = request.body.image;
+                console.log(email);
+                console.log(image);
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
+                if (foundUser && Object.keys(foundUser).length > 0) {
+                    console.log(foundUser);
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            school: image
+                        }
+                    });
+                    return res.status(200).send("image set");
+                }
+            }
+            catch (error) {
+                console.log(error.toString());
+                res.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
     //set id_expiry
     static idExpiry(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -504,7 +542,7 @@ class ArtisanController {
     //continue signup
     static vehicleDetails(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, phone, vl_expiry, vcolor, vmodel, plate, sname, sphone } = request.body;
+            const { email, phone, vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear } = request.body;
             console.log(request.body);
             const foundUser = yield schema_1.default.Artisan().findOne({ email });
             if (foundUser && Object.keys(foundUser).length > 0) {
@@ -517,6 +555,7 @@ class ArtisanController {
                             vl_expiry: vl_expiry,
                             vcolor: vcolor,
                             vmodel: vmodel,
+                            vyear: vyear,
                             plate: plate,
                             sname: sname,
                             sphone: sphone
@@ -792,34 +831,38 @@ class ArtisanController {
     static userDetails(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             var total = 0;
+            var amount = 0;
             const { uid } = request.params;
             console.log(uid);
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                 //console.log(user)
                 if (user && Object.keys(user).length) {
+                    //get Rating
                     const getRating = user.rating;
                     console.log(getRating.length);
+                    //get Earnings
+                    const getEarnings = user.earnings;
+                    console.log(getEarnings);
+                    // get rate
                     for (var i = 0; i < getRating.length; i++) {
                         total += getRating[i];
                     }
                     var rate = Math.round(total / getRating.length);
                     console.log("rating:" + rate);
-                    const now = new Date().toLocaleDateString();
-                    //deactivate account if expired
-                    console.log("now" + now);
-                    console.log('expire' + user.expireAt);
-                    if (now === user.expireAt) {
-                        console.log('expired');
-                        yield schema_1.default.Artisan().updateOne({ _id: uid }, {
-                            $set: {
-                                active: false
-                            }
-                        });
+                    //get total amount
+                    for (var i = 0; i < getEarnings.length; i++) {
+                        amount += getEarnings[i];
                     }
+                    console.log('amount:' + amount);
+                    //amount to pay
+                    var pay = Math.round(amount * 0.1);
+                    console.log('pay' + pay);
                     response.status(200).send({
                         user,
-                        rating: rate
+                        rating: rate,
+                        earning: amount,
+                        pay: pay
                     });
                     // console.log(user)
                 }
@@ -841,16 +884,21 @@ class ArtisanController {
     static activateAccount(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid } = request.params;
-            const expire = addMonths(new Date(), 1).toLocaleDateString();
+            //const expire =  addWeek(new Date(), 1).toLocaleDateString();
+            var now = new Date();
+            //after 7 days
+            const expire = now.setDate(now.getDate() + 7);
+            console.log(now.toLocaleDateString());
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                 if (user) {
                     yield schema_1.default.Artisan().updateOne({ _id: uid }, {
                         $set: {
                             active: true,
-                            expireAt: expire
+                            expireAt: now.toLocaleDateString()
                         }
                     });
+                    user.earnings.splice(0, user.earnings.length);
                     response.status(200).send({
                         message: 'Account Activated!'
                     });

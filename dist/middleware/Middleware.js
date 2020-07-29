@@ -26,7 +26,7 @@ class MiddleWare {
                     password: 'Password is too short'
                 }];
         }
-        if (!phone) {
+        if (!phone || phone.length < 14 || phone.length > 14) {
             errors = [...errors, {
                     phone: 'incorrect phone number entered'
                 }];
@@ -87,7 +87,7 @@ class MiddleWare {
         phone = phone.trim();
         password = password.trim();
         let errors = [];
-        if (!phone) {
+        if (!phone || phone.length < 14 || phone.length > 14) {
             errors = [...errors, {
                     phone: 'incorrect phone number entered'
                 }];

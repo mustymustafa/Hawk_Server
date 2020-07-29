@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.upload = void 0;
 const multer = require('multer'), aws = require('aws-sdk'), multerS3 = require('multer-s3'), path = require('path');
 const s3 = new aws.S3({
     accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,

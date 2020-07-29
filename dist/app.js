@@ -27,8 +27,10 @@ const UserController_1 = __importDefault(require("./controllers/UserController")
 const ArtisanController_1 = __importDefault(require("./controllers/ArtisanController"));
 const util_1 = require("./util");
 const JobController_1 = __importDefault(require("./controllers/JobController"));
+const expo_server_sdk_1 = require("expo-server-sdk");
+const expo = new expo_server_sdk_1.Expo();
 //database 
-mongoose_1.default.connect(`mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('database connected.....'))
+mongoose_1.default.connect(`mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }).then(() => console.log('database connected.....'))
     .catch((error) => console.log(error.toString()));
 const app = express_1.default();
 app.use(cors_1.default());
@@ -48,10 +50,12 @@ app.post('/api/v1/image', util_1.upload.single('image'), ArtisanController_1.def
 app.post('/api/v1/dp', util_1.upload.single('image'), ArtisanController_1.default.uploadDp);
 //certificate
 app.post('/api/v1/cert', util_1.upload.single('image'), ArtisanController_1.default.uploadCert);
+app.post('/api/v1/school', util_1.upload.single('image'), ArtisanController_1.default.uploadSchool);
 //set images
 app.post('/api/v1/setid', ArtisanController_1.default.setId);
 app.post('/api/v1/setdp', ArtisanController_1.default.setDp);
 app.post('/api/v1/setcert', ArtisanController_1.default.setCert);
+app.post('/api/v1/setschool', ArtisanController_1.default.setSchool);
 //vehicle papers start
 app.post('/api/v1/vl', util_1.upload.single('image'), ArtisanController_1.default.uploadVl);
 app.post('/api/v1/insurance', util_1.upload.single('image'), ArtisanController_1.default.uploadIns);
@@ -97,6 +101,7 @@ app.post('/api/v1/movinglocation/:uid', ArtisanController_1.default.updateLocati
 app.post('/api/v1/aToken/:uid', ArtisanController_1.default.savePushToken);
 //jobs 
 app.post('/api/v1/jobs', JobController_1.default.displayJobs);
+app.post('/api/v1/logjobs', JobController_1.default.logRequests);
 app.post('/api/v1/job/:job_id/accept', JobController_1.default.acceptJob);
 app.post('/api/v1/job/:job_id/start', JobController_1.default.startJob);
 app.post('/api/v1/job/:job_id/arrive', JobController_1.default.driverArrived);
@@ -112,19 +117,56 @@ app.post('/api/v1/:uid/job/artisan/start', JobController_1.default.startedJob);
 app.post('/api/v1/job/:uid/lastjob', JobController_1.default.checkRating);
 app.post('/api/v1/job/:uid/rate', JobController_1.default.rateArtisan);
 //check for unfinished registration and delete
-const task = node_cron_1.default.schedule("59 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const task = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("registration deletion after a day");
     //find accounts
-    const accounts = yield schema_1.default.Artisan().find({ isConfirmed: false });
-    console.log(accounts);
-    if (accounts.length > 1) {
-        const delete_account = yield schema_1.default.Artisan().deleteMany({ isConfirmed: false });
-    }
-    else {
-        console.log('no accounts found');
-    }
+    const delete_account = yield schema_1.default.Artisan().deleteMany({ isConfirmed: false });
+    console.log("deleted:" + delete_account);
+    const now = new Date().toLocaleDateString();
+    //deactivate account if expired
+    console.log("now" + now);
+    const user = yield schema_1.default.Artisan().updateMany({ expireAt: now }, { $set: { active: false } }, function (err, result) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log('Expired users updated');
+        }
+    });
+    console.log(user);
+}), { scheduled: true });
+// send discount notification
+const discount = node_cron_1.default.schedule("00 09 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("discount notification initialized");
+    //find accounts
+    const now = new Date().toLocaleDateString();
+    const get_users = yield schema_1.default.User().find({ next_promo: now });
+    // console.log("deleted:" + get_users)
+    get_users.map(users => {
+        console.log("tokens:" + users.pushToken);
+        let chunks = expo.chunkPushNotifications([{
+                "to": [users.pushToken],
+                "sound": "default",
+                "title": "You have 50% off discount today!",
+                "body": "Open your Sleek App"
+            }]);
+        let tickets = [];
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            for (let chunk of chunks) {
+                try {
+                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                    console.log(ticketChunk);
+                    tickets.push(...ticketChunk);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            }
+        }))();
+    });
 }), { scheduled: true });
 task.start();
+discount.start();
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
 app.set('port', port);

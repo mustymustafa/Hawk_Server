@@ -14,7 +14,11 @@ class Schema {
             password: String,
             pushToken: String,
             confirmationCode: String,
-            isConfirmed: Boolean
+            isConfirmed: Boolean,
+            promo: { type: Boolean, default: false },
+            next_promo: String,
+            promo_date: String,
+            createdAt: String
         });
         const User = mongoose_1.default.models.User || mongoose_1.default.model('User', UserSchema);
         return User;
@@ -31,6 +35,7 @@ class Schema {
             wage: Number,
             idCard: String,
             cert: String,
+            school: String,
             id_expiry: String,
             vir: String,
             vl: String,
@@ -39,6 +44,7 @@ class Schema {
             poo: String,
             vcolor: String,
             vmodel: String,
+            vyear: String,
             plate: String,
             vpic: String,
             sname: String,
@@ -50,6 +56,7 @@ class Schema {
             arrived: { type: Boolean, default: false },
             completed: { type: Number, default: 0 },
             rating: [Number],
+            earnings: [Number],
             comments: [String],
             area1: String,
             area2: String,
@@ -100,11 +107,24 @@ class Schema {
             createdAt: String,
             rated: Boolean,
             now: Number,
-            endAt: Number,
             active: Boolean
         });
         const Job = mongoose_1.default.models.Job || mongoose_1.default.model('Job', JobSchema);
         return Job;
+    }
+    static Emergency() {
+        const EmergencySchema = new mongoose_1.default.Schema({
+            user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
+            artisan: { type: MongooseSchema.Types.ObjectId, ref: 'Artisan' },
+            location: String,
+            lat: String,
+            long: String,
+            area1: String,
+            area2: String,
+            createdAt: { type: Date, default: Date.now },
+        });
+        const Emergency = mongoose_1.default.models.Emergency || mongoose_1.default.model('Emergency', EmergencySchema);
+        return Emergency;
     }
 }
 exports.default = Schema;

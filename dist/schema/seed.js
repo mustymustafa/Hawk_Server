@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.seedArtisan = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const schema_1 = __importDefault(require("./schema"));
 const salt = bcrypt_1.default.genSaltSync(10);

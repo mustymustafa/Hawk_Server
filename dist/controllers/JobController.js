@@ -50,12 +50,10 @@ class JobController {
                 // console.log(user);
                 //create job
                 const dt = new Date();
-                const now = dt.setMinutes(dt.getMinutes());
-                const createdAt = dt.toLocaleDateString();
-                const endAt = dt.setMinutes(dt.getMinutes() + 30);
-                console.log(createdAt);
-                console.log("end:" + endAt);
-                console.log("now:" + now);
+                //const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
+                //console.log(createdAt)
+                //console.log("end:" + endAt)
+                //console.log("now:" + now)
                 yield schema_1.default.Job().create({
                     user: uid,
                     category: category,
@@ -65,16 +63,21 @@ class JobController {
                     rated: false,
                     area1: area1,
                     area2: area2,
-                    createdAt: createdAt,
-                    endAt: endAt,
-                    now: now,
+                    createdAt: dt,
                     active: true
                 });
                 response.status(201).send({
                     message: 'Job created successfully',
                     status: 201
                 });
+                let title;
                 const artisan = yield schema_1.default.Artisan().findOne({ category: category });
+                if (category === 'driver') {
+                    title = 'Ride Request';
+                }
+                if (category === 'log' || category === 'shop') {
+                    title = 'Dispatch Rider Request';
+                }
                 const artis = artisan.pushToken;
                 savedTokens = artis;
                 console.log(artis);
@@ -87,8 +90,8 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": savedTokens,
                         "sound": "default",
-                        "title": "Job Request",
-                        "body": `A ${category} is needed.`
+                        "title": title,
+                        "body": "Open your 247 App"
                     }]);
                 let tickets = [];
                 (() => __awaiter(this, void 0, void 0, function* () {
@@ -114,29 +117,26 @@ class JobController {
     }
     static driverRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { category, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price } = request.body;
-            console.log(category, uid, location);
-            console.log("area1:" + area1);
-            console.log("area2:" + area2);
-            console.log("lat:" + lat);
-            console.log("long:" + long);
-            console.log("destLat:" + destLat);
-            console.log("destLong:" + destLong);
-            console.log("to:" + to);
-            console.log("from:" + from);
-            console.log("time:" + time);
-            console.log("distance:" + distance);
-            console.log("price:" + price);
+            const { category, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price, to2, destLat2, destLong2 } = request.body;
+            //console.log(category, uid,location)
+            //console.log("area1:" + area1);
+            //console.log("area2:" + area2);
+            //console.log("lat:" + lat);
+            //console.log("long:" + long)
+            //console.log("destLat:" + destLat);
+            //console.log("destLong:" + destLong);
+            //console.log("to:" + to);
+            //console.log("from:" + from);
+            //console.log("time:" + time);
+            //console.log("distance:" + distance);
+            //console.log("price:" + price);
             let savedTokens;
             try {
                 //create job
                 const dt = new Date();
-                const now = dt.setMinutes(dt.getMinutes());
-                const createdAt = dt.toLocaleDateString();
-                const endAt = dt.setMinutes(dt.getMinutes() + 30);
-                console.log(createdAt);
-                console.log("end:" + endAt);
-                console.log("now:" + now);
+                // console.log(createdAt)
+                //console.log("end:" + endAt)
+                //console.log("now:" + now)
                 const job = yield schema_1.default.Job().create({
                     user: uid,
                     category: category,
@@ -146,17 +146,18 @@ class JobController {
                     area1: area1,
                     area2: area2,
                     to: to,
+                    to2: to2,
                     from: from,
                     lat: lat,
                     long: long,
                     destLat: destLat,
+                    destLat2: destLat2,
                     destLong: destLong,
+                    destLong2: destLong2,
                     time: time,
                     price: price,
                     distance: distance,
-                    createdAt: createdAt,
-                    endAt: endAt,
-                    now: now,
+                    createdAt: dt,
                     active: true
                 });
                 console.log("job id!!!!" + job.id);
@@ -165,36 +166,36 @@ class JobController {
                     message: 'Job created successfully',
                     status: 201
                 });
-                const artisan = yield schema_1.default.Artisan().findOne({ category: category });
-                console.log(artisan);
-                const artis = artisan.pushToken;
-                savedTokens = artis;
-                console.log(artis);
+                const artisan = yield schema_1.default.Artisan().find({ category: category }).where({ area1: area1, $or: [{ area2: area2 }] });
                 if (!artisan) {
                     return response.status(404).send({
-                        message: 'No artisans found'
+                        message: 'No driver found'
                     });
                 }
-                //send notification
-                let chunks = expo.chunkPushNotifications([{
-                        "to": savedTokens,
-                        "sound": "default",
-                        "title": "Driver Request",
-                        "body": `A ${category} is needed.`
-                    }]);
-                let tickets = [];
-                (() => __awaiter(this, void 0, void 0, function* () {
-                    for (let chunk of chunks) {
-                        try {
-                            let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                            console.log(ticketChunk);
-                            tickets.push(...ticketChunk);
+                console.log(artisan);
+                artisan.map(artis => {
+                    console.log(artis.pushToken);
+                    //send notification
+                    let chunks = expo.chunkPushNotifications([{
+                            "to": [artis.pushToken],
+                            "sound": "default",
+                            "title": "Ride Request",
+                            "body": "Open your Sleek App"
+                        }]);
+                    let tickets = [];
+                    (() => __awaiter(this, void 0, void 0, function* () {
+                        for (let chunk of chunks) {
+                            try {
+                                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                console.log(ticketChunk);
+                                tickets.push(...ticketChunk);
+                            }
+                            catch (error) {
+                                console.error(error);
+                            }
                         }
-                        catch (error) {
-                            console.error(error);
-                        }
-                    }
-                }))();
+                    }))();
+                });
             }
             catch (error) {
                 console.log(error.toString());
@@ -207,7 +208,7 @@ class JobController {
     static logRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price } = request.body;
-            console.log(category);
+            //console.log(category)
             let savedTokens;
             try {
                 //create job
@@ -215,9 +216,9 @@ class JobController {
                 const now = dt.setMinutes(dt.getMinutes());
                 const createdAt = dt.toLocaleDateString();
                 const endAt = dt.setMinutes(dt.getMinutes() + 30);
-                console.log(createdAt);
-                console.log("end:" + endAt);
-                console.log("now:" + now);
+                //console.log(createdAt)
+                //console.log("end:" + endAt)
+                //console.log("now:" + now)
                 const job = yield schema_1.default.Job().create({
                     user: uid,
                     category: category,
@@ -256,36 +257,36 @@ class JobController {
                     message: 'Job created successfully',
                     status: 201
                 });
-                const artisan = yield schema_1.default.Artisan().findOne({ category: 'log' });
-                console.log(artisan);
-                const artis = artisan.pushToken;
-                savedTokens = artis;
-                console.log(artis);
+                const artisan = yield schema_1.default.Artisan().find({ category: 'log' });
                 if (!artisan) {
                     return response.status(404).send({
-                        message: 'No artisans found'
+                        message: 'No riders found'
                     });
                 }
-                //send notification
-                let chunks = expo.chunkPushNotifications([{
-                        "to": savedTokens,
-                        "sound": "default",
-                        "title": "New Request",
-                        "body": `A Dispatch Rider is needed.`
-                    }]);
-                let tickets = [];
-                (() => __awaiter(this, void 0, void 0, function* () {
-                    for (let chunk of chunks) {
-                        try {
-                            let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                            console.log(ticketChunk);
-                            tickets.push(...ticketChunk);
+                console.log(artisan);
+                artisan.map((artis) => {
+                    console.log(artis.pushToken);
+                    //send notification
+                    let chunks = expo.chunkPushNotifications([{
+                            "to": [artis.pushToken],
+                            "sound": "default",
+                            "title": "New Request",
+                            "body": "A dispatch Rider is needed!"
+                        }]);
+                    let tickets = [];
+                    (() => __awaiter(this, void 0, void 0, function* () {
+                        for (let chunk of chunks) {
+                            try {
+                                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                console.log(ticketChunk);
+                                tickets.push(...ticketChunk);
+                            }
+                            catch (error) {
+                                console.error(error);
+                            }
                         }
-                        catch (error) {
-                            console.error(error);
-                        }
-                    }
-                }))();
+                    }))();
+                });
             }
             catch (error) {
                 console.log(error.toString());
@@ -295,14 +296,32 @@ class JobController {
             }
         });
     }
+    //display requests
     static displayJobs(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { category, area1, area2 } = request.body;
             console.log(category);
             console.log("area1:" + area1);
             console.log("area2:" + area2);
-            // find artisan
-            const job = yield schema_1.default.Job().find({ category: category, $or: [{ area1: area1 }, { area2: area2 }], $and: [{ status: 'active' }] });
+            const job = yield schema_1.default.Job().find({ category: category }).where({ area1: area1, $or: [{ area2: area2 }], $and: [{ status: 'active' }] }).sort({ '_id': -1 });
+            console.log(job);
+            //get hirer id
+            const user = job.map(usr => {
+                return usr.user;
+            });
+            const hirer = yield schema_1.default.User().findOne({ _id: user });
+            console.log("hirer:" + hirer);
+            return response.status(200).send({ job: job, hirer: hirer });
+        });
+    }
+    //display logistics requests
+    static logRequests(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { category } = request.body;
+            console.log(category);
+            //console.log("area1:" + area1);
+            //console.log("area2:" + area2);
+            const job = yield schema_1.default.Job().find({ category: category }).where({ status: 'active' }).sort({ '_id': -1 });
             console.log(job);
             //get hirer id
             const user = job.map(usr => {
@@ -324,12 +343,7 @@ class JobController {
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: uid });
             console.log(price);
-            console.log("wage " + artisan.wage);
-            if (!price || price > artisan.wage) {
-                return response.status(404).send({
-                    message: `Please enter a price between (₦)0-${artisan.wage}`
-                });
-            }
+            console.log("artisan name " + artisan.name);
             if (!job && !hirer) {
                 return response.status(404).send({
                     message: 'Job does not exist'
@@ -355,7 +369,7 @@ class JobController {
                         "to": savedTokens,
                         "sound": "default",
                         "title": "Request Accepted!",
-                        "body": `A/an ${job.category} has accepted your request.`
+                        "body": `A driver has accepted your request.`
                     }]);
                 let tickets = [];
                 (() => __awaiter(this, void 0, void 0, function* () {
@@ -388,7 +402,7 @@ class JobController {
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: uid });
             console.log(price);
-            console.log("wage " + artisan.wage);
+            console.log("artisan " + artisan.name);
             if (!job && !hirer) {
                 return response.status(404).send({
                     message: 'Job does not exist'
@@ -401,6 +415,7 @@ class JobController {
                     $set: {
                         artisan: uid,
                         status: 'accepted',
+                        artisan_name: artisan.name,
                         price: price
                     }
                 });
@@ -413,7 +428,7 @@ class JobController {
                         "to": savedTokens,
                         "sound": "default",
                         "title": "Request Accepted!",
-                        "body": `Your ${job.category} has accepted your request and is on his way.`
+                        "body": `A Driver has accepted your request and is on his way.`
                     }]);
                 let tickets = [];
                 (() => __awaiter(this, void 0, void 0, function* () {
@@ -443,6 +458,9 @@ class JobController {
             console.log("job found:" + job);
             const hirer = yield schema_1.default.User().findOne({ _id: job.user });
             console.log("hirer:" + hirer);
+            //find artisan
+            const arti = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
+            console.log("artisan found:" + arti);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: uid });
             if (!job && !hirer) {
                 return response.status(404).send({
@@ -450,7 +468,7 @@ class JobController {
                 });
             }
             try {
-                response.status(200).send({ hirer: hirer.name, number: hirer.phone, job: job });
+                response.status(200).send({ hirer: hirer.name, number: hirer.phone, job: job, artisan: arti });
             }
             catch (error) {
                 console.log(error);
@@ -478,8 +496,8 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": artisan.pushToken,
                         "sound": "default",
-                        "title": "Job Canceled!",
-                        "body": `${hirer.name} canceled his job request.`
+                        "title": "Request Canceled!",
+                        "body": `${hirer.name} canceled his  request.`
                     }]);
                 let tickets = [];
                 (() => __awaiter(this, void 0, void 0, function* () {
@@ -558,8 +576,8 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": hirer.pushToken,
                         "sound": "default",
-                        "title": "Job Canceled!",
-                        "body": `The ${artisan.category},  ${artisan.name} canceled the Job`
+                        "title": "Request Canceled!",
+                        "body": `${artisan.name} canceled the Request`
                     }]);
                 let tickets = [];
                 (() => __awaiter(this, void 0, void 0, function* () {
@@ -615,16 +633,21 @@ class JobController {
                     _id: job_id
                 }, {
                     $set: {
-                        status: 'completed',
-                        start: false,
-                        arrived: false
+                        status: 'completed'
                     }
                 });
                 yield schema_1.default.Artisan().updateOne({
                     _id: artisan._id
                 }, {
+                    $set: {
+                        start: false,
+                        arrived: false
+                    },
                     $inc: {
                         completed: 1
+                    },
+                    $push: {
+                        earnings: job.price
                     }
                 });
                 response.status(201).send({
@@ -635,8 +658,8 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": hirer.pushToken,
                         "sound": "default",
-                        "title": "Job Completed!",
-                        "body": 'Yay! your Job is done.'
+                        "title": "Ride Completed!",
+                        "body": 'Yay! Ride completed'
                     }]);
                 let tickets = [];
                 (() => __awaiter(this, void 0, void 0, function* () {
@@ -664,7 +687,7 @@ class JobController {
             console.log("artisan:" + uid);
             // find artisan and hirer
             try {
-                const job = yield schema_1.default.Job().find({ artisan: uid, $and: [{ status: 'accepted' }] });
+                const job = yield schema_1.default.Job().find({ artisan: uid }).sort({ '_id': -1 });
                 //console.log(job)
                 //get hirer id
                 const user = job.map(usr => {
@@ -687,57 +710,59 @@ class JobController {
     static getArtisan(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             var total = 0;
-            const { uid, name } = request.body;
+            const { uid, name, job_id } = request.body;
             let savedTokens;
             console.log("category" + name);
             console.log("user:" + uid);
             const user = yield schema_1.default.User().findOne({ _id: uid });
-            //console.log(user)
+            console.log(user);
             // find artisan
-            const job = yield schema_1.default.Job().findOne({ user: uid, $and: [{ category: name }] }).where('status').equals('accepted');
-            console.log(job);
-            const findArtisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
-            console.log(findArtisan);
-            if (!findArtisan) {
-                console.log("No Artisan Available");
-                return response.status(400).send({ notFound: "No Artisan is available at the moment" });
-            }
-            try {
-                const getRating = findArtisan.rating;
-                console.log(getRating.length);
-                for (var i = 0; i < getRating.length; i++) {
-                    total += getRating[i];
-                }
-                var rate = Math.round(total / getRating.length);
-                console.log("rating:" + rate);
-                response.status(200).send({ artisan: findArtisan, job: job, rating: rate });
-                // send notification
-                savedTokens = user.pushToken;
-                console.log(savedTokens);
-                //send notification
-                let chunks = expo.chunkPushNotifications([{
-                        "to": savedTokens,
-                        "sound": "default",
-                        "title": "Artisan Found!",
-                        "body": `Yay! We have found your nearest ${job.category}`
-                    }]);
-                let tickets = [];
-                (() => __awaiter(this, void 0, void 0, function* () {
-                    for (let chunk of chunks) {
-                        try {
-                            let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                            console.log(ticketChunk);
-                            tickets.push(...ticketChunk);
-                        }
-                        catch (error) {
-                            console.error(error);
-                        }
+            const job = yield schema_1.default.Job().findOne({ _id: job_id, $and: [{ category: name }] }).where('status').equals('accepted');
+            console.log('Job A' + job);
+            if (job) {
+                const findArtisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
+                console.log(findArtisan);
+                try {
+                    const getRating = findArtisan.rating;
+                    console.log(getRating.length);
+                    for (var i = 0; i < getRating.length; i++) {
+                        total += getRating[i];
                     }
-                }))();
+                    var rate = Math.round(total / getRating.length);
+                    console.log("rating:" + rate);
+                    response.status(200).send({ artisan: findArtisan, job: job, rating: rate });
+                    // send notification
+                    savedTokens = user.pushToken;
+                    console.log(savedTokens);
+                    //send notification
+                    let chunks = expo.chunkPushNotifications([{
+                            "to": savedTokens,
+                            "sound": "default",
+                            "title": "Yay! Driver Found",
+                            "body": `Open your 247 App`
+                        }]);
+                    let tickets = [];
+                    (() => __awaiter(this, void 0, void 0, function* () {
+                        for (let chunk of chunks) {
+                            try {
+                                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                console.log(ticketChunk);
+                                tickets.push(...ticketChunk);
+                            }
+                            catch (error) {
+                                console.error(error);
+                            }
+                        }
+                    }))();
+                }
+                catch (error) {
+                    console.log(error);
+                    response.status(404).send("something went wrong");
+                }
             }
-            catch (error) {
-                console.log(error);
-                response.status(404).send("something went wrong");
+            else {
+                console.log("No Driver Available");
+                return response.status(404).send("no driver yet");
             }
         });
     }
@@ -904,18 +929,19 @@ class JobController {
             // find artisan
             const job = yield schema_1.default.Job().findOne({ user: uid, $and: [{ category: name }] }).where('status').equals('accepted');
             console.log(job);
-            const findArtisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
-            console.log(findArtisan);
-            if (!findArtisan) {
-                console.log("No Artisan Available");
-                return response.status(400).send({ notFound: "No Artisan is available at the moment" });
+            if (job) {
+                const findArtisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
+                //console.log(findArtisan)
+                try {
+                    response.status(200).send({ artisan: findArtisan.start });
+                }
+                catch (error) {
+                    console.log(error);
+                    response.status(404).send("something went wrong");
+                }
             }
-            try {
-                response.status(200).send({ artisan: findArtisan.start });
-            }
-            catch (error) {
-                console.log(error);
-                response.status(404).send("something went wrong");
+            else {
+                console.log("No Driver Available");
             }
         });
     }
@@ -925,11 +951,11 @@ class JobController {
             const { job_id } = request.body;
             let savedTokens;
             const job = yield schema_1.default.Job().findOne({ _id: job_id });
-            console.log("job found:" + job);
-            const driver = yield schema_1.default.User().findOne({ _id: job.artisan });
-            console.log("driver:" + driver);
+            //console.log("job found:" + job);
+            const driver = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
+            //console.log("driver:" + driver)
             const hirer = yield schema_1.default.User().findOne({ _id: job.user });
-            console.log("hirer:" + hirer);
+            //console.log("hirer:" + hirer)
             if (!job && !hirer) {
                 return response.status(404).send({
                     message: 'Job does not exist'
@@ -946,7 +972,7 @@ class JobController {
                     });
                     // send notification
                     savedTokens = hirer.pushToken;
-                    console.log(savedTokens);
+                    //console.log(savedTokens)
                     //send notification
                     let chunks = expo.chunkPushNotifications([{
                             "to": savedTokens,
@@ -987,7 +1013,7 @@ class JobController {
             const user = yield schema_1.default.User().findOne({ _id: uid });
             console.log(user);
             //get user jobs
-            const job = yield schema_1.default.Job().find({ user: uid });
+            const job = yield schema_1.default.Job().find({ user: uid }).sort({ '_id': -1 });
             console.log(job);
             if (user) {
                 return response.status(200).send({
