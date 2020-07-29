@@ -37,7 +37,7 @@ class UserController {
     // sign up
     static signup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { fullname, email, password, phone, cpassword } = request.body;
+            const { fullname, email, password, phone, cpassword, country } = request.body;
             console.log(request.body);
             try {
                 const foundEmail = yield schema_1.default.User().find({ phone: phone.trim() });
@@ -70,6 +70,7 @@ class UserController {
                     .then(response => console.log(response.sid));
                 yield schema_1.default.User().create({
                     name: fullname.trim(),
+                    country: country,
                     email: email.trim(),
                     password: bcrypt_1.default.hashSync(password.trim(), UserController.generateSalt()),
                     phone,

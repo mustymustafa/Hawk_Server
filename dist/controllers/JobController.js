@@ -207,7 +207,7 @@ class JobController {
     }
     static logRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price } = request.body;
+            const { category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime } = request.body;
             //console.log(category)
             let savedTokens;
             try {
@@ -231,6 +231,7 @@ class JobController {
                     to4: to4,
                     to5: to5,
                     from: from,
+                    pTime: pTime,
                     lat: lat,
                     long: long,
                     destLat: destLat,

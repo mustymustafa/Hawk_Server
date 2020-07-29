@@ -47,7 +47,7 @@ class ArtisanController {
     // sign up
     static signup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { fullname, email, password, phone, cpassword } = request.body;
+            const { fullname, email, password, phone, cpassword, country } = request.body;
             console.log(phone);
             try {
                 const foundEmail = yield schema_1.default.Artisan().find({ phone: phone.trim() });
@@ -70,6 +70,7 @@ class ArtisanController {
                 }
                 yield schema_1.default.Artisan().create({
                     name: fullname.trim(),
+                    country: country,
                     email: email.trim(),
                     password: bcrypt_1.default.hashSync(password.trim(), ArtisanController.generateSalt()),
                     phone,
