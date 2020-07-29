@@ -33,7 +33,7 @@ class UserController {
     // sign up
   static async signup (request: Request, response: Response) {
     const {
-      fullname, email, password, phone, cpassword
+      fullname, email, password, phone, cpassword, country
     } = request.body;
 
     console.log(request.body);
@@ -80,6 +80,7 @@ class UserController {
       
       await Schema.User().create({
         name: fullname.trim(),
+        country: country,
         email: email.trim(),
         password: bcrypt.hashSync(password.trim(), UserController.generateSalt()),
         phone,

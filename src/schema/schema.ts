@@ -6,6 +6,7 @@ class Schema {
     static User() {
         const UserSchema = new mongoose.Schema({
             name: String,
+            country: String,
             email: String,
             phone: String,
             password: String,
@@ -25,6 +26,7 @@ class Schema {
     static Artisan() {
         const ArtisanSchema = new mongoose.Schema({
             name: String,
+            country: String,
             email: String,
             phone: String,
             password: String,
@@ -81,6 +83,7 @@ class Schema {
     static Job() {
         const JobSchema = new mongoose.Schema({
             category: String,
+            pTime: String,
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
             artisan: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
             artisan_name: String,

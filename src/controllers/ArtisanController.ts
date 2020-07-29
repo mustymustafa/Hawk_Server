@@ -49,7 +49,7 @@ class ArtisanController {
     // sign up
   static async signup (request: Request, response: Response) {
     const {
-      fullname, email, password, phone, cpassword
+      fullname, email, password, phone, cpassword, country
     } = request.body;
 
     console.log(phone);
@@ -82,6 +82,7 @@ class ArtisanController {
       
       await Schema.Artisan().create({
         name: fullname.trim(),
+        country: country,
         email: email.trim(),
         password: bcrypt.hashSync(password.trim(),ArtisanController.generateSalt()),
         phone,

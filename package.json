@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "postinstall": "tsc",
@@ -44,6 +44,6 @@
   },
   "engines": {
     "node": "10.15.1",
-    "yarn": "1.17.3"
+    "yarn": "1.22.4"
   }
 }

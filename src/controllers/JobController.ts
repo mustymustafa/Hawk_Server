@@ -287,7 +287,7 @@ let title;
   }
 
   static async logRequest (request:Request, response:Response){
-    const {category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price} = request.body;
+    const {category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime} = request.body;
   //console.log(category)
   
     let savedTokens;
@@ -321,6 +321,7 @@ let title;
             to5: to5,
 
             from: from,
+            pTime: pTime,
             lat: lat,
             long: long,
 
@@ -989,9 +990,9 @@ console.log(hirer.pushToken)
             start: false,
             arrived: false
           },
-            $inc: {
-                completed: 1
-            },
+          $inc: {
+            completed:  1
+          },
             $push: {
              earnings: job.price
           }
