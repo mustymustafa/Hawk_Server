@@ -990,9 +990,9 @@ console.log(hirer.pushToken)
             start: false,
             arrived: false
           },
-          $inc: {
-            completed:  1
-          },
+        /**  $inc: {
+            completed: 1
+          },*/ 
             $push: {
              earnings: job.price
           }
