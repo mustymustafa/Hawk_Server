@@ -205,7 +205,7 @@ console.log(user)
 
 
 // send discount notification
-const discount = cron.schedule("00 09 * * *", async () => {
+const discount = cron.schedule("00 12 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
@@ -221,7 +221,46 @@ const now = new Date().toLocaleDateString();
     let chunks = expo.chunkPushNotifications([{
       "to": [users.pushToken],
       "sound": "default",
-      "title": "You have 50% off discount today!",
+      "title": "You have 30% off discount today!",
+      "body": "Open your Sleek App"
+    }]);
+    let tickets = [];
+    (async () => {
+      for (let chunk of chunks) {
+        try {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+       
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    })();
+    })
+  
+},
+
+{scheduled: true}
+);
+
+const discount1 = cron.schedule("00 00 * * *", async () => {
+  
+  console.log("discount notification initialized");
+//find accounts
+
+const now = new Date().toLocaleDateString();
+
+  const get_users = await Schema.User().find({next_promo: now})
+ // console.log("deleted:" + get_users)
+
+  get_users.map(users => {
+ 
+    console.log("tokens:" + users.pushToken)
+    let chunks = expo.chunkPushNotifications([{
+      "to": [users.pushToken],
+      "sound": "default",
+      "title": "You have 30% off discount today!",
       "body": "Open your Sleek App"
     }]);
     let tickets = [];
@@ -246,6 +285,8 @@ const now = new Date().toLocaleDateString();
 
 task.start();
 discount.start();
+discount1.start();
+
 
 
 
