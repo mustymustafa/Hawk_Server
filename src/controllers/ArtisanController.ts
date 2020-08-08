@@ -1063,11 +1063,11 @@ class ArtisanController {
   //confrimation code
   static async confirm(request: Request, response: Response) {
     const {
-      email, confirmationCode
+      phone, confirmationCode
     } = request.body;
     console.log(confirmationCode)
 
-    const foundUser: any = await Schema.Artisan().findOne({ email });
+    const foundUser: any = await Schema.Artisan().findOne({ phone });
     console.log(foundUser.confirmationCode)
 
     if (foundUser && Object.keys(foundUser).length > 0) {
