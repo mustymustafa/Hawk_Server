@@ -37,6 +37,7 @@ class Schema {
             idCard: String,
             cert: String,
             school: String,
+            cac: String,
 
             id_expiry: String,
             vir: String,
