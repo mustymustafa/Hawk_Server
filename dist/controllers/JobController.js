@@ -216,7 +216,7 @@ class JobController {
                 const now = dt.setMinutes(dt.getMinutes());
                 const createdAt = dt.toLocaleDateString();
                 const endAt = dt.setMinutes(dt.getMinutes() + 30);
-                //console.log(createdAt)
+                // console.log(pTime)
                 //console.log("end:" + endAt)
                 //console.log("now:" + now)
                 const job = yield schema_1.default.Job().create({
@@ -644,9 +644,9 @@ class JobController {
                         start: false,
                         arrived: false
                     },
-                    $inc: {
+                    /**  $inc: {
                         completed: 1
-                    },
+                      },*/
                     $push: {
                         earnings: job.price
                     }

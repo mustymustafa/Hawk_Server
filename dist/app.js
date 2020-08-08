@@ -136,7 +136,7 @@ const task = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0,
     console.log(user);
 }), { scheduled: true });
 // send discount notification
-const discount = node_cron_1.default.schedule("00 09 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discount = node_cron_1.default.schedule("00 12 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount notification initialized");
     //find accounts
     const now = new Date().toLocaleDateString();
@@ -147,7 +147,36 @@ const discount = node_cron_1.default.schedule("00 09 * * *", () => __awaiter(voi
         let chunks = expo.chunkPushNotifications([{
                 "to": [users.pushToken],
                 "sound": "default",
-                "title": "You have 50% off discount today!",
+                "title": "You have 30% off discount today!",
+                "body": "Open your Sleek App"
+            }]);
+        let tickets = [];
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            for (let chunk of chunks) {
+                try {
+                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                    console.log(ticketChunk);
+                    tickets.push(...ticketChunk);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            }
+        }))();
+    });
+}), { scheduled: true });
+const discount1 = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("discount notification initialized");
+    //find accounts
+    const now = new Date().toLocaleDateString();
+    const get_users = yield schema_1.default.User().find({ next_promo: now });
+    // console.log("deleted:" + get_users)
+    get_users.map(users => {
+        console.log("tokens:" + users.pushToken);
+        let chunks = expo.chunkPushNotifications([{
+                "to": [users.pushToken],
+                "sound": "default",
+                "title": "You have 30% off discount today!",
                 "body": "Open your Sleek App"
             }]);
         let tickets = [];
@@ -167,6 +196,7 @@ const discount = node_cron_1.default.schedule("00 09 * * *", () => __awaiter(voi
 }), { scheduled: true });
 task.start();
 discount.start();
+discount1.start();
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
 app.set('port', port);

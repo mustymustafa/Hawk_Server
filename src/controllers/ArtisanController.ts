@@ -3,11 +3,11 @@ import jwt from 'jsonwebtoken';
 import { Request, Response } from "express";
 
 import twilio from 'twilio';
-const accountSid = process.env.TWILIO_SID; 
-const authToken = process.env.TWILIO_AUTH_TOKEN; 
-const client = twilio(accountSid, authToken,  { 
-  lazyLoading: true 
-}); 
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio(accountSid, authToken, {
+  lazyLoading: true
+});
 
 import { Expo } from "expo-server-sdk";
 
@@ -31,8 +31,8 @@ var transporter = nodemailer.createTransport({
  });
 */
 
- function addWeek(date: any, week: any) {
-   console.log(date)
+function addWeek(date: any, week: any) {
+  console.log(date)
   const d = date.getDate();
 
   date.setDate(date.getDate() + +week);
@@ -46,8 +46,8 @@ var transporter = nodemailer.createTransport({
 class ArtisanController {
 
 
-    // sign up
-  static async signup (request: Request, response: Response) {
+  // sign up
+  static async signup(request: Request, response: Response) {
     const {
       fullname, email, password, phone, cpassword, country
     } = request.body;
@@ -55,7 +55,7 @@ class ArtisanController {
     console.log(phone);
 
     try {
-      const foundEmail = await Schema.Artisan().find({phone: phone.trim()});
+      const foundEmail = await Schema.Artisan().find({ phone: phone.trim() });
       if (foundEmail && foundEmail.length > 0) {
 
         console.log(foundEmail[0])
@@ -71,25 +71,25 @@ class ArtisanController {
           message: 'The Password do not match'
         });
       }
-      if (!phone || phone.length < 14 || phone.length > 14 ) {
-       
+      if (!phone || phone.length < 14 || phone.length > 14) {
+
         return response.status(409).send({
           message: 'Please enter a valid  number',
         });
       }
 
 
-      
+
       await Schema.Artisan().create({
         name: fullname.trim(),
         country: country,
         email: email.trim(),
-        password: bcrypt.hashSync(password.trim(),ArtisanController.generateSalt()),
+        password: bcrypt.hashSync(password.trim(), ArtisanController.generateSalt()),
         phone,
         isConfirmed: false
       });
-     
-          
+
+
       response.status(201).send({
         message: 'User created successfully',
         status: 201
@@ -102,148 +102,148 @@ class ArtisanController {
     }
   }
 
- 
+
 
   //continue signup
-  static async continueSignup (request: Request, response: Response) {
-      
+  static async continueSignup(request: Request, response: Response) {
+
     const {
-email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone, vyear
+      email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone, vyear
     } = request.body;
 
     console.log(request.body);
-    const foundUser:any = await Schema.Artisan().findOne({email});
+    const foundUser: any = await Schema.Artisan().findOne({ email });
 
     if (foundUser && Object.keys(foundUser).length > 0) {
-        console.log(foundUser);
-        try {
-          const dt = new Date();
-          const createdAt = dt.toLocaleDateString();
-          console.log(createdAt)
-          var now = new Date();
-          
-          //after 7 days
-              const expire =  now.setDate(now.getDate()+7);
+      console.log(foundUser);
+      try {
+        const dt = new Date();
+        const createdAt = dt.toLocaleDateString();
+        console.log(createdAt)
+        var now = new Date();
+
+        //after 7 days
+        const expire = now.setDate(now.getDate() + 7);
         console.log(now.toLocaleDateString())
-    
 
-  await Schema.Artisan().updateOne({
-              _id: foundUser._id
-            }, {
-              $set: {
-                bio: bio,
-              //  wage: wage,
-                category: category,
-                id_expiry: id_expiry,
-                vl_expiry: vl_expiry,
-                vcolor: vcolor,
-                vmodel: vmodel,
-                vyear: vyear,
-                plate: plate,
-                sname: sname,
-                sphone: sphone,
-                createdAt: createdAt,
-                expireAt: now.toLocaleDateString()
-              }
-            });
-    
-            
-            return   response.status(200).send({
-                message: 'User created successfully',
-                status: 201
-              });
-          } catch (error) {
-            console.log(error.toString());
-            response.status(500).send({
-              message: 'something went wrong'
-            });
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            bio: bio,
+            //  wage: wage,
+            category: category,
+            id_expiry: id_expiry,
+            vl_expiry: vl_expiry,
+            vcolor: vcolor,
+            vmodel: vmodel,
+            vyear: vyear,
+            plate: plate,
+            sname: sname,
+            sphone: sphone,
+            createdAt: createdAt,
+            expireAt: now.toLocaleDateString()
           }
-        }
+        });
 
 
+        return response.status(200).send({
+          message: 'User created successfully',
+          status: 201
+        });
+      } catch (error) {
+        console.log(error.toString());
+        response.status(500).send({
+          message: 'something went wrong'
+        });
+      }
     }
 
 
+  }
 
-    //update profile
-    static async updateArtisan (request: Request, response: Response) {
-      
-      const {
-  uid, bio, wage, phone, name
-      } = request.body;
-  
-      console.log(request.body);
-      const foundUser:any = await Schema.Artisan().findOne({_id: uid});
 
-      if (foundUser && Object.keys(foundUser).length > 0) {
-          console.log(foundUser);
-          if (!bio) {
-       
-            return response.status(409).send({
-              message: 'Please enter a bio',
-            });
-          }
 
-          if(!( (/^[a-z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())) )  ){
-     
-            return response.status(409).send({
-              message: 'Please enter a valid name',
-            });
-          }
+  //update profile
+  static async updateArtisan(request: Request, response: Response) {
 
-          if (!wage) {
-       
-            return response.status(409).send({
-              message: 'Please enter a wage',
-            });
-          }
+    const {
+      uid, bio, wage, phone, name
+    } = request.body;
 
-          if (!phone || phone.length < 11 || phone.length > 11) {
-       
-            return response.status(409).send({
-              message: 'Please enter a valid phone',
-            });
-          }
-          try {
-              await Schema.Artisan().updateOne({
-                _id: uid
-              }, {
-                $set: {
-                  bio: bio,
-                  wage: wage,
-                  phone: phone,
-                  name: name
+    console.log(request.body);
+    const foundUser: any = await Schema.Artisan().findOne({ _id: uid });
 
-                }
-              });
-      
-              
-              return   response.status(200).send({
-                  message: 'User updated successfully',
-                  status: 201
-                });
-            } catch (error) {
-              console.log(error.toString());
-              response.status(500).send({
-                message: 'something went wrong'
-              });
-            }
-          }
-  
-  
+    if (foundUser && Object.keys(foundUser).length > 0) {
+      console.log(foundUser);
+      if (!bio) {
+
+        return response.status(409).send({
+          message: 'Please enter a bio',
+        });
       }
-  
+
+      if (!((/^[a-z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())))) {
+
+        return response.status(409).send({
+          message: 'Please enter a valid name',
+        });
+      }
+
+      if (!wage) {
+
+        return response.status(409).send({
+          message: 'Please enter a wage',
+        });
+      }
+
+      if (!phone || phone.length < 11 || phone.length > 11) {
+
+        return response.status(409).send({
+          message: 'Please enter a valid phone',
+        });
+      }
+      try {
+        await Schema.Artisan().updateOne({
+          _id: uid
+        }, {
+          $set: {
+            bio: bio,
+            wage: wage,
+            phone: phone,
+            name: name
+
+          }
+        });
+
+
+        return response.status(200).send({
+          message: 'User updated successfully',
+          status: 201
+        });
+      } catch (error) {
+        console.log(error.toString());
+        response.status(500).send({
+          message: 'something went wrong'
+        });
+      }
+    }
+
+
+  }
+
   //update artisan location
 
 
 
 
   //upload images
-    static uploadimage(req: Request, res: Response) {
-        const parts = req.file.originalname.split(' ')
-        const find = parts[0]
-        console.log(find)
-        res.json(req.file)
+  static uploadimage(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
   }
 
   static uploadDp(req: Request, res: Response) {
@@ -251,56 +251,63 @@ email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, 
     const find = parts[0]
     console.log(find)
     res.json(req.file)
-}
+  }
 
-static uploadVl(req: Request, res: Response) {
-  const parts = req.file.originalname.split(' ')
-  const find = parts[0]
-  console.log(find)
-  res.json(req.file)
-}
+  static uploadVl(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
+  }
 
-static uploadIns(req: Request, res: Response) {
-  const parts = req.file.originalname.split(' ')
-  const find = parts[0]
-  console.log(find)
-  res.json(req.file)
-}
+  static uploadIns(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
+  }
 
-static uploadPoo(req: Request, res: Response) {
-  const parts = req.file.originalname.split(' ')
-  const find = parts[0]
-  console.log(find)
-  res.json(req.file)
-}
+  static uploadPoo(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
+  }
 
-static uploadVir(req: Request, res: Response) {
-  const parts = req.file.originalname.split(' ')
-  const find = parts[0]
-  console.log(find)
-  res.json(req.file)
-}
+  static uploadVir(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
+  }
 
-static uploadVpic(req: Request, res: Response) {
-  const parts = req.file.originalname.split(' ')
-  const find = parts[0]
-  console.log(find)
-  res.json(req.file)
-}
+  static uploadVpic(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
+  }
 
-static uploadCert(req: Request, res: Response) {
-  const parts = req.file.originalname.split(' ')
-  const find = parts[0]
-  console.log(find)
-  res.json(req.file)
-}
+  static uploadCert(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
+  }
 
-static uploadSchool(req: Request, res: Response) {
-  const parts = req.file.originalname.split(' ')
-  const find = parts[0]
-  console.log(find)
-  res.json(req.file)
-}
+  static uploadSchool(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
+  }
+
+  static uploadCac(req: Request, res: Response) {
+    const parts = req.file.originalname.split(' ')
+    const find = parts[0]
+    console.log(find)
+    res.json(req.file)
+  }
 
 
 
@@ -308,474 +315,522 @@ static uploadSchool(req: Request, res: Response) {
 
 
 
-//set images
-static async setId( request: Request, res: Response) {
-     
-  
+
+
+  //set images
+  static async setId(request: Request, res: Response) {
+
+
     console.log(request.body)
-        try {
-         const email = request.body.email
-         const image = request.body.image
-           console.log(email)
-           console.log(image)
-        
-        
-         
-
-        const foundUser:any = await Schema.Artisan().findOne({email});
-    
-        if (foundUser && Object.keys(foundUser).length > 0) {
-            console.log(foundUser);
-         
-                await Schema.Artisan().updateOne({
-                  _id: foundUser._id
-                }, {
-                  $set: {
-                    idCard: image
-                   
-                  }
-                });
-    
-                
-                return  res.status(200).send("image set")
-                } 
-              } catch (error) {
-                console.log(error.toString());
-                res.status(500).send({
-                  message: 'something went wrong'
-                });
-              }
-        
-    
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
 
 
 
-            }
 
- static async setDp( request: Request, res: Response) {
-     
-  
-                console.log(request.body)
-                    try {
-                     const email = request.body.email
-                     const image = request.body.image
-                       console.log(email)
-                       console.log(image)
-                    
-                    
-                     
-            
-                    const foundUser:any = await Schema.Artisan().findOne({email});
-                
-                    if (foundUser && Object.keys(foundUser).length > 0) {
-                        console.log(foundUser);
-                     
-                            await Schema.Artisan().updateOne({
-                              _id: foundUser._id
-                            }, {
-                              $set: {
-                                pic: image
-                               
-                              }
-                            });
-                
-                            
-                            return  res.status(200).send("image set")
-                            } 
-                          } catch (error) {
-                            console.log(error.toString());
-                            res.status(500).send({
-                              message: 'something went wrong'
-                            });
-                          }
-                    
-                
-            
-            
-            
-                        }
-       
-  static async setCert( request: Request, res: Response) {
-     
-  
-                          console.log(request.body)
-                              try {
-                               const email = request.body.email
-                               const image = request.body.image
-                                 console.log(email)
-                                 console.log(image)
-                              
-                              
-                               
-                      
-                              const foundUser:any = await Schema.Artisan().findOne({email});
-                          
-                              if (foundUser && Object.keys(foundUser).length > 0) {
-                                  console.log(foundUser);
-                               
-                                      await Schema.Artisan().updateOne({
-                                        _id: foundUser._id
-                                      }, {
-                                        $set: {
-                                          cert: image
-                                         
-                                        }
-                                      });
-                          
-                                      
-                                      return  res.status(200).send("image set")
-                                      } 
-                                    } catch (error) {
-                                      console.log(error.toString());
-                                      res.status(500).send({
-                                        message: 'something went wrong'
-                                      });
-                                    }
-                              
-                          
-                      
-                      
-                      
-                                  }
-                      
-  static async setVl( request: Request, res: Response) {
-     
-  
-                                    console.log(request.body)
-                                        try {
-                                         const email = request.body.email
-                                         const image = request.body.image
-                                           console.log(email)
-                                           console.log(image)
-                                        
-                                        
-                                         
-                                
-                                        const foundUser:any = await Schema.Artisan().findOne({email});
-                                    
-                                        if (foundUser && Object.keys(foundUser).length > 0) {
-                                            console.log(foundUser);
-                                         
-                                                await Schema.Artisan().updateOne({
-                                                  _id: foundUser._id
-                                                }, {
-                                                  $set: {
-                                                    vl: image
-                                                   
-                                                  }
-                                                });
-                                    
-                                                
-                                                return  res.status(200).send("image set")
-                                                } 
-                                              } catch (error) {
-                                                console.log(error.toString());
-                                                res.status(500).send({
-                                                  message: 'something went wrong'
-                                                });
-                                              }
-                                        
-                                    
-                                
-                                
-                                
-                                            }
-   static async setIns( request: Request, res: Response) {
-     
-  
-                                              console.log(request.body)
-                                                  try {
-                                                   const email = request.body.email
-                                                   const image = request.body.image
-                                                     console.log(email)
-                                                     console.log(image)
-                                                  
-                                                  
-                                                   
-                                          
-                                                  const foundUser:any = await Schema.Artisan().findOne({email});
-                                              
-                                                  if (foundUser && Object.keys(foundUser).length > 0) {
-                                                      console.log(foundUser);
-                                                   
-                                                          await Schema.Artisan().updateOne({
-                                                            _id: foundUser._id
-                                                          }, {
-                                                            $set: {
-                                                              insurance: image
-                                                             
-                                                            }
-                                                          });
-                                              
-                                                          
-                                                          return  res.status(200).send("image set")
-                                                          } 
-                                                        } catch (error) {
-                                                          console.log(error.toString());
-                                                          res.status(500).send({
-                                                            message: 'something went wrong'
-                                                          });
-                                                        }
-                                                  
-                                              
-                                          
-                                          
-                                          
-                                                      }
-                                          
-  static async setPoo( request: Request, res: Response) {
-     
-  
-                                                        console.log(request.body)
-                                                            try {
-                                                             const email = request.body.email
-                                                             const image = request.body.image
-                                                               console.log(email)
-                                                               console.log(image)
-                                                            
-                                                            
-                                                             
-                                                    
-                                                            const foundUser:any = await Schema.Artisan().findOne({email});
-                                                        
-                                                            if (foundUser && Object.keys(foundUser).length > 0) {
-                                                                console.log(foundUser);
-                                                             
-                                                                    await Schema.Artisan().updateOne({
-                                                                      _id: foundUser._id
-                                                                    }, {
-                                                                      $set: {
-                                                                        poo: image
-                                                                       
-                                                                      }
-                                                                    });
-                                                        
-                                                                    
-                                                                    return  res.status(200).send("image set")
-                                                                    } 
-                                                                  } catch (error) {
-                                                                    console.log(error.toString());
-                                                                    res.status(500).send({
-                                                                      message: 'something went wrong'
-                                                                    });
-                                                                  }
-                                                            
-                                                        
-                                                    
-                                                    
-                                                    
-                                                                }
-                                                    
- static async setVir( request: Request, res: Response) {
-     
-  
-                console.log(request.body)
-                    try {
-                     const email = request.body.email
-                     const image = request.body.image
-                       console.log(email)
-                       console.log(image)
-                    
-                    
-                     
-            
-                    const foundUser:any = await Schema.Artisan().findOne({email});
-                
-                    if (foundUser && Object.keys(foundUser).length > 0) {
-                        console.log(foundUser);
-                     
-                            await Schema.Artisan().updateOne({
-                              _id: foundUser._id
-                            }, {
-                              $set: {
-                                vir: image
-                               
-                              }
-                            });
-                
-                            
-                            return  res.status(200).send("image set")
-                            } 
-                          } catch (error) {
-                            console.log(error.toString());
-                            res.status(500).send({
-                              message: 'something went wrong'
-                            });
-                          }
-                    
-                
-            
-            
-            
-                        }
-            
-   static async setVpic( request: Request, res: Response) {
-     
-  
-                          console.log(request.body)
-                              try {
-                               const email = request.body.email
-                               const image = request.body.image
-                                 console.log(email)
-                                 console.log(image)
-                              
-                              
-                               
-                      
-                              const foundUser:any = await Schema.Artisan().findOne({email});
-                          
-                              if (foundUser && Object.keys(foundUser).length > 0) {
-                                  console.log(foundUser);
-                               
-                                      await Schema.Artisan().updateOne({
-                                        _id: foundUser._id
-                                      }, {
-                                        $set: {
-                                          vpic: image
-                                         
-                                        }
-                                      });
-                          
-                                      
-                                      return  res.status(200).send("image set")
-                                      } 
-                                    } catch (error) {
-                                      console.log(error.toString());
-                                      res.status(500).send({
-                                        message: 'something went wrong'
-                                      });
-                                    }
-                              
-                          
-                      
-                      
-                      
-                                  }
-         
-                                  static async setSchool( request: Request, res: Response) {
-     
-  
-                                    console.log(request.body)
-                                        try {
-                                         const email = request.body.email
-                                         const image = request.body.image
-                                           console.log(email)
-                                           console.log(image)
-                                        
-                                        
-                                         
-                                
-                                        const foundUser:any = await Schema.Artisan().findOne({email});
-                                    
-                                        if (foundUser && Object.keys(foundUser).length > 0) {
-                                            console.log(foundUser);
-                                         
-                                                await Schema.Artisan().updateOne({
-                                                  _id: foundUser._id
-                                                }, {
-                                                  $set: {
-                                                    school: image
-                                                   
-                                                  }
-                                                });
-                                    
-                                                
-                                                return  res.status(200).send("image set")
-                                                } 
-                                              } catch (error) {
-                                                console.log(error.toString());
-                                                res.status(500).send({
-                                                  message: 'something went wrong'
-                                                });
-                                              }
-                                        
-                                    
-                                
-                                
-                                
-                                            }
-                                                                                                         
-            //set id_expiry
-            static async idExpiry (request: Request, response: Response) {
-      
-              const {
-          email,  id_expiry,
-              } = request.body;
-          
-              console.log(request.body);
-              const foundUser:any = await Schema.Artisan().findOne({email});
-          
-              if (foundUser && Object.keys(foundUser).length > 0) {
-                  console.log(foundUser);
-                  try {
-                      await Schema.Artisan().updateOne({
-                        _id: foundUser._id
-                      }, {
-                        $set: {
-                          id_expiry: id_expiry,
-                        
-                        }
-                      });
-              
-                      
-                      return   response.status(200).send({
-                          message: 'User updated successfully',
-                          status: 201
-                        });
-                    } catch (error) {
-                      console.log(error.toString());
-                      response.status(500).send({
-                        message: 'something went wrong'
-                      });
-                    }
-                  }
-          
-          
-              }
-          
-  //set vehicle details
-   //continue signup
-   static async vehicleDetails (request: Request, response: Response) {
-      
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            idCard: image
+
+          }
+        });
+
+
+        return res.status(200).send("image set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+
+  static async setDp(request: Request, res: Response) {
+
+
+    console.log(request.body)
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
+
+
+
+
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            pic: image
+
+          }
+        });
+
+
+        return res.status(200).send("image set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+
+  static async setCert(request: Request, res: Response) {
+
+
+    console.log(request.body)
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
+
+
+
+
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            cert: image
+
+          }
+        });
+
+
+        return res.status(200).send("image set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+
+  static async setVl(request: Request, res: Response) {
+
+
+    console.log(request.body)
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
+
+
+
+
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            vl: image
+
+          }
+        });
+
+
+        return res.status(200).send("image set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+  static async setIns(request: Request, res: Response) {
+
+
+    console.log(request.body)
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
+
+
+
+
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            insurance: image
+
+          }
+        });
+
+
+        return res.status(200).send("image set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+
+  static async setPoo(request: Request, res: Response) {
+
+
+    console.log(request.body)
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
+
+
+
+
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            poo: image
+
+          }
+        });
+
+
+        return res.status(200).send("image set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+
+  static async setVir(request: Request, res: Response) {
+
+
+    console.log(request.body)
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
+
+
+
+
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            vir: image
+
+          }
+        });
+
+
+        return res.status(200).send("image set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+
+  static async setVpic(request: Request, res: Response) {
+
+
+    console.log(request.body)
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
+
+
+
+
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            vpic: image
+
+          }
+        });
+
+
+        return res.status(200).send("image set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+
+  static async setSchool(request: Request, res: Response) {
+
+
+    console.log(request.body)
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
+
+
+
+
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            school: image
+
+          }
+        });
+
+
+        return res.status(200).send("image set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+
+
+  // set CAC
+
+  static async setCac(request: Request, res: Response) {
+
+
+    console.log(request.body)
+    try {
+      const email = request.body.email
+      const image = request.body.image
+      console.log(email)
+      console.log(image)
+
+
+
+
+      const foundUser: any = await Schema.Artisan().findOne({ email });
+
+      if (foundUser && Object.keys(foundUser).length > 0) {
+        console.log(foundUser);
+
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            cac: image
+
+          }
+        });
+
+
+        return res.status(200).send("cac set")
+      }
+    } catch (error) {
+      console.log(error.toString());
+      res.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+
+
+
+
+
+  }
+
+  //set id_expiry
+  static async idExpiry(request: Request, response: Response) {
+
     const {
-email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
+      email, id_expiry,
     } = request.body;
 
     console.log(request.body);
-    const foundUser:any = await Schema.Artisan().findOne({email});
+    const foundUser: any = await Schema.Artisan().findOne({ email });
 
     if (foundUser && Object.keys(foundUser).length > 0) {
-        console.log(foundUser);
-        try {
-            await Schema.Artisan().updateOne({
-              _id: foundUser._id
-            }, {
-              $set: {
-                vl_expiry: vl_expiry,
-                vcolor: vcolor,
-                vmodel: vmodel,
-                vyear: vyear,
-                plate: plate,
-                sname: sname,
-                sphone: sphone
-              }
-            });
-    
-            
-            return   response.status(200).send({
-                message: 'User updated successfully',
-                status: 201
-              });
-          } catch (error) {
-            console.log(error.toString());
-            response.status(500).send({
-              message: 'something went wrong'
-            });
+      console.log(foundUser);
+      try {
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            id_expiry: id_expiry,
+
           }
-        }
+        });
 
 
+        return response.status(200).send({
+          message: 'User updated successfully',
+          status: 201
+        });
+      } catch (error) {
+        console.log(error.toString());
+        response.status(500).send({
+          message: 'something went wrong'
+        });
+      }
     }
+
+
+  }
+
+  //set vehicle details
+  //continue signup
+  static async vehicleDetails(request: Request, response: Response) {
+
+    const {
+      email, phone, vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
+    } = request.body;
+
+    console.log(request.body);
+    const foundUser: any = await Schema.Artisan().findOne({ email });
+
+    if (foundUser && Object.keys(foundUser).length > 0) {
+      console.log(foundUser);
+      try {
+        await Schema.Artisan().updateOne({
+          _id: foundUser._id
+        }, {
+          $set: {
+            vl_expiry: vl_expiry,
+            vcolor: vcolor,
+            vmodel: vmodel,
+            vyear: vyear,
+            plate: plate,
+            sname: sname,
+            sphone: sphone
+          }
+        });
+
+
+        return response.status(200).send({
+          message: 'User updated successfully',
+          status: 201
+        });
+      } catch (error) {
+        console.log(error.toString());
+        response.status(500).send({
+          message: 'something went wrong'
+        });
+      }
+    }
+
+
+  }
 
 
 
@@ -807,33 +862,33 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         .updateOne({
           phone,
         }, {
-        $set: {
-          confirmationCode
-        }
-      });
+          $set: {
+            confirmationCode
+          }
+        });
       const message = `Token: ${confirmationCode}`;
-     //ArtisanController.sendMail(email, message, 'Registration');
-     client.messages 
-     .create({ 
-        body: message, 
-        from: '+17076402854',       
-        to: phone 
-      }) 
-     .then(response => console.log(response.sid))  
-     response.status(200).send({
+      //ArtisanController.sendMail(email, message, 'Registration');
+      client.messages
+        .create({
+          body: message,
+          from: '+17076402854',
+          to: phone
+        })
+        .then(response => console.log(response.sid))
+      response.status(200).send({
         message: 'Please check your phone for token'
       });
       return;
     } catch (error) {
-        console.log(error.toString(), "========")
-        return response.status(500).send({
-          message: 'Something went wrong'
-        })
+      console.log(error.toString(), "========")
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
     }
   }
 
   //forgot password
-  static async forgotPassword (request: Request, response: Response) {
+  static async forgotPassword(request: Request, response: Response) {
     const {
       email
     } = request.body;
@@ -842,7 +897,7 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         message: "Invalid email"
       });
     }
-    const user = await Schema.Artisan().findOne({email: email.trim()});
+    const user = await Schema.Artisan().findOne({ email: email.trim() });
     if (!user) {
       return response.status(404).send({
         message: 'User does not exist'
@@ -855,33 +910,33 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         .updateOne({
           _id: user._id,
         }, {
-        $set: {
-          confirmationCode
-        }
-      });
+          $set: {
+            confirmationCode
+          }
+        });
       const message = `Token: ${confirmationCode}`;
-     //ArtisanController.sendMail(user.email, message, 'Password change');
-     client.messages 
-     .create({ 
-        body: message, 
-        from: '+17076402854',       
-        to: user.phone 
-      }) 
-     .then(response => console.log(response.sid))  
-     response.status(200).send({
+      //ArtisanController.sendMail(user.email, message, 'Password change');
+      client.messages
+        .create({
+          body: message,
+          from: '+17076402854',
+          to: user.phone
+        })
+        .then(response => console.log(response.sid))
+      response.status(200).send({
         message: 'Please check your phone for token'
       });
       return;
     } catch (error) {
-        console.log(error.toString(), "========")
-        return response.status(500).send({
-          message: 'Something went wrong'
-        })
+      console.log(error.toString(), "========")
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
     }
   }
 
   //change password
-  static async changePassword (request: Request, response: Response) {
+  static async changePassword(request: Request, response: Response) {
     const {
       confirmationCode,
       password,
@@ -897,7 +952,7 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         message: "Password is required"
       });
     }
-    const user = await Schema.Artisan().findOne({email: email.trim()});
+    const user = await Schema.Artisan().findOne({ email: email.trim() });
     if (!user) {
       return response.status(404).send({
         message: 'User does not exist'
@@ -913,18 +968,18 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         .updateOne({
           _id: user._id,
         }, {
-        $set: {
-          password: bcrypt.hashSync(password.trim(),ArtisanController.generateSalt()),
-        }
-      });
+          $set: {
+            password: bcrypt.hashSync(password.trim(), ArtisanController.generateSalt()),
+          }
+        });
       return response.status(200).send({
-        token:ArtisanController.generateToken(user)
+        token: ArtisanController.generateToken(user)
       });
     } catch (error) {
-        console.log(error.toString(), "========")
-        return response.status(500).send({
-          message: 'Something went wrong'
-        })
+      console.log(error.toString(), "========")
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
     }
   }
 
@@ -952,18 +1007,18 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
   }
 
 */
-  
 
 
-  
 
-//sign in
-  static async signin (request: Request, response: Response) {
+
+
+  //sign in
+  static async signin(request: Request, response: Response) {
     const {
       phone, password
     } = request.body;
     console.log(phone)
-    const foundUser:any = await Schema.Artisan().findOne({phone: phone.trim()});
+    const foundUser: any = await Schema.Artisan().findOne({ phone: phone.trim() });
 
     if (foundUser && Object.keys(foundUser).length > 0) {
       if (!bcrypt.compareSync(password, foundUser.password)) {
@@ -972,7 +1027,7 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         });
       }
       return response.status(200).send({
-        token:ArtisanController.generateToken(foundUser)
+        token: ArtisanController.generateToken(foundUser)
       });
     } else {
       return response.status(401).send({
@@ -982,12 +1037,12 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
   }
 
   //sign in with phone
-  static async signinPhone (request: Request, response: Response) {
+  static async signinPhone(request: Request, response: Response) {
     const {
       email, password
     } = request.body;
 
-    const foundUser:any = await Schema.Artisan().findOne({email: email.trim()});
+    const foundUser: any = await Schema.Artisan().findOne({ email: email.trim() });
 
     if (foundUser && Object.keys(foundUser).length > 0) {
       if (!bcrypt.compareSync(password, foundUser.password)) {
@@ -996,7 +1051,7 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         });
       }
       return response.status(200).send({
-        token:ArtisanController.generateToken(foundUser)
+        token: ArtisanController.generateToken(foundUser)
       });
     } else {
       return response.status(401).send({
@@ -1006,13 +1061,13 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
   }
 
   //confrimation code
-  static async confirm (request: Request, response: Response) {
+  static async confirm(request: Request, response: Response) {
     const {
       email, confirmationCode
     } = request.body;
     console.log(confirmationCode)
 
-    const foundUser:any = await Schema.Artisan().findOne({email});
+    const foundUser: any = await Schema.Artisan().findOne({ email });
     console.log(foundUser.confirmationCode)
 
     if (foundUser && Object.keys(foundUser).length > 0) {
@@ -1033,7 +1088,7 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
 
         foundUser.isConfirmed = true;
         return response.status(200).send({
-          token:ArtisanController.generateToken(foundUser)
+          token: ArtisanController.generateToken(foundUser)
         });
       } catch (error) {
         console.log(error.toString());
@@ -1046,9 +1101,9 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         message: 'Incorrect Username or Password'
       });
     }
-  
 
-}
+
+  }
 
 
   static generateSalt(): string | number {
@@ -1056,13 +1111,13 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
   }
 
   //generate token
-  static generateToken (user: {_id: string, name: string, email: string, phone: string, isConfirmed: boolean}) {
+  static generateToken(user: { _id: string, name: string, email: string, phone: string, isConfirmed: boolean }) {
     return process.env.SECRET && jwt.sign(
       {
         _id: user._id,
         name: user.name,
         email: user.email,
-        
+
         phone: user.phone,
         isConfirmed: user.isConfirmed
       },
@@ -1072,54 +1127,54 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
 
   //GET USER DETAILS
 
-  static async userDetails(request: Request, response: Response){
-     
+  static async userDetails(request: Request, response: Response) {
+
     var total = 0;
     var amount = 0;
 
-    const {uid} = request.params;
+    const { uid } = request.params;
     console.log(uid)
 
     try {
-      const user = await Schema.Artisan().findOne({_id: uid});
+      const user = await Schema.Artisan().findOne({ _id: uid });
       //console.log(user)
       if (user && Object.keys(user).length) {
 
         //get Rating
-         const getRating = user.rating
-    console.log(getRating.length);
+        const getRating = user.rating
+        console.log(getRating.length);
 
-    //get Earnings
-    const getEarnings = user.earnings;
-    console.log(getEarnings);
+        //get Earnings
+        const getEarnings = user.earnings;
+        console.log(getEarnings);
 
 
         // get rate
-    for(var i = 0; i < getRating.length; i++){
-        total += getRating[i]
-    }
-    var rate = Math.round(total / getRating.length);
-    console.log("rating:" + rate)
+        for (var i = 0; i < getRating.length; i++) {
+          total += getRating[i]
+        }
+        var rate = Math.round(total / getRating.length);
+        console.log("rating:" + rate)
 
 
-      //get total amount
-      for(var i = 0; i < getEarnings.length; i++){
-        amount += getEarnings[i]
-    }
-    console.log('amount:' + amount)
+        //get total amount
+        for (var i = 0; i < getEarnings.length; i++) {
+          amount += getEarnings[i]
+        }
+        console.log('amount:' + amount)
         //amount to pay
         var pay = Math.round(amount * 0.1);
         console.log('pay' + pay)
 
 
-    response.status(200).send({
-      user,
-      rating: rate,
-      earning: amount,
-      pay: pay
+        response.status(200).send({
+          user,
+          rating: rate,
+          earning: amount,
+          pay: pay
 
-    });
-       // console.log(user)
+        });
+        // console.log(user)
       } else {
         response.status(404).send({
           message: 'Cannot find details for this user'
@@ -1134,36 +1189,36 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
   }
 
   //update status on payment
-  static async activateAccount(request: Request, response: Response){
-    const {uid} = request.params
+  static async activateAccount(request: Request, response: Response) {
+    const { uid } = request.params
     //const expire =  addWeek(new Date(), 1).toLocaleDateString();
     var now = new Date();
-          
+
     //after 7 days
-        const expire =  now.setDate(now.getDate()+7);
-  console.log(now.toLocaleDateString())
+    const expire = now.setDate(now.getDate() + 7);
+    console.log(now.toLocaleDateString())
 
-    
 
-    try{
-      const user =  await Schema.Artisan().findOne({_id: uid})
-      if(user){
 
-       await Schema.Artisan().updateOne({_id: uid},
+    try {
+      const user = await Schema.Artisan().findOne({ _id: uid })
+      if (user) {
+
+        await Schema.Artisan().updateOne({ _id: uid },
           {
             $set: {
               active: true,
               expireAt: now.toLocaleDateString()
             }
           }
-             
-           )
 
-           user.earnings.splice(0, user.earnings.length)
+        )
 
-           response.status(200).send({
-             message: 'Account Activated!'
-           })
+        user.earnings.splice(0, user.earnings.length)
+
+        response.status(200).send({
+          message: 'Account Activated!'
+        })
 
       } else {
         response.status(404).send({
@@ -1171,93 +1226,93 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         });
       }
 
-    } catch(error){
-      response.status(404).send({error: 'could not complete your request at the moment' })
+    } catch (error) {
+      response.status(404).send({ error: 'could not complete your request at the moment' })
     }
 
   }
 
   //location
-  static async storeLocation(request: Request, response: Response){
-    const {lat, long, location, area1, area2} = request.body;
-    const {uid} = request.params;
+  static async storeLocation(request: Request, response: Response) {
+    const { lat, long, location, area1, area2 } = request.body;
+    const { uid } = request.params;
 
-    const user = await Schema.Artisan().findOne({_id: uid});
+    const user = await Schema.Artisan().findOne({ _id: uid });
     if (!user) {
       return response.status(404).send({
         message: 'User does not exist'
       });
     }
- 
+
     try {
       await Schema.Artisan()
         .updateOne({
           _id: user._id,
         }, {
-        $set: {
-          lat: lat,
-          long: long,
-          location: location,
-          area1: area1,
-          area2: area2
-        }
-      });
+          $set: {
+            lat: lat,
+            long: long,
+            location: location,
+            area1: area1,
+            area2: area2
+          }
+        });
       return response.status(200).send("location saved");
     } catch (error) {
-        console.log(error.toString(), "========")
-        return response.status(500).send({
-          message: 'Something went wrong'
-        })
+      console.log(error.toString(), "========")
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
     }
 
 
-  } 
+  }
 
   //update lat and long while moving
-  static async updateLocation(request: Request, response: Response){
-    const {lat, long} = request.body;
-    const {uid} = request.params;
+  static async updateLocation(request: Request, response: Response) {
+    const { lat, long } = request.body;
+    const { uid } = request.params;
 
 
 
-    const user = await Schema.Artisan().findOne({_id: uid});
+    const user = await Schema.Artisan().findOne({ _id: uid });
     if (!user) {
       return response.status(404).send({
         message: 'User does not exist'
       });
     }
- 
+
     try {
       await Schema.Artisan()
         .updateOne({
           _id: uid,
         }, {
-        $set: {
-          lat: lat,
-          long: long
-        }
-      });
+          $set: {
+            lat: lat,
+            long: long
+          }
+        });
 
       return response.status(200).send("location saved");
     } catch (error) {
-        console.log(error.toString(), "========")
-        return response.status(500).send({
-          message: 'Something went wrong'
-        })
+      console.log(error.toString(), "========")
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
     }
 
 
-  } 
+  }
 
 
   //get artisan  lat and long
-  static async artisanLoc(request: Request, response: Response){
+  static async artisanLoc(request: Request, response: Response) {
 
-    const {uid} = request.params;
+    const { uid } = request.params;
     //console.log("uid" + uid)
 
     try {
-      const user = await Schema.Artisan().findOne({_id: uid});
+      const user = await Schema.Artisan().findOne({ _id: uid });
       //console.log(user)
       if (user) {
 
@@ -1265,7 +1320,7 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
           lat: user.lat,
           long: user.long
         });
-       // console.log(user)
+        // console.log(user)
       } else {
         response.status(404).send({
           message: 'Cannot find details for this user'
@@ -1281,25 +1336,25 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
 
 
   //get all drivers
-  static async getDrivers(request: Request, response: Response){
+  static async getDrivers(request: Request, response: Response) {
 
-    
+
 
     try {
-      const user = await Schema.Artisan().find({category: 'driver'});
-     
+      const user = await Schema.Artisan().find({ category: 'driver' });
+
 
       if (user) {
-   
-          console.log(user)
-          return response.status(200).send({user});
- 
-        
+
+        console.log(user)
+        return response.status(200).send({ user });
 
 
-  
 
- 
+
+
+
+
       } else {
         response.status(404).send({
           message: 'Cannot find details for this user'
@@ -1314,17 +1369,17 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
   }
 
 
-  
 
-  static async savePushToken(request: Request, response: Response){
 
-    const {uid} = request.params;
+  static async savePushToken(request: Request, response: Response) {
+
+    const { uid } = request.params;
     const token = request.body.token
 
     console.log(token)
 
     //check token
-    if(!Expo.isExpoPushToken(token)){
+    if (!Expo.isExpoPushToken(token)) {
       console.log("invalid token")
       return response.status(404).send({
         message: "invalid token"
@@ -1332,16 +1387,16 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
 
     }
 
-   
- 
+
+
     try {
-      const user = await Schema.Artisan().findOne({_id: uid});
+      const user = await Schema.Artisan().findOne({ _id: uid });
       if (!user) {
         return response.status(404).send({
           message: 'User does not exist'
         });
       }
-      if(user.pushToken === token){
+      if (user.pushToken === token) {
         console.log("token exists already")
         return response.status(404).send({
           message: 'token exists already'
@@ -1351,16 +1406,16 @@ email, phone,  vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear
         .updateOne({
           _id: user._id,
         }, {
-        $set: {
-          pushToken: token,
-        }
-      });
+          $set: {
+            pushToken: token,
+          }
+        });
       return response.status(200).send("token saved");
     } catch (error) {
-        console.log(error.toString(), "========")
-        return response.status(500).send({
-          message: 'Something went wrong'
-        })
+      console.log(error.toString(), "========")
+      return response.status(500).send({
+        message: 'Something went wrong'
+      })
     }
   }
 
