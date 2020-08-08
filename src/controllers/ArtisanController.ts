@@ -1163,7 +1163,7 @@ class ArtisanController {
         }
         console.log('amount:' + amount)
         //amount to pay
-        var pay = Math.round(amount * 0.1);
+        var pay = Math.round(amount * 0.25);
         console.log('pay' + pay)
 
 
