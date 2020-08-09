@@ -247,6 +247,12 @@ class ArtisanController {
         console.log(find);
         res.json(req.file);
     }
+    static uploadCac(req, res) {
+        const parts = req.file.originalname.split(' ');
+        const find = parts[0];
+        console.log(find);
+        res.json(req.file);
+    }
     //set images
     static setId(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -499,6 +505,36 @@ class ArtisanController {
                         }
                     });
                     return res.status(200).send("image set");
+                }
+            }
+            catch (error) {
+                console.log(error.toString());
+                res.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    // set CAC
+    static setCac(request, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(request.body);
+            try {
+                const email = request.body.email;
+                const image = request.body.image;
+                console.log(email);
+                console.log(image);
+                const foundUser = yield schema_1.default.Artisan().findOne({ email });
+                if (foundUser && Object.keys(foundUser).length > 0) {
+                    console.log(foundUser);
+                    yield schema_1.default.Artisan().updateOne({
+                        _id: foundUser._id
+                    }, {
+                        $set: {
+                            cac: image
+                        }
+                    });
+                    return res.status(200).send("cac set");
                 }
             }
             catch (error) {
@@ -777,9 +813,9 @@ class ArtisanController {
     //confrimation code
     static confirm(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, confirmationCode } = request.body;
+            const { phone, confirmationCode } = request.body;
             console.log(confirmationCode);
-            const foundUser = yield schema_1.default.Artisan().findOne({ email });
+            const foundUser = yield schema_1.default.Artisan().findOne({ phone });
             console.log(foundUser.confirmationCode);
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (foundUser.confirmationCode !== confirmationCode) {
@@ -857,7 +893,7 @@ class ArtisanController {
                     }
                     console.log('amount:' + amount);
                     //amount to pay
-                    var pay = Math.round(amount * 0.1);
+                    var pay = Math.round(amount * 0.25);
                     console.log('pay' + pay);
                     response.status(200).send({
                         user,

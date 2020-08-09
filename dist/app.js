@@ -51,11 +51,13 @@ app.post('/api/v1/dp', util_1.upload.single('image'), ArtisanController_1.defaul
 //certificate
 app.post('/api/v1/cert', util_1.upload.single('image'), ArtisanController_1.default.uploadCert);
 app.post('/api/v1/school', util_1.upload.single('image'), ArtisanController_1.default.uploadSchool);
+app.post('/api/v1/cac', util_1.upload.single('image'), ArtisanController_1.default.uploadCac);
 //set images
 app.post('/api/v1/setid', ArtisanController_1.default.setId);
 app.post('/api/v1/setdp', ArtisanController_1.default.setDp);
 app.post('/api/v1/setcert', ArtisanController_1.default.setCert);
 app.post('/api/v1/setschool', ArtisanController_1.default.setSchool);
+app.post('/api/v1/setcac', ArtisanController_1.default.setCac);
 //vehicle papers start
 app.post('/api/v1/vl', util_1.upload.single('image'), ArtisanController_1.default.uploadVl);
 app.post('/api/v1/insurance', util_1.upload.single('image'), ArtisanController_1.default.uploadIns);

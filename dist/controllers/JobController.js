@@ -644,9 +644,9 @@ class JobController {
                         start: false,
                         arrived: false
                     },
-                    /**  $inc: {
+                    $inc: {
                         completed: 1
-                      },*/
+                    },
                     $push: {
                         earnings: job.price
                     }
