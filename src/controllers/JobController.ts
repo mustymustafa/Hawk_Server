@@ -857,8 +857,7 @@ let tickets = [];
         },
           {
             $set: {
-              status: 'cancelled',
-              earnings: earnings
+              status: 'cancelled'
             }
          
           }
