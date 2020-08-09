@@ -651,6 +651,102 @@ let tickets = [];
 
   }
 
+  static async acceptLog(request:Request, response:Response){
+
+    const {uid, job_id, price} = request.body
+    console.log("uid" + uid, "job_id" + job_id)
+    
+    let savedTokens;
+
+  
+
+    const job = await Schema.Job().findOne({_id: job_id})
+    console.log("job found:" + job);
+
+       const hirer = await Schema.User().findOne({_id: job.user});
+       console.log("hirer:" + hirer)
+const artisan = await Schema.Artisan().findOne({_id: uid});
+console.log(price);
+    console.log("artisan " + artisan.name)
+   
+    if (!job && !hirer) {
+        return response.status(404).send({
+          message: 'Job does not exist'
+        });
+      }
+   
+    try {
+        await Schema.Job().updateOne({
+            _id: job_id
+        },
+        {
+            $set: {
+                artisan: uid,
+                status: 'accepted',
+                artisan_name: artisan.name,
+                price: price
+            }
+        }
+        );
+
+        await Schema.Artisan().updateOne({
+          _id: uid
+      },
+      {
+        $push: {
+          earnings: price
+       }
+      }
+      );
+
+
+        response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job})
+       
+// send notification
+
+
+savedTokens = hirer.pushToken;
+
+console.log(savedTokens)
+
+
+
+
+//send notification
+
+let chunks = expo.chunkPushNotifications([{
+  "to": savedTokens,
+  "sound": "default",
+  "title": "Request Accepted!",
+  "body": `A Driver has accepted your request and is on his way.`
+}]);
+let tickets = [];
+(async () => {
+  for (let chunk of chunks) {
+    try {
+      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+      console.log(ticketChunk);
+      tickets.push(...ticketChunk);
+   
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})();
+
+
+
+
+    } catch(error) {
+        console.log(error)
+        return response.status(404).send("an error occured")
+    }
+  
+
+
+
+  }
+
   
 
   static async showJob(request:Request, response:Response){
@@ -720,10 +816,9 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
        
        const artisan = await Schema.Artisan().findOne({_id: job.artisan});
        console.log("artisan:" + artisan)
-
-       
-       
-
+    const earning = artisan.earnings
+    const earnings = earning.splice( earning.indexOf(job.price), 1 );
+    
 
     
     if (!job && !hirer) {
@@ -762,13 +857,26 @@ let tickets = [];
         },
           {
             $set: {
-              status: 'cancelled'
+              status: 'cancelled',
+              earnings: earnings
             }
          
           }
           
           );
 
+          await Schema.Artisan().updateOne({
+            _id: job.artisan
+          },
+            {
+              $set: {
+                earnings: earnings
+              }
+           
+            }
+            
+            );
+  
         console.log("cancelled");
         response.status(201).send({
             message: 'Task Cancelled successfully',
@@ -962,7 +1070,15 @@ console.log(hirer.pushToken)
     
     const artisan = await Schema.Artisan().findOne({_id: job.artisan});
     console.log("artisan:" + artisan)
+    const completed =  Math.round(artisan.complted + 1)
 
+    let earnings; 
+    if(artisan.category === 'log'){
+      earnings = 0;
+    } else {
+      earnings =  job. price;
+    }
+   
        
     
     if (!job) {
@@ -988,13 +1104,11 @@ console.log(hirer.pushToken)
         {
           $set: {
             start: false,
-            arrived: false
-          },
-         $inc: {
-            completed: 1
+            arrived: false,
+            completed: completed
           },
             $push: {
-             earnings: job.price
+             earnings: earnings
           }
         }
         );

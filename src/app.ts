@@ -24,7 +24,7 @@ const expo = new Expo();
 //database 
  mongoose.connect(
     `mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`,
-  { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true },
+  { useNewUrlParser: true, useUnifiedTopology: true},
 ).then(() =>   console.log('database connected.....'))
 .catch((error) => console.log(error.toString()));
 
@@ -153,6 +153,7 @@ app.post('/api/v1/job/:job_id/arrive', JobController.driverArrived);
 
 
 app.post('/api/v1/job/:job_id/accepttaxi', JobController.acceptTaxi);
+app.post('/api/v1/job/:job_id/acceptlog', JobController.acceptLog);
 app.post('/api/v1/job/:job_id/show', JobController.showJob);
 
 

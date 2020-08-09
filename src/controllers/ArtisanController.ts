@@ -1208,13 +1208,14 @@ class ArtisanController {
           {
             $set: {
               active: true,
-              expireAt: now.toLocaleDateString()
+              expireAt: now.toLocaleDateString(),
+              earnings: user.earnings.splice(0, user.earnings.length)
             }
           }
 
         )
 
-        user.earnings.splice(0, user.earnings.length)
+
 
         response.status(200).send({
           message: 'Account Activated!'
