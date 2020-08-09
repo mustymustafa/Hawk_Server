@@ -932,10 +932,10 @@ class ArtisanController {
                     yield schema_1.default.Artisan().updateOne({ _id: uid }, {
                         $set: {
                             active: true,
-                            expireAt: now.toLocaleDateString()
+                            expireAt: now.toLocaleDateString(),
+                            earnings: user.earnings.splice(0, user.earnings.length)
                         }
                     });
-                    user.earnings.splice(0, user.earnings.length);
                     response.status(200).send({
                         message: 'Account Activated!'
                     });

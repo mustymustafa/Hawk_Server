@@ -30,7 +30,7 @@ const JobController_1 = __importDefault(require("./controllers/JobController"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
 //database 
-mongoose_1.default.connect(`mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }).then(() => console.log('database connected.....'))
+mongoose_1.default.connect(`mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('database connected.....'))
     .catch((error) => console.log(error.toString()));
 const app = express_1.default();
 app.use(cors_1.default());
@@ -108,6 +108,7 @@ app.post('/api/v1/job/:job_id/accept', JobController_1.default.acceptJob);
 app.post('/api/v1/job/:job_id/start', JobController_1.default.startJob);
 app.post('/api/v1/job/:job_id/arrive', JobController_1.default.driverArrived);
 app.post('/api/v1/job/:job_id/accepttaxi', JobController_1.default.acceptTaxi);
+app.post('/api/v1/job/:job_id/acceptlog', JobController_1.default.acceptLog);
 app.post('/api/v1/job/:job_id/show', JobController_1.default.showJob);
 app.post('/api/v1/job/:job_id/cancel', JobController_1.default.cancelJob);
 app.post('/api/v1/job/:job_id/delete', JobController_1.default.deleteJob);

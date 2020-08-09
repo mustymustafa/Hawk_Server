@@ -451,6 +451,72 @@ class JobController {
             }
         });
     }
+    static acceptLog(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid, job_id, price } = request.body;
+            console.log("uid" + uid, "job_id" + job_id);
+            let savedTokens;
+            const job = yield schema_1.default.Job().findOne({ _id: job_id });
+            console.log("job found:" + job);
+            const hirer = yield schema_1.default.User().findOne({ _id: job.user });
+            console.log("hirer:" + hirer);
+            const artisan = yield schema_1.default.Artisan().findOne({ _id: uid });
+            console.log(price);
+            console.log("artisan " + artisan.name);
+            if (!job && !hirer) {
+                return response.status(404).send({
+                    message: 'Job does not exist'
+                });
+            }
+            try {
+                yield schema_1.default.Job().updateOne({
+                    _id: job_id
+                }, {
+                    $set: {
+                        artisan: uid,
+                        status: 'accepted',
+                        artisan_name: artisan.name,
+                        price: price
+                    }
+                });
+                yield schema_1.default.Artisan().updateOne({
+                    _id: uid
+                }, {
+                    $push: {
+                        earnings: price
+                    }
+                });
+                response.status(200).send({ hirer: hirer.name, number: hirer.phone, job: job });
+                // send notification
+                savedTokens = hirer.pushToken;
+                console.log(savedTokens);
+                //send notification
+                let chunks = expo.chunkPushNotifications([{
+                        "to": savedTokens,
+                        "sound": "default",
+                        "title": "Request Accepted!",
+                        "body": `A Driver has accepted your request and is on his way.`
+                    }]);
+                let tickets = [];
+                (() => __awaiter(this, void 0, void 0, function* () {
+                    for (let chunk of chunks) {
+                        try {
+                            let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                            console.log(ticketChunk);
+                            tickets.push(...ticketChunk);
+                        }
+                        catch (error) {
+                            console.error(error);
+                        }
+                    }
+                }))();
+            }
+            catch (error) {
+                console.log(error);
+                return response.status(404).send("an error occured");
+            }
+        });
+    }
     static showJob(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid, job_id } = request.body;
@@ -487,6 +553,8 @@ class JobController {
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             console.log("artisan:" + artisan);
+            const earning = artisan.earnings;
+            const earnings = earning.splice(earning.indexOf(job.price), 1);
             if (!job && !hirer) {
                 return response.status(404).send({
                     message: 'Job does not exist'
@@ -517,7 +585,15 @@ class JobController {
                     _id: job_id
                 }, {
                     $set: {
-                        status: 'cancelled'
+                        status: 'cancelled',
+                        earnings: earnings
+                    }
+                });
+                yield schema_1.default.Artisan().updateOne({
+                    _id: job.artisan
+                }, {
+                    $set: {
+                        earnings: earnings
                     }
                 });
                 console.log("cancelled");
@@ -624,6 +700,14 @@ class JobController {
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             console.log("artisan:" + artisan);
+            const completed = Math.round(artisan.complted + 1);
+            let earnings;
+            if (artisan.category === 'log') {
+                earnings = 0;
+            }
+            else {
+                earnings = job.price;
+            }
             if (!job) {
                 return response.status(404).send({
                     message: 'Job does not exist'
@@ -642,13 +726,11 @@ class JobController {
                 }, {
                     $set: {
                         start: false,
-                        arrived: false
-                    },
-                    $inc: {
-                        completed: 1
+                        arrived: false,
+                        completed: completed
                     },
                     $push: {
-                        earnings: job.price
+                        earnings: earnings
                     }
                 });
                 response.status(201).send({
