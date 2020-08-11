@@ -1235,7 +1235,7 @@ class ArtisanController {
 
   //location
   static async storeLocation(request: Request, response: Response) {
-    const { lat, long, location, area1, area2 } = request.body;
+    const { lat, long, location, area1, area2, city } = request.body;
     const { uid } = request.params;
 
     const user = await Schema.Artisan().findOne({ _id: uid });
@@ -1255,7 +1255,8 @@ class ArtisanController {
             long: long,
             location: location,
             area1: area1,
-            area2: area2
+            area2: area2,
+            city: city
           }
         });
       return response.status(200).send("location saved");
