@@ -585,8 +585,7 @@ class JobController {
                     _id: job_id
                 }, {
                     $set: {
-                        status: 'cancelled',
-                        earnings: earnings
+                        status: 'cancelled'
                     }
                 });
                 yield schema_1.default.Artisan().updateOne({
