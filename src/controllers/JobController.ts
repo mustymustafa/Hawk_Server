@@ -288,11 +288,11 @@ let title;
   }
 
   static async logRequest (request:Request, response:Response){
-    const {city1, city2, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime} = request.body;
+    const {city,  category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime} = request.body;
   //console.log(category)
    
-  console.log(city1)
-  console.log(city2)
+  console.log(city)
+
     let savedTokens;
 
 
@@ -314,8 +314,8 @@ let title;
           
             category: category,
             location: location,
-            city1: city1,
-            city2: city2,
+            city: city,
+          
 
             status: 'active',
             rated: false,
@@ -365,7 +365,7 @@ let title;
 
 
         
-     const artisan = await Schema.Artisan().find({category: 'log'}).where({city2: city2,$or:[{city1: city1}]})
+     const artisan = await Schema.Artisan().find({category: 'log'}).where({city: city})
      
 
      if (!artisan) {
@@ -455,13 +455,13 @@ console.log("hirer:" + hirer)
 
   //display logistics requests
   static async logRequests(request:Request, response:Response) {
-    const {category, city1, city2} = request.body; 
+    const {category, city, city2} = request.body; 
     console.log(category);
     //console.log("area1:" + area1);
     //console.log("area2:" + area2);
     
   
-  const job = await Schema.Job().find({category: category}).where({city1: city1,$or:[{city2: city2}], $and: [{status: 'active'}]}).sort({'_id': -1})  
+  const job = await Schema.Job().find({category: category}).where({city: city, $and: [{status: 'active'}]}).sort({'_id': -1})  
 
   console.log(job)
 
