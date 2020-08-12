@@ -186,6 +186,7 @@ let title;
             location: location,
             status: 'active',
             rated: false,
+            
             area1: area1,
             area2: area2,
             to: to,
@@ -287,7 +288,7 @@ let title;
   }
 
   static async logRequest (request:Request, response:Response){
-    const {category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime} = request.body;
+    const {city1, city2, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime} = request.body;
   //console.log(category)
   
     let savedTokens;
@@ -311,6 +312,9 @@ let title;
           
             category: category,
             location: location,
+            city1: city1,
+            city2: city2,
+            
             status: 'active',
             rated: false,
            
