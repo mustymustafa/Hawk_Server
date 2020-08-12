@@ -1062,7 +1062,7 @@ console.log(hirer.pushToken)
   static async completeJob(request:Request, response:Response){
 
     let savedTokens = [];
-    const {job_id,} = request.body
+    const {job_id} = request.body
     console.log( "job_id" + job_id)
     
 
@@ -1075,7 +1075,7 @@ console.log(hirer.pushToken)
     
     const artisan = await Schema.Artisan().findOne({_id: job.artisan});
     console.log("artisan:" + artisan)
-    const completed =  Math.round(artisan.complted + 1)
+    const completed =  Math.round(artisan.completed + 1)
 
     let earnings; 
     if(artisan.category === 'log'){
