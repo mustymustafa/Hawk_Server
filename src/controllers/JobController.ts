@@ -363,7 +363,7 @@ let title;
 
 
         
-     const artisan = await Schema.Artisan().find({category: 'log'}).where({city2: city1,$or:[{city2: city2}]})
+     const artisan = await Schema.Artisan().find({category: 'log'}).where({city2: city2,$or:[{city1: city1, city2: city1}]})
      
 
      if (!artisan) {
@@ -459,7 +459,7 @@ console.log("hirer:" + hirer)
     //console.log("area2:" + area2);
     
   
-  const job = await Schema.Job().find({category: category}).where({city1: city2,$or:[{city2: city2}], $and: [{status: 'active'}]}).sort({'_id': -1})  
+  const job = await Schema.Job().find({category: category}).where({city1: city1,$or:[{city2: city2, city1: city2}], $and: [{status: 'active'}]}).sort({'_id': -1})  
 
   console.log(job)
 
