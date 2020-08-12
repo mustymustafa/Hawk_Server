@@ -314,7 +314,7 @@ let title;
             location: location,
             city1: city1,
             city2: city2,
-            
+
             status: 'active',
             rated: false,
            
@@ -453,13 +453,13 @@ console.log("hirer:" + hirer)
 
   //display logistics requests
   static async logRequests(request:Request, response:Response) {
-    const {category} = request.body; 
+    const {category, city1, city2} = request.body; 
     console.log(category);
     //console.log("area1:" + area1);
     //console.log("area2:" + area2);
     
   
-  const job = await Schema.Job().find({category: category}).where({status: 'active'}).sort({'_id': -1})    
+  const job = await Schema.Job().find({category: category}).where({city1: city1,$or:[{city2: city2}], $and: [{status: 'active'}]}).sort({'_id': -1})  
 
   console.log(job)
 
