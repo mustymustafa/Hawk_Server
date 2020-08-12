@@ -365,7 +365,7 @@ let title;
 
 
         
-     const artisan = await Schema.Artisan().find({category: 'log'}).where({city2: city2,$or:[{city1: city1, city2: city1}]})
+     const artisan = await Schema.Artisan().find({category: 'log'}).where({city2: city2,$or:[{city1: city1}]})
      
 
      if (!artisan) {
