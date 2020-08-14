@@ -112,6 +112,7 @@ let title;
       let chunks = expo.chunkPushNotifications([{
         "to": savedTokens,
         "sound": "default",
+        "channelId": "notification-sound-channel",
         "title": title,
         "body": "Open your 247 App"
       }]);
@@ -248,6 +249,7 @@ let title;
       let chunks = expo.chunkPushNotifications([{
         "to": [artis.pushToken],
         "sound": "default",
+        "channelId": "notification-sound-channel",
         "title": "Ride Request",
         "body": "Open your Sleek App"
       }]);
@@ -392,6 +394,7 @@ let title;
       let chunks = expo.chunkPushNotifications([{
         "to": [artis.pushToken],
         "sound": "default",
+        "channelId": "notification-sound-channel",
         "title": "New Request",
         "body": "A dispatch Rider is needed!"
       }]);
@@ -537,6 +540,7 @@ console.log(savedTokens)
 let chunks = expo.chunkPushNotifications([{
   "to": savedTokens,
   "sound": "default",
+  "channelId": "notification-sound-channel",
   "title": "Request Accepted!",
   "body": `A driver has accepted your request.`
 }]);
@@ -627,6 +631,7 @@ console.log(savedTokens)
 let chunks = expo.chunkPushNotifications([{
   "to": savedTokens,
   "sound": "default",
+  "channelId": "notification-sound-channel",
   "title": "Request Accepted!",
   "body": `A Driver has accepted your request and is on his way.`
 }]);
@@ -723,6 +728,7 @@ console.log(savedTokens)
 let chunks = expo.chunkPushNotifications([{
   "to": savedTokens,
   "sound": "default",
+  "channelId": "notification-sound-channel",
   "title": "Request Accepted!",
   "body": `A Driver has accepted your request and is on his way.`
 }]);
@@ -840,6 +846,7 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
 let chunks = expo.chunkPushNotifications([{
   "to":  artisan.pushToken,
   "sound": "default",
+  "channelId": "notification-sound-channel",
   "title": "Request Canceled!",
   "body": `${hirer.name} canceled his  request.`
 }]);
@@ -998,6 +1005,7 @@ let tickets = [];
 let chunks = expo.chunkPushNotifications([{
   "to": hirer.pushToken,
   "sound": "default",
+  "channelId": "notification-sound-channel",
   "title": "Request Canceled!",
   "body": `${artisan.name} canceled the Request`
 }]);
@@ -1139,6 +1147,7 @@ console.log(hirer.pushToken)
 let chunks = expo.chunkPushNotifications([{
   "to": hirer.pushToken,
   "sound": "default",
+  "channelId": "notification-sound-channel",
   "title": "Ride Completed!",
   "body": 'Yay! Ride completed'
 }]);
@@ -1271,6 +1280,7 @@ console.log(savedTokens)
 let chunks = expo.chunkPushNotifications([{
   "to": savedTokens,
   "sound": "default",
+  "channelId": "notification-sound-channel",
   "title": "Yay! Driver Found",
   "body": `Open your 247 App`
 }]);
@@ -1409,6 +1419,7 @@ savedTokens = artisan.pushToken;
 let chunks = expo.chunkPushNotifications([{
     "to": savedTokens,
     "sound": "default",
+    "channelId": "notification-sound-channel",
     "title": "New Rating",
     "body": 'You just got rated for your last job.'
   }]);
@@ -1499,6 +1510,7 @@ console.log(savedTokens)
 let chunks = expo.chunkPushNotifications([{
 "to": savedTokens,
 "sound": "default",
+"channelId": "notification-sound-channel",
 "title": "Trip Started!",
 "body": `Your driver has started the trip.`
 }]);
@@ -1631,6 +1643,7 @@ static async driverArrived(request:Request, response:Response){
     let chunks = expo.chunkPushNotifications([{
     "to": savedTokens,
     "sound": "default",
+    "channelId": "notification-sound-channel",
     "title": "Driver Arrival!",
     "body": `Your driver has arrived.`
     }]);
