@@ -516,6 +516,23 @@ class UserController {
 
 
 
+  //get users
+  static async Users(request: Request, response: Response) {
+
+
+    try {
+      const users = await Schema.User().find({}).sort({'_id': -1})  
+      console.log(users)
+      return response.status(200).send({value: users})
+    } catch(error) {
+        console.log(error.toString());
+    return  response.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+  }
+
+
 
 
 

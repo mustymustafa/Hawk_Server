@@ -21,7 +21,7 @@ import Validator from '../validator/Validator';
 import nodemailer from "nodemailer";
 import { create } from 'domain';
 
-/** 
+
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -29,7 +29,7 @@ var transporter = nodemailer.createTransport({
          pass: process.env.PASS
      }
  });
-*/
+
 
 function addWeek(date: any, week: any) {
   console.log(date)
@@ -983,30 +983,8 @@ class ArtisanController {
     }
   }
 
-  /** 
-  static sendMail (email: string, message: string, subject = 'Registration') {
-    try{
- 
-      const msg = {
-        to: email,
-        from: '"Hawk" <no-reply@thegreenearthcomp.com>',
-        subject,
-        html: `<p> ${message} </p>`
-      };
-      transporter.sendMail(msg, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-    
-    } catch (error) {
-      console.log(error.toString());
-    }
-  }
 
-*/
+
 
 
 
@@ -1087,9 +1065,11 @@ class ArtisanController {
         });
 
         foundUser.isConfirmed = true;
+        ArtisanController.sendMail('support@platabox.com', 'New Registration Request. Please attend to it now.', 'New Registration');
         return response.status(200).send({
           token: ArtisanController.generateToken(foundUser)
         });
+
       } catch (error) {
         console.log(error.toString());
         response.status(500).send({
@@ -1103,6 +1083,96 @@ class ArtisanController {
     }
 
 
+  }
+
+
+  //get Drivers
+  static async Drivers(request: Request, response: Response) {
+
+
+    try {
+      const drivers = await Schema.Artisan().find({'category': 'driver'}).where({'active': true}).sort({'_id': -1})  
+      console.log(drivers)
+      return response.status(200).send({value: drivers})
+    } catch(error) {
+        console.log(error.toString());
+    return  response.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+  }
+
+  static async Logs(request: Request, response: Response) {
+
+
+    try {
+      const logs = await Schema.Artisan().find({'category': 'log'}).where({'active': true}).sort({'_id': -1})  
+      console.log(logs)
+      return response.status(200).send({value: logs})
+    } catch(error) {
+        console.log(error.toString());
+    return  response.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+  }
+  
+
+
+
+//get registratins 
+static async getLogRegistartion(request: Request, response: Response) {
+
+
+  try {
+    const registrations = await Schema.Artisan().find({'category': 'log'}).where({'active': false}).sort({'_id': -1})  
+    console.log(registrations)
+    return response.status(200).send({value: registrations})
+  } catch(error) {
+      console.log(error.toString());
+  return  response.status(500).send({
+      message: 'something went wrong'
+    });
+  }
+}
+
+static async getDriverRegistartion(request: Request, response: Response) {
+
+
+  try {
+    const registrations = await Schema.Artisan().find({'category': 'driver'}).where({'active': false}).sort({'_id': -1})  
+    console.log(registrations)
+    return response.status(200).send({value: registrations})
+  } catch(error) {
+      console.log(error.toString());
+  return  response.status(500).send({
+      message: 'something went wrong'
+    });
+  }
+}
+
+
+
+  static sendMail (email: string, message: string, subject: string) {
+    try{
+ 
+      const msg = {
+        to: email,
+        from: '"Platabox" <no-reply@support@platabox.com>',
+        subject,
+        html: `<p> ${message}</p>`
+      };
+      transporter.sendMail(msg, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+    
+    } catch (error) {
+      console.log(error.toString());
+    }
   }
 
 
@@ -1372,6 +1442,40 @@ class ArtisanController {
   }
 
 
+ //Get all logistics
+ static async getLog(request: Request, response: Response) {
+
+
+
+  try {
+    const user = await Schema.Artisan().find({ category: 'log' });
+
+
+    if (user) {
+
+      console.log(user)
+      return response.status(200).send({ user });
+
+
+
+
+
+
+
+    } else {
+      response.status(404).send({
+        message: 'Cannot find details for this user'
+      });
+      console.log("not found")
+    }
+  } catch (error) {
+    return response.status(500).send({
+      message: 'Something went wrong'
+    })
+  }
+}
+
+
 
 
   static async savePushToken(request: Request, response: Response) {
@@ -1420,6 +1524,153 @@ class ArtisanController {
         message: 'Something went wrong'
       })
     }
+  }
+
+
+
+  //ADMIN ACTIVATE
+
+   //update status on payment
+   static async adminActivate(request: Request, response: Response) {
+    const { uid } = request.body
+    //const expire =  addWeek(new Date(), 1).toLocaleDateString();
+    var now = new Date();
+
+    //after 7 days
+    const expire = now.setDate(now.getDate() + 7);
+    console.log(now.toLocaleDateString())
+
+
+
+    try {
+      const user = await Schema.Artisan().findOne({ _id: uid })
+      if (user) {
+
+        await Schema.Artisan().updateOne({ _id: uid },
+          {
+            $set: {
+              active: true,
+              expireAt: now.toLocaleDateString(),
+              earnings: user.earnings.splice(0, user.earnings.length)
+            }
+          }
+
+        )
+
+
+
+        response.status(200).send({
+          message: 'Account Activated!'
+        })
+
+
+      //send notification
+  
+      let chunks = expo.chunkPushNotifications([{
+        "to": user.pushToken,
+        "sound": "default",
+        "channelId": "notification-sound-channel",
+        "title": 'Account Activated !',
+        "body": "You are now a Platabox Driver :)"
+      }]);
+      let tickets = [];
+      (async () => {
+        for (let chunk of chunks) {
+          try {
+            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+            console.log(ticketChunk);
+            tickets.push(...ticketChunk);
+         
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      })();
+
+      ArtisanController.sendMail(user.email, 'Account Activated. you can start using Platabox Driver now and start earning more money!.', 'Activated');
+      } else {
+        response.status(404).send({
+          message: 'Cannot find details for this user'
+        });
+      }
+
+    } catch (error) {
+      response.status(404).send({ error: 'could not complete your request at the moment' })
+    }
+
+  }
+
+
+  //ADMIN DEACTIVATE
+   //update status on payment
+
+   static async deactivateAccount(request: Request, response: Response) {
+    const { uid } = request.body
+    //const expire =  addWeek(new Date(), 1).toLocaleDateString();
+    var now = new Date();
+
+    //after 7 days
+    const expire = now.setDate(now.getDate() + 7);
+    console.log(now.toLocaleDateString())
+
+
+
+    try {
+      const user = await Schema.Artisan().findOne({ _id: uid })
+      if (user) {
+
+        await Schema.Artisan().updateOne({ _id: uid },
+          {
+            $set: {
+              active: false,
+              expireAt: '',
+              earnings: user.earnings.splice(0, user.earnings.length)
+            }
+          }
+
+        )
+
+
+
+        response.status(200).send({
+          message: 'Account De-activated!'
+        })
+
+
+      //send notification
+  
+      let chunks = expo.chunkPushNotifications([{
+        "to": user.pushToken,
+        "sound": "default",
+        "channelId": "notification-sound-channel",
+        "title": "Account De-activated",
+        "body": "You are no longer a Platabox Driver"
+      }]);
+      let tickets = [];
+      (async () => {
+        for (let chunk of chunks) {
+          try {
+            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+            console.log(ticketChunk);
+            tickets.push(...ticketChunk);
+         
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      })();
+
+      ArtisanController.sendMail(user.email, 'Your account has been disabled for a reason. Contact us to see what went wrong.', 'De-activated');
+      } else {
+        response.status(404).send({
+          message: 'Cannot find details for this user'
+        });
+      }
+
+    } catch (error) {
+      response.status(404).send({ error: 'could not complete your request at the moment' })
+    }
+
   }
 
 

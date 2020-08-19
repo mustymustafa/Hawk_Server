@@ -173,6 +173,29 @@ app.post('/api/v1/job/:uid/rate', JobController.rateArtisan);
 
 
 
+//ADMIN API
+app.get('/api/v1/driverregistration', ArtisanController.getDriverRegistartion);
+app.get('/api/v1/logregistration', ArtisanController.getLogRegistartion);
+app.get('/api/v1/getdrivers', ArtisanController.getDrivers);
+app.get('/api/v1/getlogs', ArtisanController.getLog);
+app.get('/api/v1/getusers', UserController.Users);
+app.get('/api/v1/getdeliveires', JobController.Deliveries);
+app.get('/api/v1/getrides', JobController.Rides);
+
+app.post('/api/v1/:uid/activate', ArtisanController.adminActivate);
+app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //check for unfinished registration and delete

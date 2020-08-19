@@ -1712,6 +1712,43 @@ static async getHistory(request:Request, response:Response){
 
 
 
+
+
+//GET DELIVERY REQUESTS
+static async Deliveries(request: Request, response: Response) {
+
+
+  try {
+    const deliveries = await Schema.Job().find({'category': 'log'}).sort({'_id': -1})  
+    console.log(deliveries)
+    return response.status(200).send({value: deliveries})
+  } catch(error) {
+      console.log(error.toString());
+  return  response.status(500).send({
+      message: 'something went wrong'
+    });
+  }
+}
+
+//RIDES
+static async Rides(request: Request, response: Response) {
+
+
+  try {
+    const rides = await Schema.Job().find({'category': 'driver'}).sort({'_id': -1})  
+    console.log(rides)
+    return response.status(200).send({value: rides})
+  } catch(error) {
+      console.log(error.toString());
+  return  response.status(500).send({
+      message: 'something went wrong'
+    });
+  }
+}
+
+
+
+
  }
 
 
