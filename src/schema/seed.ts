@@ -21,8 +21,8 @@ const seedUser = async () => {
 
 export const seedArtisan = async () => {
     await Schema.Artisan().create({
-      name: 'user',
-      email: 'artisan@hawk.com',
+      name: 'admin',
+      email: 'admin@platabox.com',
       phone: '09038826995',
       password: bcrypt.hashSync('musty100', salt),
       isConfirmed: true,

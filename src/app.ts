@@ -45,6 +45,10 @@ app.use(cookieParser());
 
 app.post('/api/v1/signup', Middleware.signupMiddleware, UserController.signup);
 app.post('/api/v1/signin', Middleware.signinPhoneMiddleware, UserController.signin);
+app.post('/api/v1/adminsignin', Middleware.signinMiddleware, ArtisanController.adminSignin);
+
+
+
 app.post('/api/v1/confirmation', UserController.confirm);
 app.post('/api/v1/resend-otp', UserController.resendOtp);
 app.post('/api/v1/forgot-password', UserController.forgotPassword);
@@ -315,6 +319,7 @@ discount1.start();
 
 
 
+//seedArtisan();
 
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
