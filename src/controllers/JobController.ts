@@ -8,8 +8,10 @@ import Validator from '../validator/Validator';
 import nodemailer from "nodemailer";
 import { Expo } from "expo-server-sdk";
 
-import mongoose from 'mongoose';
+
 const expo = new Expo();
+
+import mongoose from 'mongoose';
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
