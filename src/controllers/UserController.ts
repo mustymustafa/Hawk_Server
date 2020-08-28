@@ -142,14 +142,10 @@ class UserController {
   //forgot password
   static async forgotPassword (request: Request, response: Response) {
     const {
-      email
+      phone
     } = request.body;
-    if (!email || !Validator.validateEmail(email.trim())) {
-      return response.status(400).send({
-        message: "Invalid email"
-      });
-    }
-    const user = await Schema.User().findOne({email: email.trim()});
+  
+    const user = await Schema.User().findOne({phone: phone.trim()});
     if (!user) {
       return response.status(404).send({
         message: 'User does not exist'
@@ -192,7 +188,7 @@ class UserController {
     const {
       confirmationCode,
       password,
-      email
+      phone
     } = request.body;
     if (!confirmationCode || !confirmationCode.trim()) {
       return response.status(400).send({
@@ -204,7 +200,7 @@ class UserController {
         message: "Password is required"
       });
     }
-    const user = await Schema.User().findOne({email: email.trim()});
+    const user = await Schema.User().findOne({phone: phone.trim()});
     if (!user) {
       return response.status(404).send({
         message: 'User does not exist'
@@ -316,10 +312,10 @@ class UserController {
   //confrimation code
   static async confirm (request: Request, response: Response) {
     const {
-      email, confirmationCode
+      phone, confirmationCode
     } = request.body;
 
-    const foundUser:any = await Schema.User().findOne({email});
+    const foundUser:any = await Schema.User().findOne({phone});
 
     if (foundUser && Object.keys(foundUser).length > 0) {
       if (foundUser.confirmationCode !== confirmationCode) {

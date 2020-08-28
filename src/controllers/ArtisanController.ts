@@ -25,7 +25,7 @@ import { create } from 'domain';
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-         user: 'musty.mohammed1998@gmail.com',
+         user: process.env.EMAIL,
          pass: process.env.PASS
      }
  });
@@ -890,14 +890,10 @@ class ArtisanController {
   //forgot password
   static async forgotPassword(request: Request, response: Response) {
     const {
-      email
+      phone
     } = request.body;
-    if (!email || !Validator.validateEmail(email.trim())) {
-      return response.status(400).send({
-        message: "Invalid email"
-      });
-    }
-    const user = await Schema.Artisan().findOne({ email: email.trim() });
+
+    const user = await Schema.Artisan().findOne({ phone: phone.trim() });
     if (!user) {
       return response.status(404).send({
         message: 'User does not exist'
@@ -940,7 +936,7 @@ class ArtisanController {
     const {
       confirmationCode,
       password,
-      email
+      phone
     } = request.body;
     if (!confirmationCode || !confirmationCode.trim()) {
       return response.status(400).send({
@@ -952,7 +948,7 @@ class ArtisanController {
         message: "Password is required"
       });
     }
-    const user = await Schema.Artisan().findOne({ email: email.trim() });
+    const user = await Schema.Artisan().findOne({ phone: phone.trim() });
     if (!user) {
       return response.status(404).send({
         message: 'User does not exist'

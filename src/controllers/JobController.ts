@@ -16,7 +16,7 @@ import mongoose from 'mongoose';
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-         user: 'musty.mohammed1998@gmail.com',
+         user: process.env.EMAIL,
          pass: process.env.PASS
      }
  });
