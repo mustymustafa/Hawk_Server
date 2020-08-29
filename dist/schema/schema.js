@@ -28,6 +28,7 @@ class Schema {
         const ArtisanSchema = new mongoose_1.default.Schema({
             name: String,
             country: String,
+            city: String,
             email: String,
             phone: String,
             password: String,
@@ -104,6 +105,7 @@ class Schema {
             time: String,
             area1: String,
             area2: String,
+            city: String,
             description: String,
             price: String,
             paid: Boolean,

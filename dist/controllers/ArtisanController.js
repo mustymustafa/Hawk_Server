@@ -23,16 +23,14 @@ const client = twilio_1.default(accountSid, authToken, {
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
 const schema_1 = __importDefault(require("../schema/schema"));
-const Validator_1 = __importDefault(require("../validator/Validator"));
-/**
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-         user: 'musty.mohammed1998@gmail.com',
-         pass: process.env.PASS
-     }
- });
-*/
+const nodemailer_1 = __importDefault(require("nodemailer"));
+var transporter = nodemailer_1.default.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASS
+    }
+});
 function addWeek(date, week) {
     console.log(date);
     const d = date.getDate();
@@ -651,13 +649,8 @@ class ArtisanController {
     //forgot password
     static forgotPassword(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email } = request.body;
-            if (!email || !Validator_1.default.validateEmail(email.trim())) {
-                return response.status(400).send({
-                    message: "Invalid email"
-                });
-            }
-            const user = yield schema_1.default.Artisan().findOne({ email: email.trim() });
+            const { phone } = request.body;
+            const user = yield schema_1.default.Artisan().findOne({ phone: phone.trim() });
             if (!user) {
                 return response.status(404).send({
                     message: 'User does not exist'
@@ -698,7 +691,7 @@ class ArtisanController {
     //change password
     static changePassword(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { confirmationCode, password, email } = request.body;
+            const { confirmationCode, password, phone } = request.body;
             if (!confirmationCode || !confirmationCode.trim()) {
                 return response.status(400).send({
                     message: "Token is required"
@@ -709,7 +702,7 @@ class ArtisanController {
                     message: "Password is required"
                 });
             }
-            const user = yield schema_1.default.Artisan().findOne({ email: email.trim() });
+            const user = yield schema_1.default.Artisan().findOne({ phone: phone.trim() });
             if (!user) {
                 return response.status(404).send({
                     message: 'User does not exist'
@@ -741,36 +734,35 @@ class ArtisanController {
             }
         });
     }
-    /**
-    static sendMail (email: string, message: string, subject = 'Registration') {
-      try{
-   
-        const msg = {
-          to: email,
-          from: '"Hawk" <no-reply@thegreenearthcomp.com>',
-          subject,
-          html: `<p> ${message} </p>`
-        };
-        transporter.sendMail(msg, function(error, info){
-          if (error) {
-            console.log(error);
-          } else {
-            console.log('Email sent: ' + info.response);
-          }
-        });
-      
-      } catch (error) {
-        console.log(error.toString());
-      }
-    }
-  
-  */
     //sign in
     static signin(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { phone, password } = request.body;
             console.log(phone);
             const foundUser = yield schema_1.default.Artisan().findOne({ phone: phone.trim() });
+            if (foundUser && Object.keys(foundUser).length > 0) {
+                if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
+                    return response.status(403).send({
+                        message: 'Incorrect Password'
+                    });
+                }
+                return response.status(200).send({
+                    token: ArtisanController.generateToken(foundUser)
+                });
+            }
+            else {
+                return response.status(401).send({
+                    message: 'Incorrect Username or Password'
+                });
+            }
+        });
+    }
+    //ADMIN SIGN  IN
+    static adminSignin(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, password } = request.body;
+            console.log(email);
+            const foundUser = yield schema_1.default.Artisan().findOne({ email: email.trim() });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
                     return response.status(403).send({
@@ -833,6 +825,7 @@ class ArtisanController {
                         }
                     });
                     foundUser.isConfirmed = true;
+                    ArtisanController.sendMail('support@platabox.com', 'New Registration Request. Please attend to it now.', 'New Registration');
                     return response.status(200).send({
                         token: ArtisanController.generateToken(foundUser)
                     });
@@ -850,6 +843,89 @@ class ArtisanController {
                 });
             }
         });
+    }
+    //get Drivers
+    static Drivers(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const drivers = yield schema_1.default.Artisan().find({ 'category': 'driver' }).where({ 'active': true }).sort({ '_id': -1 });
+                console.log(drivers);
+                return response.status(200).send({ value: drivers });
+            }
+            catch (error) {
+                console.log(error.toString());
+                return response.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    static Logs(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const logs = yield schema_1.default.Artisan().find({ 'category': 'log' }).where({ 'active': true }).sort({ '_id': -1 });
+                console.log(logs);
+                return response.status(200).send({ value: logs });
+            }
+            catch (error) {
+                console.log(error.toString());
+                return response.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    //get registratins 
+    static getLogRegistartion(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const registrations = yield schema_1.default.Artisan().find({ 'category': 'log' }).where({ 'active': false }).sort({ '_id': -1 });
+                console.log(registrations);
+                return response.status(200).send({ value: registrations });
+            }
+            catch (error) {
+                console.log(error.toString());
+                return response.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    static getDriverRegistartion(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const registrations = yield schema_1.default.Artisan().find({ 'category': 'driver' }).where({ 'active': false }).sort({ '_id': -1 });
+                console.log(registrations);
+                return response.status(200).send({ value: registrations });
+            }
+            catch (error) {
+                console.log(error.toString());
+                return response.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    static sendMail(email, message, subject) {
+        try {
+            const msg = {
+                to: email,
+                from: '"Platabox" <no-reply@support@platabox.com>',
+                subject,
+                html: `<p> ${message}</p>`
+            };
+            transporter.sendMail(msg, function (error, info) {
+                if (error) {
+                    console.log(error);
+                }
+                else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+        }
+        catch (error) {
+            console.log(error.toString());
+        }
     }
     static generateSalt() {
         return bcrypt_1.default.genSaltSync(10);
@@ -954,7 +1030,7 @@ class ArtisanController {
     //location
     static storeLocation(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { lat, long, location, area1, area2 } = request.body;
+            const { lat, long, location, area1, area2, city } = request.body;
             const { uid } = request.params;
             const user = yield schema_1.default.Artisan().findOne({ _id: uid });
             if (!user) {
@@ -972,7 +1048,8 @@ class ArtisanController {
                         long: long,
                         location: location,
                         area1: area1,
-                        area2: area2
+                        area2: area2,
+                        city: city
                     }
                 });
                 return response.status(200).send("location saved");
@@ -1068,6 +1145,29 @@ class ArtisanController {
             }
         });
     }
+    //Get all logistics
+    static getLog(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield schema_1.default.Artisan().find({ category: 'log' });
+                if (user) {
+                    console.log(user);
+                    return response.status(200).send({ user });
+                }
+                else {
+                    response.status(404).send({
+                        message: 'Cannot find details for this user'
+                    });
+                    console.log("not found");
+                }
+            }
+            catch (error) {
+                return response.status(500).send({
+                    message: 'Something went wrong'
+                });
+            }
+        });
+    }
     static savePushToken(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid } = request.params;
@@ -1108,6 +1208,120 @@ class ArtisanController {
                 return response.status(500).send({
                     message: 'Something went wrong'
                 });
+            }
+        });
+    }
+    //ADMIN ACTIVATE
+    //update status on payment
+    static adminActivate(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.body;
+            //const expire =  addWeek(new Date(), 1).toLocaleDateString();
+            var now = new Date();
+            //after 7 days
+            const expire = now.setDate(now.getDate() + 7);
+            console.log(now.toLocaleDateString());
+            try {
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                if (user) {
+                    yield schema_1.default.Artisan().updateOne({ _id: uid }, {
+                        $set: {
+                            active: true,
+                            expireAt: now.toLocaleDateString(),
+                            earnings: user.earnings.splice(0, user.earnings.length)
+                        }
+                    });
+                    response.status(200).send({
+                        message: 'Account Activated!'
+                    });
+                    //send notification
+                    let chunks = expo.chunkPushNotifications([{
+                            "to": user.pushToken,
+                            "sound": "default",
+                            "channelId": "notification-sound-channel",
+                            "title": 'Account Activated !',
+                            "body": "You are now a Platabox Driver :)"
+                        }]);
+                    let tickets = [];
+                    (() => __awaiter(this, void 0, void 0, function* () {
+                        for (let chunk of chunks) {
+                            try {
+                                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                console.log(ticketChunk);
+                                tickets.push(...ticketChunk);
+                            }
+                            catch (error) {
+                                console.error(error);
+                            }
+                        }
+                    }))();
+                    ArtisanController.sendMail(user.email, 'Account Activated. you can start using Platabox Driver now and start earning more money!.', 'Activated');
+                }
+                else {
+                    response.status(404).send({
+                        message: 'Cannot find details for this user'
+                    });
+                }
+            }
+            catch (error) {
+                response.status(404).send({ error: 'could not complete your request at the moment' });
+            }
+        });
+    }
+    //ADMIN DEACTIVATE
+    //update status on payment
+    static deactivateAccount(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.body;
+            //const expire =  addWeek(new Date(), 1).toLocaleDateString();
+            var now = new Date();
+            //after 7 days
+            const expire = now.setDate(now.getDate() + 7);
+            console.log(now.toLocaleDateString());
+            try {
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                if (user) {
+                    yield schema_1.default.Artisan().updateOne({ _id: uid }, {
+                        $set: {
+                            active: false,
+                            expireAt: '',
+                            earnings: user.earnings.splice(0, user.earnings.length)
+                        }
+                    });
+                    response.status(200).send({
+                        message: 'Account De-activated!'
+                    });
+                    //send notification
+                    let chunks = expo.chunkPushNotifications([{
+                            "to": user.pushToken,
+                            "sound": "default",
+                            "channelId": "notification-sound-channel",
+                            "title": "Account De-activated",
+                            "body": "You are no longer a Platabox Driver"
+                        }]);
+                    let tickets = [];
+                    (() => __awaiter(this, void 0, void 0, function* () {
+                        for (let chunk of chunks) {
+                            try {
+                                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                console.log(ticketChunk);
+                                tickets.push(...ticketChunk);
+                            }
+                            catch (error) {
+                                console.error(error);
+                            }
+                        }
+                    }))();
+                    ArtisanController.sendMail(user.email, 'Your account has been disabled for a reason. Contact us to see what went wrong.', 'De-activated');
+                }
+                else {
+                    response.status(404).send({
+                        message: 'Cannot find details for this user'
+                    });
+                }
+            }
+            catch (error) {
+                response.status(404).send({ error: 'could not complete your request at the moment' });
             }
         });
     }

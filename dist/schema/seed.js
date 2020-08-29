@@ -27,8 +27,8 @@ const seedUser = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.seedArtisan = () => __awaiter(void 0, void 0, void 0, function* () {
     yield schema_1.default.Artisan().create({
-        name: 'user',
-        email: 'artisan@hawk.com',
+        name: 'admin',
+        email: 'admin@platabox.com',
         phone: '09038826995',
         password: bcrypt_1.default.hashSync('musty100', salt),
         isConfirmed: true,

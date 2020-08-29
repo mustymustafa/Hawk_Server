@@ -116,7 +116,7 @@ let title;
         "sound": "default",
         "channelId": "notification-sound-channel",
         "title": title,
-        "body": "Open your 247 App"
+        "body": "Open your Platabox App"
       }]);
       let tickets = [];
       (async () => {
@@ -253,7 +253,7 @@ let title;
         "sound": "default",
         "channelId": "notification-sound-channel",
         "title": "Ride Request",
-        "body": "Open your Sleek App"
+        "body": "Open your Platabox App"
       }]);
       let tickets = [];
       (async () => {
@@ -732,7 +732,7 @@ let chunks = expo.chunkPushNotifications([{
   "sound": "default",
   "channelId": "notification-sound-channel",
   "title": "Request Accepted!",
-  "body": `A Driver has accepted your request and is on his way.`
+  "body": `A Dispatcher has accepted your request.`
 }]);
 let tickets = [];
 (async () => {
@@ -850,7 +850,7 @@ let chunks = expo.chunkPushNotifications([{
   "sound": "default",
   "channelId": "notification-sound-channel",
   "title": "Request Canceled!",
-  "body": `${hirer.name} canceled his  request.`
+  "body": `${hirer.name} canceled his request.`
 }]);
 let tickets = [];
 (async () => {
@@ -1283,8 +1283,8 @@ let chunks = expo.chunkPushNotifications([{
   "to": savedTokens,
   "sound": "default",
   "channelId": "notification-sound-channel",
-  "title": "Yay! Driver Found",
-  "body": `Open your 247 App`
+  "title": "Yay! Dispatcher Found",
+  "body": `Open your Platabox App`
 }]);
 let tickets = [];
 (async () => {

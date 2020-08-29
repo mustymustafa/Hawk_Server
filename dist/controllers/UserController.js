@@ -21,7 +21,6 @@ const client = twilio_1.default(accountSid, authToken, {
     lazyLoading: true
 });
 const schema_1 = __importDefault(require("../schema/schema"));
-const Validator_1 = __importDefault(require("../validator/Validator"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
 /**
@@ -130,13 +129,8 @@ class UserController {
     //forgot password
     static forgotPassword(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email } = request.body;
-            if (!email || !Validator_1.default.validateEmail(email.trim())) {
-                return response.status(400).send({
-                    message: "Invalid email"
-                });
-            }
-            const user = yield schema_1.default.User().findOne({ email: email.trim() });
+            const { phone } = request.body;
+            const user = yield schema_1.default.User().findOne({ phone: phone.trim() });
             if (!user) {
                 return response.status(404).send({
                     message: 'User does not exist'
@@ -177,7 +171,7 @@ class UserController {
     //change password
     static changePassword(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { confirmationCode, password, email } = request.body;
+            const { confirmationCode, password, phone } = request.body;
             if (!confirmationCode || !confirmationCode.trim()) {
                 return response.status(400).send({
                     message: "Token is required"
@@ -188,7 +182,7 @@ class UserController {
                     message: "Password is required"
                 });
             }
-            const user = yield schema_1.default.User().findOne({ email: email.trim() });
+            const user = yield schema_1.default.User().findOne({ phone: phone.trim() });
             if (!user) {
                 return response.status(404).send({
                     message: 'User does not exist'
@@ -291,8 +285,8 @@ class UserController {
     //confrimation code
     static confirm(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, confirmationCode } = request.body;
-            const foundUser = yield schema_1.default.User().findOne({ email });
+            const { phone, confirmationCode } = request.body;
+            const foundUser = yield schema_1.default.User().findOne({ phone });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (foundUser.confirmationCode !== confirmationCode) {
                     return response.status(403).send({
@@ -454,6 +448,22 @@ class UserController {
                 console.log(error.toString(), "========");
                 return response.status(500).send({
                     message: 'Something went wrong'
+                });
+            }
+        });
+    }
+    //get users
+    static Users(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const users = yield schema_1.default.User().find({}).sort({ '_id': -1 });
+                console.log(users);
+                return response.status(200).send({ value: users });
+            }
+            catch (error) {
+                console.log(error.toString());
+                return response.status(500).send({
+                    message: 'something went wrong'
                 });
             }
         });

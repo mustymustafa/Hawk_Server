@@ -41,6 +41,7 @@ app.use(cookie_parser_1.default());
 //routes
 app.post('/api/v1/signup', Middleware_1.default.signupMiddleware, UserController_1.default.signup);
 app.post('/api/v1/signin', Middleware_1.default.signinPhoneMiddleware, UserController_1.default.signin);
+app.post('/api/v1/adminsignin', Middleware_1.default.signinMiddleware, ArtisanController_1.default.adminSignin);
 app.post('/api/v1/confirmation', UserController_1.default.confirm);
 app.post('/api/v1/resend-otp', UserController_1.default.resendOtp);
 app.post('/api/v1/forgot-password', UserController_1.default.forgotPassword);
@@ -119,6 +120,16 @@ app.post('/api/v1/:uid/job/artisan', JobController_1.default.getArtisan);
 app.post('/api/v1/:uid/job/artisan/start', JobController_1.default.startedJob);
 app.post('/api/v1/job/:uid/lastjob', JobController_1.default.checkRating);
 app.post('/api/v1/job/:uid/rate', JobController_1.default.rateArtisan);
+//ADMIN API
+app.get('/api/v1/driverregistration', ArtisanController_1.default.getDriverRegistartion);
+app.get('/api/v1/logregistration', ArtisanController_1.default.getLogRegistartion);
+app.get('/api/v1/getdrivers', ArtisanController_1.default.getDrivers);
+app.get('/api/v1/getlogs', ArtisanController_1.default.getLog);
+app.get('/api/v1/getusers', UserController_1.default.Users);
+app.get('/api/v1/getdeliveires', JobController_1.default.Deliveries);
+app.get('/api/v1/getrides', JobController_1.default.Rides);
+app.post('/api/v1/:uid/activate', ArtisanController_1.default.adminActivate);
+app.post('/api/v1/:uid/deactivate', ArtisanController_1.default.deactivateAccount);
 //check for unfinished registration and delete
 const task = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("registration deletion after a day");
@@ -200,6 +211,7 @@ const discount1 = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(vo
 task.start();
 discount.start();
 discount1.start();
+//seedArtisan();
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
 app.set('port', port);

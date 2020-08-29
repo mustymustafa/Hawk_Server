@@ -19,7 +19,7 @@ const expo = new expo_server_sdk_1.Expo();
 var transporter = nodemailer_1.default.createTransport({
     service: 'gmail',
     auth: {
-        user: 'musty.mohammed1998@gmail.com',
+        user: process.env.EMAIL,
         pass: process.env.PASS
     }
 });
@@ -90,6 +90,7 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": savedTokens,
                         "sound": "default",
+                        "channelId": "notification-sound-channel",
                         "title": title,
                         "body": "Open your 247 App"
                     }]);
@@ -179,6 +180,7 @@ class JobController {
                     let chunks = expo.chunkPushNotifications([{
                             "to": [artis.pushToken],
                             "sound": "default",
+                            "channelId": "notification-sound-channel",
                             "title": "Ride Request",
                             "body": "Open your Sleek App"
                         }]);
@@ -207,8 +209,9 @@ class JobController {
     }
     static logRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime } = request.body;
+            const { city, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime } = request.body;
             //console.log(category)
+            console.log(city);
             let savedTokens;
             try {
                 //create job
@@ -223,6 +226,7 @@ class JobController {
                     user: uid,
                     category: category,
                     location: location,
+                    city: city,
                     status: 'active',
                     rated: false,
                     to: to,
@@ -258,7 +262,7 @@ class JobController {
                     message: 'Job created successfully',
                     status: 201
                 });
-                const artisan = yield schema_1.default.Artisan().find({ category: 'log' });
+                const artisan = yield schema_1.default.Artisan().find({ category: 'log' }).where({ city: city });
                 if (!artisan) {
                     return response.status(404).send({
                         message: 'No riders found'
@@ -271,6 +275,7 @@ class JobController {
                     let chunks = expo.chunkPushNotifications([{
                             "to": [artis.pushToken],
                             "sound": "default",
+                            "channelId": "notification-sound-channel",
                             "title": "New Request",
                             "body": "A dispatch Rider is needed!"
                         }]);
@@ -318,11 +323,11 @@ class JobController {
     //display logistics requests
     static logRequests(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { category } = request.body;
+            const { category, city, city2 } = request.body;
             console.log(category);
             //console.log("area1:" + area1);
             //console.log("area2:" + area2);
-            const job = yield schema_1.default.Job().find({ category: category }).where({ status: 'active' }).sort({ '_id': -1 });
+            const job = yield schema_1.default.Job().find({ category: category }).where({ city: city, $and: [{ status: 'active' }] }).sort({ '_id': -1 });
             console.log(job);
             //get hirer id
             const user = job.map(usr => {
@@ -369,6 +374,7 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": savedTokens,
                         "sound": "default",
+                        "channelId": "notification-sound-channel",
                         "title": "Request Accepted!",
                         "body": `A driver has accepted your request.`
                     }]);
@@ -428,6 +434,7 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": savedTokens,
                         "sound": "default",
+                        "channelId": "notification-sound-channel",
                         "title": "Request Accepted!",
                         "body": `A Driver has accepted your request and is on his way.`
                     }]);
@@ -494,6 +501,7 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": savedTokens,
                         "sound": "default",
+                        "channelId": "notification-sound-channel",
                         "title": "Request Accepted!",
                         "body": `A Driver has accepted your request and is on his way.`
                     }]);
@@ -565,6 +573,7 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": artisan.pushToken,
                         "sound": "default",
+                        "channelId": "notification-sound-channel",
                         "title": "Request Canceled!",
                         "body": `${hirer.name} canceled his  request.`
                     }]);
@@ -652,6 +661,7 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": hirer.pushToken,
                         "sound": "default",
+                        "channelId": "notification-sound-channel",
                         "title": "Request Canceled!",
                         "body": `${artisan.name} canceled the Request`
                     }]);
@@ -691,7 +701,7 @@ class JobController {
     static completeJob(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             let savedTokens = [];
-            const { job_id, } = request.body;
+            const { job_id } = request.body;
             console.log("job_id" + job_id);
             const job = yield schema_1.default.Job().findOne({ _id: job_id });
             console.log("job found:" + job);
@@ -699,7 +709,7 @@ class JobController {
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             console.log("artisan:" + artisan);
-            const completed = Math.round(artisan.complted + 1);
+            const completed = Math.round(artisan.completed + 1);
             let earnings;
             if (artisan.category === 'log') {
                 earnings = 0;
@@ -740,6 +750,7 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": hirer.pushToken,
                         "sound": "default",
+                        "channelId": "notification-sound-channel",
                         "title": "Ride Completed!",
                         "body": 'Yay! Ride completed'
                     }]);
@@ -820,6 +831,7 @@ class JobController {
                     let chunks = expo.chunkPushNotifications([{
                             "to": savedTokens,
                             "sound": "default",
+                            "channelId": "notification-sound-channel",
                             "title": "Yay! Driver Found",
                             "body": `Open your 247 App`
                         }]);
@@ -922,6 +934,7 @@ class JobController {
                     let chunks = expo.chunkPushNotifications([{
                             "to": savedTokens,
                             "sound": "default",
+                            "channelId": "notification-sound-channel",
                             "title": "New Rating",
                             "body": 'You just got rated for your last job.'
                         }]);
@@ -979,6 +992,7 @@ class JobController {
                 let chunks = expo.chunkPushNotifications([{
                         "to": savedTokens,
                         "sound": "default",
+                        "channelId": "notification-sound-channel",
                         "title": "Trip Started!",
                         "body": `Your driver has started the trip.`
                     }]);
@@ -1059,6 +1073,7 @@ class JobController {
                     let chunks = expo.chunkPushNotifications([{
                             "to": savedTokens,
                             "sound": "default",
+                            "channelId": "notification-sound-channel",
                             "title": "Driver Arrival!",
                             "body": `Your driver has arrived.`
                         }]);
@@ -1105,6 +1120,39 @@ class JobController {
             else {
                 console.log('no user');
                 response.status(404).send('no user found');
+            }
+        });
+    }
+    //Emergency Call
+    //GET DELIVERY REQUESTS
+    static Deliveries(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const deliveries = yield schema_1.default.Job().find({ 'category': 'log' }).sort({ '_id': -1 });
+                console.log(deliveries);
+                return response.status(200).send({ value: deliveries });
+            }
+            catch (error) {
+                console.log(error.toString());
+                return response.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    //RIDES
+    static Rides(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const rides = yield schema_1.default.Job().find({ 'category': 'driver' }).sort({ '_id': -1 });
+                console.log(rides);
+                return response.status(200).send({ value: rides });
+            }
+            catch (error) {
+                console.log(error.toString());
+                return response.status(500).send({
+                    message: 'something went wrong'
+                });
             }
         });
     }
