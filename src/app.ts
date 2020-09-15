@@ -43,7 +43,7 @@ app.use(cookieParser());
 
 //routes
 
-app.post('/api/v1/signup', Middleware.signupMiddleware, UserController.signup);
+app.post('/api/v1/signup', Middleware.userSignupMiddleware, UserController.signup);
 app.post('/api/v1/signin', Middleware.signinPhoneMiddleware, UserController.signin);
 app.post('/api/v1/adminsignin', Middleware.signinMiddleware, ArtisanController.adminSignin);
 

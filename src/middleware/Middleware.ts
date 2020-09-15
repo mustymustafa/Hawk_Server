@@ -85,6 +85,86 @@ export default class MiddleWare {
     next();
   }
 
+  static userSignupMiddleware(req: Request, res: Response, next: NextFunction) {
+    let { email, password, fullname, cpassword, phone, bio, category, wage } = req.body;
+
+    email = email.trim();
+    phone=phone
+    password = password.trim();
+    fullname = fullname.trim();
+    //bio = bio.trim();
+    //category = category.trim();
+    //wage = wage.trim();
+
+
+
+
+
+
+
+    let errors: {[error: string]: string}[] = []
+    if (!Validator.validateEmail(email)) {
+      errors = [...errors, {
+        email: 'You have not entered an email'
+      }]
+    }
+    if (password.trim().length < 6) {
+      errors = [...errors, {
+        password: 'Password is too short'
+      }]
+    }
+
+    if (!phone || phone.length < 14 || phone.length > 14 ) {
+       
+      errors = [...errors, {
+        phone: 'incorrect phone number entered'
+      }]
+    }
+    
+
+    if(cpassword !== password){
+      errors = [...errors, {
+        cpassword: 'Passwords do not match'
+      }]
+    }
+
+    if(bio !== bio){
+      errors = [...errors, {
+        bio: 'Please enter a bio'
+      }]
+    }
+
+
+    if(category !== category){
+      errors = [...errors, {
+        category: 'Please enter a category'
+      }]
+    }
+
+
+ if(!( (/^[a-z][a-z]+\s[a-z][a-z]+$/.test(fullname.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(fullname.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(fullname.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(fullname.trim())) )  ){
+      errors =[
+        ...errors, {
+        errorMessage: 'Please enter your full name',
+        }
+     ]
+    }
+
+
+  
+
+
+  
+
+
+    if (errors.length) {
+      return res.status(400).send({
+        errors
+      });
+    }
+    next();
+  }
+
   static signinMiddleware (req: Request, res: Response, next: NextFunction) {
     let { email, password,  } = req.body;
 

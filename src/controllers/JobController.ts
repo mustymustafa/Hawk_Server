@@ -702,16 +702,7 @@ console.log(price);
         }
         );
 
-        await Schema.Artisan().updateOne({
-          _id: uid
-      },
-      {
-        $push: {
-          earnings: price
-       }
-      }
-      );
-
+  
 
         response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job})
        
@@ -830,8 +821,11 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
        
        const artisan = await Schema.Artisan().findOne({_id: job.artisan});
        console.log("artisan:" + artisan)
-    const earning = artisan.earnings
+       /** 
+        *     const earning = artisan.earnings
     const earnings = earning.splice( earning.indexOf(job.price), 1 );
+       */
+
     
 
     
@@ -879,17 +873,7 @@ let tickets = [];
           
           );
 
-          await Schema.Artisan().updateOne({
-            _id: job.artisan
-          },
-            {
-              $set: {
-                earnings: earnings
-              }
-           
-            }
-            
-            );
+    
   
         console.log("cancelled");
         response.status(201).send({
@@ -1087,12 +1071,15 @@ console.log(hirer.pushToken)
     console.log("artisan:" + artisan)
     const completed =  Math.round(artisan.completed + 1)
 
-    let earnings; 
+    /**
+     *  let earnings; 
     if(artisan.category === 'log'){
       earnings = 0;
     } else {
-      earnings =  job. price;
+      earnings =  job.price;
     }
+     */
+   
    
        
     
@@ -1123,7 +1110,7 @@ console.log(hirer.pushToken)
             completed: completed
           },
             $push: {
-             earnings: earnings
+             earnings: job.price
           }
         }
         );
