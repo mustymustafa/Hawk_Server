@@ -1224,6 +1224,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
     var total = 0;
     var amount = 0;
+    var expire = false;
 
     const { uid } = request.params;
     console.log(uid)
@@ -1260,11 +1261,21 @@ static async getDriverRegistartion(request: Request, response: Response) {
         console.log('pay' + pay)
 
 
+        const dt = new Date();
+        const today = dt.toLocaleDateString();
+
+        console.log("TODAY:" + today)
+
+        if(user.expireAt === today){
+          expire = true
+        }
+        console.log("EXPIRIED?" + expire)
         response.status(200).send({
           user,
           rating: rate,
           earning: amount,
-          pay: pay
+          pay: pay,
+          expired: expire
 
         });
         // console.log(user)
