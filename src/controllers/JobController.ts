@@ -381,13 +381,13 @@ let title;
 
      artisan.map((artis:any) => {
 
-      console.log(artis.pushToken);
+      console.log("push tokens:" + artis.pushToken);
 
     
       
 
     
-     
+
       
  
  
