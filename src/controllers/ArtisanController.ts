@@ -1083,12 +1083,12 @@ class ArtisanController {
         }, {
           $set: {
             isConfirmed: true,
-            active: true
+            active: false
           }
         });
 
         foundUser.isConfirmed = true;
-        ArtisanController.sendMail('support@platabox.com', 'New Registration Request. Please attend to it now.', 'New Registration');
+        ArtisanController.sendMail('management@platabox.com', 'New Registration Request. Please attend to it now.', 'New Registration');
         return response.status(200).send({
           token: ArtisanController.generateToken(foundUser)
         });
