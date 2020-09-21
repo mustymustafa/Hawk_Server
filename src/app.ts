@@ -323,7 +323,7 @@ discount1.start();
 
 
 
-seedArtisan();
+//seedArtisan();
 
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
