@@ -1561,7 +1561,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
   //ADMIN ACTIVATE
 
    static async adminActivate(request: Request, response: Response) {
-    const { uid } = request.body
+    const { id } = request.body
     //const expire =  addWeek(new Date(), 1).toLocaleDateString();
     var now = new Date();
 
@@ -1572,10 +1572,10 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
 
     try {
-      const user = await Schema.Artisan().findOne({ _id: uid })
+      const user = await Schema.Artisan().findOne({ _id: id })
       if (user) {
 
-        await Schema.Artisan().updateOne({ _id: uid },
+        await Schema.Artisan().updateOne({ _id: id },
           {
             $set: {
               active: true,
