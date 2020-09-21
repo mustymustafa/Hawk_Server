@@ -903,7 +903,7 @@ let tickets = [];
           );
 
           await Schema.Artisan().updateOne({
-            _id: uid
+            _id: job.artisan
         },
         {
             $set: {
