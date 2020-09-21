@@ -256,7 +256,7 @@ const now = new Date().toLocaleDateString();
       "to": [users.pushToken],
       "sound": "default",
       "title": "You have 30% off discount today!",
-      "body": "Open your Platabox App"
+      "body": "Open your Sleek App"
     }]);
     let tickets = [];
     (async () => {
@@ -295,7 +295,7 @@ const now = new Date().toLocaleDateString();
       "to": [users.pushToken],
       "sound": "default",
       "title": "You have 30% off discount today!",
-      "body": "Open your Platabox App"
+      "body": "Open your Sleek App"
     }]);
     let tickets = [];
     (async () => {
@@ -323,7 +323,7 @@ discount1.start();
 
 
 
-//seedArtisan();
+seedArtisan();
 
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;

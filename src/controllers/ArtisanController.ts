@@ -1560,7 +1560,6 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
   //ADMIN ACTIVATE
 
-   //update status on payment
    static async adminActivate(request: Request, response: Response) {
     const { uid } = request.body
     //const expire =  addWeek(new Date(), 1).toLocaleDateString();
@@ -1632,7 +1631,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
 
   //ADMIN DEACTIVATE
-   //update status on payment
+
 
    static async deactivateAccount(request: Request, response: Response) {
     const { uid } = request.body
@@ -1653,8 +1652,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
           {
             $set: {
               active: false,
-              expireAt: '',
-              earnings: user.earnings.splice(0, user.earnings.length)
+              expireAt: ''
             }
           }
 
