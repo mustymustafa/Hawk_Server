@@ -186,7 +186,8 @@ app.get('/api/v1/getusers', UserController.Users);
 app.get('/api/v1/getdeliveires', JobController.Deliveries);
 app.get('/api/v1/getrides', JobController.Rides);
 
-app.post('/api/v1/:id/activate', ArtisanController.adminActivate);
+app.post('/api/v1/:uid/activate', ArtisanController.adminActivate);
+
 app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
 
 
