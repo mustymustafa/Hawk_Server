@@ -1223,7 +1223,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
   static async userDetails(request: Request, response: Response) {
 
     var total = 0;
-    var amount = 0;
+
     var expire = false;
 
     const { uid } = request.params;
@@ -1581,7 +1581,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
             $set: {
               active: true,
               expireAt: now.toLocaleDateString(),
-              earnings: user.earnings.splice(0, user.earnings.length)
+              earnings: 0
             }
           }
 
