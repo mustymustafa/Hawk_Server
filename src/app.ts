@@ -219,7 +219,7 @@ const now = new Date().toLocaleDateString();
 
 //deactivate account if expired
  console.log("now" + now)
-const user = await Schema.Artisan().updateMany({expireAt: now}, 
+const user = await Schema.Artisan().updateMany({expireAt: now, earnings: {$gt: 1500}},  
   {$set: {active: false}},
   function(err, result){ 
   if(err) {
