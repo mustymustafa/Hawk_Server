@@ -256,7 +256,7 @@ const now = new Date().toLocaleDateString();
       "to": [users.pushToken],
       "sound": "default",
       "title": "You have 30% off discount today!",
-      "body": "Open your Sleek App"
+      "body": "Open your Platabox App"
     }]);
     let tickets = [];
     (async () => {
@@ -295,7 +295,7 @@ const now = new Date().toLocaleDateString();
       "to": [users.pushToken],
       "sound": "default",
       "title": "You have 30% off discount today!",
-      "body": "Open your Sleek App"
+      "body": "Open your Platabox App"
     }]);
     let tickets = [];
     (async () => {
