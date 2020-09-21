@@ -1149,9 +1149,6 @@ console.log(hirer.pushToken)
             start: false,
             arrived: false,
             completed: completed
-          },
-            $push: {
-             earnings: job.price
           }
         }
         );
