@@ -211,8 +211,12 @@ const task = cron.schedule("00 00 * * *", async () => {
   const delete_account = await Schema.Artisan().deleteMany({isConfirmed: false})
   console.log("deleted:" + delete_account)
 
+  const delete_user = await Schema.User().deleteMany({isConfirmed: false})
+  console.log("deleted:" + delete_user)
+
 
 const now = new Date().toLocaleDateString();
+
 //deactivate account if expired
  console.log("now" + now)
 const user = await Schema.Artisan().updateMany({expireAt: now}, 

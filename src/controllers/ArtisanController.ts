@@ -1238,9 +1238,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         const getRating = user.rating
         console.log(getRating.length);
 
-        //get Earnings
-        const getEarnings = user.earnings;
-        console.log(getEarnings);
+      
 
 
         // get rate
@@ -1252,12 +1250,10 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
 
         //get total amount
-        for (var i = 0; i < getEarnings.length; i++) {
-          amount += getEarnings[i]
-        }
-        console.log('amount:' + amount)
+      
+        console.log('total earnings:' + user.earnings)
         //amount to pay
-        var pay = Math.round(amount * 0.25);
+        var pay = Math.round(user.earnings * 0.25);
         console.log('pay' + pay)
 
 
@@ -1273,7 +1269,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         response.status(200).send({
           user,
           rating: rate,
-          earning: amount,
+          earning: user.earnings,
           pay: pay,
           expired: expire
 
@@ -1313,7 +1309,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
             $set: {
               active: true,
               expireAt: now.toLocaleDateString(),
-              earnings: user.earnings.splice(0, user.earnings.length)
+              earnings: 0
             }
           }
 

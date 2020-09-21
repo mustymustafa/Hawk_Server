@@ -678,9 +678,13 @@ let tickets = [];
 
        const hirer = await Schema.User().findOne({_id: job.user});
        console.log("hirer:" + hirer)
+
 const artisan = await Schema.Artisan().findOne({_id: uid});
 console.log(price);
-    console.log("artisan " + artisan.name)
+
+var total_price = artisan.earnings + price
+
+console.log("artisan " + artisan.name)
    
     if (!job && !hirer) {
         return response.status(404).send({
@@ -689,6 +693,7 @@ console.log(price);
       }
    
     try {
+
         await Schema.Job().updateOne({
             _id: job_id
         },
@@ -700,7 +705,23 @@ console.log(price);
                 price: price
             }
         }
+
+
+
         );
+
+        await Schema.Artisan().updateOne({
+          _id: uid
+      },
+      {
+          $set: {
+            earnings: total_price
+          }
+      }
+
+
+
+      );
 
   
 
@@ -810,6 +831,7 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
     const {uid, job_id} = request.body
     console.log("job_id" + job_id)
     
+    let total_price;
 
 
     const job = await Schema.Job().findOne({_id: job_id})
@@ -821,6 +843,13 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
        
        const artisan = await Schema.Artisan().findOne({_id: job.artisan});
        console.log("artisan:" + artisan)
+      
+        if(artisan.earnings > 0){
+          total_price = Math.round((artisan.earnings) - job.price)
+        } else {
+          total_price = artisan.earnings
+        }
+       
        /** 
         *     const earning = artisan.earnings
     const earnings = earning.splice( earning.indexOf(job.price), 1 );
@@ -873,6 +902,18 @@ let tickets = [];
           
           );
 
+          await Schema.Artisan().updateOne({
+            _id: uid
+        },
+        {
+            $set: {
+              earnings: total_price
+            }
+        }
+  
+  
+  
+        );
     
   
         console.log("cancelled");
