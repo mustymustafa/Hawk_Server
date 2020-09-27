@@ -239,6 +239,34 @@ console.log(user)
 );
 
 
+//deactivate expired accounts
+const deactivate = cron.schedule("00 00 * * *", async () => {
+  console.log("account paused for payment");
+//find accounts
+
+
+const now = new Date().toLocaleDateString();
+
+//deactivate account if expired
+ console.log("now" + now)
+const user = await Schema.Artisan().updateMany({expireAt: now, earnings: {$gt: 1500}},  
+  {$set: {active: false}},
+  function(err, result){ 
+  if(err) {
+    console.log(err)
+  } else {
+    console.log('Expired users updated');
+    
+  }
+}
+  );
+console.log(user)
+  
+},
+
+{scheduled: true}
+);
+
 // send discount notification
 const discount = cron.schedule("00 12 * * *", async () => {
   
@@ -319,6 +347,7 @@ const now = new Date().toLocaleDateString();
 );
 
 task.start();
+deactivate.start();
 discount.start();
 discount1.start();
 
