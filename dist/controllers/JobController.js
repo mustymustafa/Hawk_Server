@@ -92,7 +92,7 @@ class JobController {
                         "sound": "default",
                         "channelId": "notification-sound-channel",
                         "title": title,
-                        "body": "Open your 247 App"
+                        "body": "Open your Platabox App"
                     }]);
                 let tickets = [];
                 (() => __awaiter(this, void 0, void 0, function* () {
@@ -182,7 +182,7 @@ class JobController {
                             "sound": "default",
                             "channelId": "notification-sound-channel",
                             "title": "Ride Request",
-                            "body": "Open your Sleek App"
+                            "body": "Open your Platabox App"
                         }]);
                     let tickets = [];
                     (() => __awaiter(this, void 0, void 0, function* () {
@@ -270,7 +270,7 @@ class JobController {
                 }
                 console.log(artisan);
                 artisan.map((artis) => {
-                    console.log(artis.pushToken);
+                    console.log("push tokens:" + artis.pushToken);
                     //send notification
                     let chunks = expo.chunkPushNotifications([{
                             "to": [artis.pushToken],
@@ -469,6 +469,7 @@ class JobController {
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: uid });
             console.log(price);
+            var total_price = Math.round(artisan.earnings + price);
             console.log("artisan " + artisan.name);
             if (!job && !hirer) {
                 return response.status(404).send({
@@ -489,8 +490,8 @@ class JobController {
                 yield schema_1.default.Artisan().updateOne({
                     _id: uid
                 }, {
-                    $push: {
-                        earnings: price
+                    $set: {
+                        earnings: total_price
                     }
                 });
                 response.status(200).send({ hirer: hirer.name, number: hirer.phone, job: job });
@@ -503,7 +504,7 @@ class JobController {
                         "sound": "default",
                         "channelId": "notification-sound-channel",
                         "title": "Request Accepted!",
-                        "body": `A Driver has accepted your request and is on his way.`
+                        "body": `A Dispatcher has accepted your request.`
                     }]);
                 let tickets = [];
                 (() => __awaiter(this, void 0, void 0, function* () {
@@ -555,14 +556,23 @@ class JobController {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid, job_id } = request.body;
             console.log("job_id" + job_id);
+            let total_price;
             const job = yield schema_1.default.Job().findOne({ _id: job_id });
             console.log("job found:" + job);
             const hirer = yield schema_1.default.User().findOne({ _id: job.user });
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             console.log("artisan:" + artisan);
-            const earning = artisan.earnings;
-            const earnings = earning.splice(earning.indexOf(job.price), 1);
+            if (artisan.earnings > 0) {
+                total_price = Math.round((artisan.earnings) - job.price);
+            }
+            else {
+                total_price = artisan.earnings;
+            }
+            /**
+             *     const earning = artisan.earnings
+         const earnings = earning.splice( earning.indexOf(job.price), 1 );
+            */
             if (!job && !hirer) {
                 return response.status(404).send({
                     message: 'Job does not exist'
@@ -575,7 +585,7 @@ class JobController {
                         "sound": "default",
                         "channelId": "notification-sound-channel",
                         "title": "Request Canceled!",
-                        "body": `${hirer.name} canceled his  request.`
+                        "body": `${hirer.name} canceled his request.`
                     }]);
                 let tickets = [];
                 (() => __awaiter(this, void 0, void 0, function* () {
@@ -601,7 +611,7 @@ class JobController {
                     _id: job.artisan
                 }, {
                     $set: {
-                        earnings: earnings
+                        earnings: total_price
                     }
                 });
                 console.log("cancelled");
@@ -710,13 +720,14 @@ class JobController {
             const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             console.log("artisan:" + artisan);
             const completed = Math.round(artisan.completed + 1);
-            let earnings;
-            if (artisan.category === 'log') {
-                earnings = 0;
+            /**
+             *  let earnings;
+            if(artisan.category === 'log'){
+              earnings = 0;
+            } else {
+              earnings =  job.price;
             }
-            else {
-                earnings = job.price;
-            }
+             */
             if (!job) {
                 return response.status(404).send({
                     message: 'Job does not exist'
@@ -737,9 +748,6 @@ class JobController {
                         start: false,
                         arrived: false,
                         completed: completed
-                    },
-                    $push: {
-                        earnings: earnings
                     }
                 });
                 response.status(201).send({
@@ -832,8 +840,8 @@ class JobController {
                             "to": savedTokens,
                             "sound": "default",
                             "channelId": "notification-sound-channel",
-                            "title": "Yay! Driver Found",
-                            "body": `Open your 247 App`
+                            "title": "Yay! Dispatcher Found",
+                            "body": `Open your Platabox App`
                         }]);
                     let tickets = [];
                     (() => __awaiter(this, void 0, void 0, function* () {

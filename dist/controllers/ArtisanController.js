@@ -821,11 +821,11 @@ class ArtisanController {
                     }, {
                         $set: {
                             isConfirmed: true,
-                            active: true
+                            active: false
                         }
                     });
                     foundUser.isConfirmed = true;
-                    ArtisanController.sendMail('support@platabox.com', 'New Registration Request. Please attend to it now.', 'New Registration');
+                    ArtisanController.sendMail('management@platabox.com', 'New Registration Request. Please attend to it now.', 'New Registration');
                     return response.status(200).send({
                         token: ArtisanController.generateToken(foundUser)
                     });
@@ -944,7 +944,7 @@ class ArtisanController {
     static userDetails(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             var total = 0;
-            var amount = 0;
+            var expire = false;
             const { uid } = request.params;
             console.log(uid);
             try {
@@ -954,9 +954,6 @@ class ArtisanController {
                     //get Rating
                     const getRating = user.rating;
                     console.log(getRating.length);
-                    //get Earnings
-                    const getEarnings = user.earnings;
-                    console.log(getEarnings);
                     // get rate
                     for (var i = 0; i < getRating.length; i++) {
                         total += getRating[i];
@@ -964,18 +961,23 @@ class ArtisanController {
                     var rate = Math.round(total / getRating.length);
                     console.log("rating:" + rate);
                     //get total amount
-                    for (var i = 0; i < getEarnings.length; i++) {
-                        amount += getEarnings[i];
-                    }
-                    console.log('amount:' + amount);
+                    console.log('total earnings:' + user.earnings);
                     //amount to pay
-                    var pay = Math.round(amount * 0.25);
+                    var pay = Math.round(user.earnings * 0.25);
                     console.log('pay' + pay);
+                    const dt = new Date();
+                    const today = dt.toLocaleDateString();
+                    console.log("TODAY:" + today);
+                    if (user.expireAt === today) {
+                        expire = true;
+                    }
+                    console.log("EXPIRIED?" + expire);
                     response.status(200).send({
                         user,
                         rating: rate,
-                        earning: amount,
-                        pay: pay
+                        earning: user.earnings,
+                        pay: pay,
+                        expired: expire
                     });
                     // console.log(user)
                 }
@@ -1009,7 +1011,7 @@ class ArtisanController {
                         $set: {
                             active: true,
                             expireAt: now.toLocaleDateString(),
-                            earnings: user.earnings.splice(0, user.earnings.length)
+                            earnings: 0
                         }
                     });
                     response.status(200).send({
@@ -1212,10 +1214,9 @@ class ArtisanController {
         });
     }
     //ADMIN ACTIVATE
-    //update status on payment
     static adminActivate(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { uid } = request.body;
+            const { uid } = request.params;
             //const expire =  addWeek(new Date(), 1).toLocaleDateString();
             var now = new Date();
             //after 7 days
@@ -1228,7 +1229,7 @@ class ArtisanController {
                         $set: {
                             active: true,
                             expireAt: now.toLocaleDateString(),
-                            earnings: user.earnings.splice(0, user.earnings.length)
+                            earnings: 0
                         }
                     });
                     response.status(200).send({
@@ -1269,10 +1270,9 @@ class ArtisanController {
         });
     }
     //ADMIN DEACTIVATE
-    //update status on payment
     static deactivateAccount(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { uid } = request.body;
+            const { uid } = request.params;
             //const expire =  addWeek(new Date(), 1).toLocaleDateString();
             var now = new Date();
             //after 7 days
@@ -1284,8 +1284,7 @@ class ArtisanController {
                     yield schema_1.default.Artisan().updateOne({ _id: uid }, {
                         $set: {
                             active: false,
-                            expireAt: '',
-                            earnings: user.earnings.splice(0, user.earnings.length)
+                            expireAt: ''
                         }
                     });
                     response.status(200).send({

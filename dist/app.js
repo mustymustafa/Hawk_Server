@@ -39,7 +39,7 @@ app.use(express_1.default.urlencoded({ extended: false }));
 app.use(cookie_parser_1.default());
 //app.use(express.static(path.join(__dirname, 'public')));
 //routes
-app.post('/api/v1/signup', Middleware_1.default.signupMiddleware, UserController_1.default.signup);
+app.post('/api/v1/signup', Middleware_1.default.userSignupMiddleware, UserController_1.default.signup);
 app.post('/api/v1/signin', Middleware_1.default.signinPhoneMiddleware, UserController_1.default.signin);
 app.post('/api/v1/adminsignin', Middleware_1.default.signinMiddleware, ArtisanController_1.default.adminSignin);
 app.post('/api/v1/confirmation', UserController_1.default.confirm);
@@ -136,10 +136,12 @@ const task = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0,
     //find accounts
     const delete_account = yield schema_1.default.Artisan().deleteMany({ isConfirmed: false });
     console.log("deleted:" + delete_account);
+    const delete_user = yield schema_1.default.User().deleteMany({ isConfirmed: false });
+    console.log("deleted:" + delete_user);
     const now = new Date().toLocaleDateString();
     //deactivate account if expired
     console.log("now" + now);
-    const user = yield schema_1.default.Artisan().updateMany({ expireAt: now }, { $set: { active: false } }, function (err, result) {
+    const user = yield schema_1.default.Artisan().updateMany({ expireAt: now, earnings: { $gt: 1500 } }, { $set: { active: false } }, function (err, result) {
         if (err) {
             console.log(err);
         }
