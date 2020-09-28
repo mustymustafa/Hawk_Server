@@ -80,7 +80,6 @@ class UserController {
       
       await Schema.User().create({
         name: fullname.trim(),
-        country: country,
         email: email.trim(),
         password: bcrypt.hashSync(password.trim(), UserController.generateSalt()),
         phone,
