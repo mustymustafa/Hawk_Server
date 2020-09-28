@@ -60,7 +60,7 @@ class UserController {
           message: 'The Password do not match'
         });
       }
-      if (!phone || phone.length < 14 || phone.length > 14 ) {
+      if (!phone) {
        
         return response.status(409).send({
           message: 'Please enter a valid  number',
@@ -80,6 +80,7 @@ class UserController {
       
       await Schema.User().create({
         name: fullname.trim(),
+        country: country,
         email: email.trim(),
         password: bcrypt.hashSync(password.trim(), UserController.generateSalt()),
         phone,

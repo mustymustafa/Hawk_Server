@@ -32,7 +32,7 @@ export default class MiddleWare {
       }]
     }
 
-    if (!phone || phone.length < 14 || phone.length > 14 ) {
+    if (!phone) {
        
       errors = [...errors, {
         phone: 'incorrect phone number entered'
@@ -114,7 +114,7 @@ export default class MiddleWare {
       }]
     }
 
-    if (!phone || phone.length < 14 || phone.length > 14 ) {
+    if (!phone) {
        
       errors = [...errors, {
         phone: 'incorrect phone number entered'
@@ -199,7 +199,7 @@ export default class MiddleWare {
     password = password.trim();
 
     let errors: {[error: string]: string}[] = []
-    if (!phone || phone.length < 14 || phone.length > 14 ) {
+    if (!phone) {
         errors = [...errors, {
           phone: 'incorrect phone number entered'
         }]
