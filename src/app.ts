@@ -276,7 +276,7 @@ const discount = cron.schedule("00 12 * * *", async () => {
 const now = new Date().toLocaleDateString();
 
   const get_users = await Schema.User().find({next_promo: now})
- // console.log("deleted:" + get_users)
+ console.log("users:" + get_users)
 
   get_users.map(users => {
  
@@ -284,8 +284,8 @@ const now = new Date().toLocaleDateString();
     let chunks = expo.chunkPushNotifications([{
       "to": [users.pushToken],
       "sound": "default",
-      "title": "You have 30% off discount today!",
-      "body": "Open your Sleek App"
+      "title": "Don't forget to use your 30% off discount today :)",
+      "body": "Open your Platabox App"
     }]);
     let tickets = [];
     (async () => {
@@ -307,7 +307,7 @@ const now = new Date().toLocaleDateString();
 {scheduled: true}
 );
 
-const discount1 = cron.schedule("00 00 * * *", async () => {
+const discount1 = cron.schedule("00 09 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
@@ -315,7 +315,7 @@ const discount1 = cron.schedule("00 00 * * *", async () => {
 const now = new Date().toLocaleDateString();
 
   const get_users = await Schema.User().find({next_promo: now})
- // console.log("deleted:" + get_users)
+  console.log("users:" + get_users)
 
   get_users.map(users => {
  
@@ -324,7 +324,7 @@ const now = new Date().toLocaleDateString();
       "to": [users.pushToken],
       "sound": "default",
       "title": "You have 30% off discount today!",
-      "body": "Open your Sleek App"
+      "body": "Open your Platabox App"
     }]);
     let tickets = [];
     (async () => {
