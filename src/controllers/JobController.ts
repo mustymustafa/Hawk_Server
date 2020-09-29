@@ -225,7 +225,7 @@ let title;
 
 
    
-     const artisan = await Schema.Artisan().find({category: category}).where({area1: area1,$or:[{area2: area2}]})  
+     const artisan = await Schema.Artisan().find({category: category, pushToken: {$exists: true}}).where({area1: area1,$or:[{area2: area2}]})  
      
      if (!artisan) {
       return response.status(404).send({
@@ -369,7 +369,7 @@ let title;
 
 
         
-     const artisan = await Schema.Artisan().find({category: 'log'}).where({city: city})
+     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}}).where({city: city})
      
 
      if (!artisan) {
@@ -1003,6 +1003,7 @@ let tickets = [];
     const {uid, job_id} = request.body
     console.log("job_id" + job_id)
     
+    let total_price;
   
 
     const job = await Schema.Job().findOne({_id: job_id})
@@ -1014,7 +1015,11 @@ let tickets = [];
        const artisan = await Schema.Artisan().findOne({_id: uid});
        console.log("artisan:" + artisan)
        
-       
+       if(artisan.earnings > 0){
+        total_price = Math.round((artisan.earnings) - job.price)
+      } else {
+        total_price = artisan.earnings
+      }
 
 
     
