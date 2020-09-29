@@ -275,7 +275,7 @@ const discount = cron.schedule("00 12 * * *", async () => {
 
 const now = new Date().toLocaleDateString();
 
-  const get_users = await Schema.User().find({next_promo: now})
+  const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists: true} })
  console.log("users:" + get_users)
 
   get_users.map(users => {
@@ -314,7 +314,7 @@ const discount1 = cron.schedule("00 09 * * *", async () => {
 
 const now = new Date().toLocaleDateString();
 
-  const get_users = await Schema.User().find({next_promo: now})
+const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists: true} })
   console.log("users:" + get_users)
 
   get_users.map(users => {
