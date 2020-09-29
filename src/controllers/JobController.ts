@@ -1071,6 +1071,19 @@ let tickets = [];
           
           );
 
+          await Schema.Artisan().updateOne({
+            _id: job.artisan
+        },
+        {
+            $set: {
+              earnings: total_price
+            }
+        }
+  
+  
+  
+        );
+
         console.log("deleted");
         response.status(201).send({
             message: 'Task Cancelled successfully',
