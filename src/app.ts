@@ -268,12 +268,13 @@ console.log(user)
 );
 
 // send discount notification
-const discount = cron.schedule("30 11 * * *", async () => {
+const discount = cron.schedule("27 12 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
 
 const now = new Date().toLocaleDateString();
+console.log("now:" + now)
 
   const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists: true} })
  console.log("users:" + get_users)
