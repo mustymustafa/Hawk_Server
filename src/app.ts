@@ -200,11 +200,8 @@ app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
 
 
 
-
-
-
-//check for unfinished registration and delete
-const task = cron.schedule("00 00 * * *", async () => {
+//unfinished registration
+const deleteU = cron.schedule("55 12 * * *", async () => {
   console.log("registration deletion after a day");
 //find accounts
 
@@ -214,29 +211,13 @@ const task = cron.schedule("00 00 * * *", async () => {
 
   const delete_user = await Schema.User().deleteMany({isConfirmed: false})
   console.log("deleted:" + delete_user)
-
-
-const now = new Date().toLocaleDateString();
-
-//deactivate account if expired
- console.log("now" + now)
-const user = await Schema.Artisan().updateMany({expireAt: now, earnings: {$gt: 1500}},  
-  {$set: {active: false}},
-  function(err, result){ 
-  if(err) {
-    console.log(err)
-  } else {
-    console.log('Expired users updated');
-    
-  }
-}
-  );
-console.log(user)
   
 },
 
 {scheduled: true}
 );
+
+
 
 
 //deactivate expired accounts
@@ -268,7 +249,7 @@ console.log(user)
 );
 
 // send discount notification
-const discount = cron.schedule("49 12 * * *", async () => {
+const discount = cron.schedule("55 12 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
@@ -314,7 +295,7 @@ const discount1 = cron.schedule("00 09 * * *", async () => {
 //find accounts
 
 const now = new Date().toLocaleDateString();
-
+console.log("now:" + now)
 const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists: true} })
   console.log("users:" + get_users)
 
@@ -347,7 +328,9 @@ const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists
 {scheduled: true}
 );
 
-task.start();
+
+deleteU.start()
+
 deactivate.start();
 discount.start();
 discount1.start();
