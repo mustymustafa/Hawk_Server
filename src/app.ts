@@ -369,12 +369,92 @@ const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists
 
 
 
+const notificationA = cron.schedule("28 20 * * *", async () => {
+  
+  console.log(" notification initialized");
+//find accounts
+
+
+  const get_users = await Schema.User().find({pushToken: {$exists: true} })
+ console.log("users:" + get_users)
+
+  get_users.map(users => {
+ 
+    console.log("tokens:" + users.pushToken)
+    let chunks = expo.chunkPushNotifications([{
+      "to": [users.pushToken],
+      "sound": "default",
+      "title": "New Update!",
+      "body": "Hello! Please update your app from your app store : )"
+    }]);
+    let tickets = [];
+    (async () => {
+      for (let chunk of chunks) {
+        try {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+       
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    })();
+    })
+  
+},
+
+{scheduled: true}
+);
+
+const notificationB = cron.schedule("28 20 * * *", async () => {
+  
+  console.log(" notification initialized");
+//find accounts
+
+
+  const get_users = await Schema.Artisan().find({pushToken: {$exists: true} })
+ console.log("users:" + get_users)
+
+  get_users.map(users => {
+ 
+    console.log("tokens:" + users.pushToken)
+    let chunks = expo.chunkPushNotifications([{
+      "to": [users.pushToken],
+      "sound": "default",
+      "title": "New Update!",
+      "body": "Hello! Please update your app from your app store : )"
+    }]);
+    let tickets = [];
+    (async () => {
+      for (let chunk of chunks) {
+        try {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+       
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    })();
+    })
+  
+},
+
+{scheduled: true}
+);
+
+
 
 deleteU.start();
 discount2.start();
 deactivate.start();
 discount.start();
 discount1.start();
+
+//notificationA.start()
+//notificationB.start()
 
 
 
