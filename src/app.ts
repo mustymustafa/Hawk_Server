@@ -268,7 +268,7 @@ console.log(user)
 );
 
 // send discount notification
-const discount = cron.schedule("27 12 * * *", async () => {
+const discount = cron.schedule("33 12 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
