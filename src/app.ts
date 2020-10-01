@@ -328,7 +328,7 @@ console.log("now:" + now)
 {scheduled: true}
 );
 
-const discount1 = cron.schedule("00 09 * * *", async () => {
+const discount1 = cron.schedule("00 9 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
