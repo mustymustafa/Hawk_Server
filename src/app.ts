@@ -201,7 +201,7 @@ app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
 
 
 //unfinished registration
-const deleteU = cron.schedule("00 01 * * *", async () => {
+const deleteU = cron.schedule("00 23 * * *", async () => {
   console.log("registration deletion after a day");
 //find accounts
 
@@ -218,7 +218,7 @@ const deleteU = cron.schedule("00 01 * * *", async () => {
 );
 
 
-const discount2 = cron.schedule("00 01 * * *", async () => {
+const discount2 = cron.schedule("00 23 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
@@ -260,7 +260,7 @@ const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists
 
 
 //deactivate expired accounts
-const deactivate = cron.schedule("00 01 * * *", async () => {
+const deactivate = cron.schedule("00 23 * * *", async () => {
   console.log("account paused for payment");
 //find accounts
 
@@ -288,7 +288,7 @@ console.log(user)
 );
 
 // send discount notification
-const discount = cron.schedule("00 13 * * *", async () => {
+const discount = cron.schedule("00 11 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
@@ -328,7 +328,7 @@ console.log("now:" + now)
 {scheduled: true}
 );
 
-const discount1 = cron.schedule("00 10 * * *", async () => {
+const discount1 = cron.schedule("00 09 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
