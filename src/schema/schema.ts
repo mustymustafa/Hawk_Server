@@ -38,7 +38,7 @@ class Schema {
             wage: Number,
             idCard: String,
             cert: String,
-            school: String,
+            mot: String,
             cac: String,
 
             id_expiry: String,

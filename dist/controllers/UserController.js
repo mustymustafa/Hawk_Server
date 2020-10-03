@@ -52,7 +52,7 @@ class UserController {
                         message: 'The Password do not match'
                     });
                 }
-                if (!phone || phone.length < 14 || phone.length > 14) {
+                if (!phone) {
                     return response.status(409).send({
                         message: 'Please enter a valid  number',
                     });

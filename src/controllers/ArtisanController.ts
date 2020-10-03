@@ -295,6 +295,9 @@ class ArtisanController {
     res.json(req.file)
   }
 
+
+
+  //this is now MOT
   static uploadSchool(req: Request, res: Response) {
     const parts = req.file.originalname.split(' ')
     const find = parts[0]
@@ -661,6 +664,9 @@ class ArtisanController {
 
   }
 
+
+
+  //set MOT
   static async setSchool(request: Request, res: Response) {
 
 
@@ -683,7 +689,7 @@ class ArtisanController {
           _id: foundUser._id
         }, {
           $set: {
-            school: image
+            mot: image
 
           }
         });
