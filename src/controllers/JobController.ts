@@ -470,7 +470,7 @@ console.log("hirer:" + hirer)
     //console.log("area2:" + area2);
     
   
-  const job = await Schema.Job().find({category: category}).where({city: city, $and: [{status: 'active'}]}).sort({'_id': -1})  
+  const job = await Schema.Job().find({category: category}).where({ $or: [{city: city, city2: city2}], $and: [{status: 'active'}]}).sort({'_id': -1})  
 
   console.log(job)
 
