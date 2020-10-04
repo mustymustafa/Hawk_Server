@@ -1341,7 +1341,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
   //location
   static async storeLocation(request: Request, response: Response) {
-    const { lat, long, location, area1, area2, city } = request.body;
+    const { lat, long, location, area1, area2, city, city2 } = request.body;
     const { uid } = request.params;
 
     const user = await Schema.Artisan().findOne({ _id: uid });
@@ -1362,7 +1362,8 @@ static async getDriverRegistartion(request: Request, response: Response) {
             location: location,
             area1: area1,
             area2: area2,
-            city: city
+            city: city,
+            city2: city2
         
           }
         });

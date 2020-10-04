@@ -292,7 +292,7 @@ let title;
   }
 
   static async logRequest (request:Request, response:Response){
-    const {city,  category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime} = request.body;
+    const {city, city2,  category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime} = request.body;
   //console.log(category)
    
   console.log(city)
@@ -319,6 +319,7 @@ let title;
             category: category,
             location: location,
             city: city,
+            city2: city2,
           
 
             status: 'active',
@@ -369,7 +370,10 @@ let title;
 
 
         
-     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}}).where({city: city})
+     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true},   $or: [
+      { city: city },
+      { city2: city2 }
+    ] })
      
 
      if (!artisan) {

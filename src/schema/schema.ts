@@ -28,6 +28,7 @@ class Schema {
             name: String,
             country: String,
             city: String,
+            city2: String,
         
             email: String,
             phone: String,
@@ -124,6 +125,7 @@ class Schema {
             area2: String,
 
             city: String,
+            city2: String,
   
             
             description: String,
