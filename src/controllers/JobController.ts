@@ -690,7 +690,7 @@ let tickets = [];
 const artisan = await Schema.Artisan().findOne({_id: uid});
 console.log(price);
 
- total_price = Math.round(artisan.earnings + price) 
+ total_price = Math.round(artisan.earnings + parseInt(price)) 
 
 console.log("artisan " + artisan.name)
    
