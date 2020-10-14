@@ -1259,7 +1259,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
       
         console.log('total earnings:' + user.earnings)
         //amount to pay
-        var pay = Math.round(user.earnings * 0.25);
+        var pay = Math.round(user.earnings * 0.40);
         console.log('pay' + pay)
 
 
