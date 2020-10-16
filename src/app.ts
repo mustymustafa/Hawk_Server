@@ -328,7 +328,7 @@ console.log("now:" + now)
 {scheduled: true}
 );
 
-const discount1 = cron.schedule("00 9 * * *", async () => {
+const discount1 = cron.schedule("10 08 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
@@ -369,7 +369,7 @@ const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists
 
 
 
-const notificationA = cron.schedule("28 20 * * *", async () => {
+const notificationA = cron.schedule("7 11 * * *", async () => {
   
   console.log(" notification initialized");
 //find accounts
@@ -384,8 +384,8 @@ const notificationA = cron.schedule("28 20 * * *", async () => {
     let chunks = expo.chunkPushNotifications([{
       "to": [users.pushToken],
       "sound": "default",
-      "title": "New Update!",
-      "body": "Hello! Please update your app from your app store : )"
+      "title": "Slow Pick-up Time :(",
+      "body": "We apologize for slow pick-ups because of the ongoing protest which is causing roadblocks. Thank you :)"
     }]);
     let tickets = [];
     (async () => {
