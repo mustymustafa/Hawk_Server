@@ -368,7 +368,7 @@ const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists
 );
 
 
-
+/**
 const notificationA = cron.schedule("7 11 * * *", async () => {
   
   console.log(" notification initialized");
@@ -406,6 +406,8 @@ const notificationA = cron.schedule("7 11 * * *", async () => {
 
 {scheduled: true}
 );
+ */
+
 
 const notificationB = cron.schedule("28 20 * * *", async () => {
   
