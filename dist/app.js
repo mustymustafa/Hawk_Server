@@ -130,14 +130,49 @@ app.get('/api/v1/getdeliveires', JobController_1.default.Deliveries);
 app.get('/api/v1/getrides', JobController_1.default.Rides);
 app.post('/api/v1/:uid/activate', ArtisanController_1.default.adminActivate);
 app.post('/api/v1/:uid/deactivate', ArtisanController_1.default.deactivateAccount);
-//check for unfinished registration and delete
-const task = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+//unfinished registration
+const deleteU = node_cron_1.default.schedule("00 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("registration deletion after a day");
     //find accounts
     const delete_account = yield schema_1.default.Artisan().deleteMany({ isConfirmed: false });
     console.log("deleted:" + delete_account);
     const delete_user = yield schema_1.default.User().deleteMany({ isConfirmed: false });
     console.log("deleted:" + delete_user);
+}), { scheduled: true });
+const discount2 = node_cron_1.default.schedule("00 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("discount notification initialized");
+    //find accounts
+    const now = new Date().toLocaleDateString();
+    console.log("now:" + now);
+    const get_users = yield schema_1.default.User().find({ next_promo: now, pushToken: { $exists: true } });
+    console.log("users:" + get_users);
+    get_users.map(users => {
+        console.log("tokens:" + users.pushToken);
+        let chunks = expo.chunkPushNotifications([{
+                "to": [users.pushToken],
+                "sound": "default",
+                "title": "You have 30% discount today!",
+                "body": "Open your Platabox App"
+            }]);
+        let tickets = [];
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            for (let chunk of chunks) {
+                try {
+                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                    console.log(ticketChunk);
+                    tickets.push(...ticketChunk);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            }
+        }))();
+    });
+}), { scheduled: true });
+//deactivate expired accounts
+const deactivate = node_cron_1.default.schedule("00 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("account paused for payment");
+    //find accounts
     const now = new Date().toLocaleDateString();
     //deactivate account if expired
     console.log("now" + now);
@@ -152,19 +187,20 @@ const task = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0,
     console.log(user);
 }), { scheduled: true });
 // send discount notification
-const discount = node_cron_1.default.schedule("00 12 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discount = node_cron_1.default.schedule("00 11 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount notification initialized");
     //find accounts
     const now = new Date().toLocaleDateString();
-    const get_users = yield schema_1.default.User().find({ next_promo: now });
-    // console.log("deleted:" + get_users)
+    console.log("now:" + now);
+    const get_users = yield schema_1.default.User().find({ next_promo: now, pushToken: { $exists: true } });
+    console.log("users:" + get_users);
     get_users.map(users => {
         console.log("tokens:" + users.pushToken);
         let chunks = expo.chunkPushNotifications([{
                 "to": [users.pushToken],
                 "sound": "default",
-                "title": "You have 30% off discount today!",
-                "body": "Open your Sleek App"
+                "title": "Don't forget to use your 30% discount today :)",
+                "body": "Open your Platabox App"
             }]);
         let tickets = [];
         (() => __awaiter(void 0, void 0, void 0, function* () {
@@ -181,19 +217,20 @@ const discount = node_cron_1.default.schedule("00 12 * * *", () => __awaiter(voi
         }))();
     });
 }), { scheduled: true });
-const discount1 = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discount1 = node_cron_1.default.schedule("10 08 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount notification initialized");
     //find accounts
     const now = new Date().toLocaleDateString();
-    const get_users = yield schema_1.default.User().find({ next_promo: now });
-    // console.log("deleted:" + get_users)
+    console.log("now:" + now);
+    const get_users = yield schema_1.default.User().find({ next_promo: now, pushToken: { $exists: true } });
+    console.log("users:" + get_users);
     get_users.map(users => {
         console.log("tokens:" + users.pushToken);
         let chunks = expo.chunkPushNotifications([{
                 "to": [users.pushToken],
                 "sound": "default",
-                "title": "You have 30% off discount today!",
-                "body": "Open your Sleek App"
+                "title": "Enjoy your 30% discount today!",
+                "body": "Open your Platabox App"
             }]);
         let tickets = [];
         (() => __awaiter(void 0, void 0, void 0, function* () {
@@ -210,9 +247,80 @@ const discount1 = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(vo
         }))();
     });
 }), { scheduled: true });
-task.start();
+/**
+const notificationA = cron.schedule("7 11 * * *", async () => {
+  
+  console.log(" notification initialized");
+//find accounts
+
+
+  const get_users = await Schema.User().find({pushToken: {$exists: true} })
+ console.log("users:" + get_users)
+
+  get_users.map(users => {
+ 
+    console.log("tokens:" + users.pushToken)
+    let chunks = expo.chunkPushNotifications([{
+      "to": [users.pushToken],
+      "sound": "default",
+      "title": "Slow Pick-up Time :(",
+      "body": "We apologize for slow pick-ups because of the ongoing protest which is causing roadblocks. Thank you :)"
+    }]);
+    let tickets = [];
+    (async () => {
+      for (let chunk of chunks) {
+        try {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+       
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    })();
+    })
+  
+},
+
+{scheduled: true}
+);
+ */
+const notificationB = node_cron_1.default.schedule("28 20 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(" notification initialized");
+    //find accounts
+    const get_users = yield schema_1.default.Artisan().find({ pushToken: { $exists: true } });
+    console.log("users:" + get_users);
+    get_users.map(users => {
+        console.log("tokens:" + users.pushToken);
+        let chunks = expo.chunkPushNotifications([{
+                "to": [users.pushToken],
+                "sound": "default",
+                "title": "New Update!",
+                "body": "Hello! Please update your app from your app store : )"
+            }]);
+        let tickets = [];
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            for (let chunk of chunks) {
+                try {
+                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                    console.log(ticketChunk);
+                    tickets.push(...ticketChunk);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            }
+        }))();
+    });
+}), { scheduled: true });
+deleteU.start();
+discount2.start();
+deactivate.start();
 discount.start();
 discount1.start();
+//notificationA.start()
+//notificationB.start()
 //seedArtisan();
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;

@@ -61,7 +61,7 @@ class ArtisanController {
                         message: 'The Password do not match'
                     });
                 }
-                if (!phone || phone.length < 14 || phone.length > 14) {
+                if (!phone) {
                     return response.status(409).send({
                         message: 'Please enter a valid  number',
                     });
@@ -239,6 +239,7 @@ class ArtisanController {
         console.log(find);
         res.json(req.file);
     }
+    //this is now MOT
     static uploadSchool(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
@@ -484,6 +485,7 @@ class ArtisanController {
             }
         });
     }
+    //set MOT
     static setSchool(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(request.body);
@@ -499,7 +501,7 @@ class ArtisanController {
                         _id: foundUser._id
                     }, {
                         $set: {
-                            school: image
+                            mot: image
                         }
                     });
                     return res.status(200).send("image set");
@@ -963,7 +965,7 @@ class ArtisanController {
                     //get total amount
                     console.log('total earnings:' + user.earnings);
                     //amount to pay
-                    var pay = Math.round(user.earnings * 0.25);
+                    var pay = Math.round(user.earnings * 0.40);
                     console.log('pay' + pay);
                     const dt = new Date();
                     const today = dt.toLocaleDateString();
@@ -1032,7 +1034,7 @@ class ArtisanController {
     //location
     static storeLocation(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { lat, long, location, area1, area2, city } = request.body;
+            const { lat, long, location, area1, area2, city, city2 } = request.body;
             const { uid } = request.params;
             const user = yield schema_1.default.Artisan().findOne({ _id: uid });
             if (!user) {
@@ -1051,7 +1053,8 @@ class ArtisanController {
                         location: location,
                         area1: area1,
                         area2: area2,
-                        city: city
+                        city: city,
+                        city2: city2
                     }
                 });
                 return response.status(200).send("location saved");

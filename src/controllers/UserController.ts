@@ -387,66 +387,9 @@ class UserController {
     console.log(uid)
 
     try {
-      const dt = new Date();
-      const today = dt.toLocaleDateString();
-
-      console.log(today)
-
-      var now = new Date();
-      
-      //after 7 days
-          const expire =  now.setDate(now.getDate()+7);
-    console.log(now.toLocaleDateString())
-
       const user = await Schema.User().findOne({_id: uid});
       console.log(user)
       if (user && Object.keys(user).length) {
-
-        console.log('Today' + today + 'promo_date:' + user.promo_date)
-        if(today === user.next_promo){
-          await Schema.User().updateOne({
-             _id: user._id,
-           }, {
-           $set: {
-             promo: true,
-             promo_date: today,
-             next_promo: now.toLocaleDateString()
-
-            
-           }
-         });
-         }
-
-         
-        console.log('Today' + today + 'promo_date:' + user.promo_date)
-    
-
-        if(today === user.promo_date){
-          await Schema.User().updateOne({
-             _id: user._id,
-           }, {
-           $set: {
-             promo: true,        
-           }
-         });
-         }
-
-        if(today != user.promo_date){
-         await Schema.User().updateOne({
-            _id: user._id,
-          }, {
-          $set: {
-            promo: false
-           
-          }
-        });
-        }
-
-      
- 
-
-        
-        
         response.status(200).send({
           user
         });

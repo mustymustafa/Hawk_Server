@@ -167,7 +167,7 @@ class JobController {
                     message: 'Job created successfully',
                     status: 201
                 });
-                const artisan = yield schema_1.default.Artisan().find({ category: category }).where({ area1: area1, $or: [{ area2: area2 }] });
+                const artisan = yield schema_1.default.Artisan().find({ category: category, pushToken: { $exists: true } }).where({ area1: area1, $or: [{ area2: area2 }] });
                 if (!artisan) {
                     return response.status(404).send({
                         message: 'No driver found'
@@ -209,7 +209,7 @@ class JobController {
     }
     static logRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { city, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime } = request.body;
+            const { city, city2, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime } = request.body;
             //console.log(category)
             console.log(city);
             let savedTokens;
@@ -227,6 +227,7 @@ class JobController {
                     category: category,
                     location: location,
                     city: city,
+                    city2: city2,
                     status: 'active',
                     rated: false,
                     to: to,
@@ -262,7 +263,10 @@ class JobController {
                     message: 'Job created successfully',
                     status: 201
                 });
-                const artisan = yield schema_1.default.Artisan().find({ category: 'log' }).where({ city: city });
+                const artisan = yield schema_1.default.Artisan().find({ category: 'log', pushToken: { $exists: true }, $or: [
+                        { city: city },
+                        { city2: city2 }
+                    ] });
                 if (!artisan) {
                     return response.status(404).send({
                         message: 'No riders found'
@@ -327,7 +331,10 @@ class JobController {
             console.log(category);
             //console.log("area1:" + area1);
             //console.log("area2:" + area2);
-            const job = yield schema_1.default.Job().find({ category: category }).where({ city: city, $and: [{ status: 'active' }] }).sort({ '_id': -1 });
+            const job = yield schema_1.default.Job().find({ category: category, $or: [
+                    { city: city },
+                    { city2: city2 }
+                ] }).where({ status: 'active' }).sort({ '_id': -1 });
             console.log(job);
             //get hirer id
             const user = job.map(usr => {
@@ -463,13 +470,14 @@ class JobController {
             const { uid, job_id, price } = request.body;
             console.log("uid" + uid, "job_id" + job_id);
             let savedTokens;
+            let total_price;
             const job = yield schema_1.default.Job().findOne({ _id: job_id });
             console.log("job found:" + job);
             const hirer = yield schema_1.default.User().findOne({ _id: job.user });
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: uid });
             console.log(price);
-            var total_price = Math.round(artisan.earnings + price);
+            total_price = Math.round(artisan.earnings + parseInt(price));
             console.log("artisan " + artisan.name);
             if (!job && !hirer) {
                 return response.status(404).send({
@@ -655,12 +663,19 @@ class JobController {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid, job_id } = request.body;
             console.log("job_id" + job_id);
+            let total_price;
             const job = yield schema_1.default.Job().findOne({ _id: job_id });
             console.log("job found:" + job);
             const hirer = yield schema_1.default.User().findOne({ _id: job.user });
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: uid });
             console.log("artisan:" + artisan);
+            if (artisan.earnings > 0) {
+                total_price = Math.round((artisan.earnings) - job.price);
+            }
+            else {
+                total_price = artisan.earnings;
+            }
             if (!job && !hirer) {
                 return response.status(404).send({
                     message: 'Job does not exist'
@@ -693,6 +708,13 @@ class JobController {
                 }, {
                     $set: {
                         status: 'cancelled'
+                    }
+                });
+                yield schema_1.default.Artisan().updateOne({
+                    _id: job.artisan
+                }, {
+                    $set: {
+                        earnings: total_price
                     }
                 });
                 console.log("deleted");

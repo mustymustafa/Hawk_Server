@@ -218,15 +218,93 @@ const deleteU = cron.schedule("00 23 * * *", async () => {
 );
 
 
-const discount2 = cron.schedule("00 23 * * *", async () => {
-  
-  console.log("discount notification initialized");
+
+
+//deactivate expired accounts
+const deactivate = cron.schedule("00 23 * * *", async () => {
+  console.log("account paused for payment");
 //find accounts
 
-const now = new Date().toLocaleDateString();
-console.log("now:" + now)
-const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists: true} })
-  console.log("users:" + get_users)
+//standard date
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const nextday = now.getDate() + 1
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+const next_promo = month + '/' + nextday + '/' + year
+console.log("today: " + today);
+console.log("next promo: " + next_promo)
+
+//deactivate account if expired
+
+
+//find the user's first 
+const user = await Schema.Artisan().find({expireAt: today, earnings: {$gt: 1500}});
+console.log(user)
+if(user){
+  await Schema.Artisan().updateMany({expireAt: today, earnings: {$gt: 1500}},  
+    {$set: {active: false}},
+    function(err, result){ 
+    if(err) {
+      console.log(err)
+    } else {
+      console.log('Expired users updated');
+
+      //send notification for expiry
+      user.map(usr => {
+        console.log("tokens:" + usr.pushToken)
+        let chunks = expo.chunkPushNotifications([{
+          "to": [usr.pushToken],
+          "sound": "default",
+          "title": "Account on hold",
+          "body": "Please pay your 40% weeklu commission today to activate your account :)"
+        }]);
+        let tickets = [];
+        (async () => {
+          for (let chunk of chunks) {
+            try {
+              let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+              console.log(ticketChunk);
+              tickets.push(...ticketChunk);
+           
+            } catch (error) {
+              console.error(error);
+            }
+          }
+        })();
+    
+      })
+      
+    }
+  }
+    );
+
+    
+ 
+}
+
+
+
+
+  
+},
+
+{scheduled: true}
+);
+
+
+
+
+/**
+ * const notificationA = cron.schedule("08 15 * * *", async () => {
+  
+  console.log(" notification initialized");
+//find accounts
+
+
+  const get_users = await Schema.User().find({pushToken: {$exists: true} })
+ console.log("users:" + get_users)
 
   get_users.map(users => {
  
@@ -234,8 +312,8 @@ const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists
     let chunks = expo.chunkPushNotifications([{
       "to": [users.pushToken],
       "sound": "default",
-      "title": "You have 30% discount today!",
-      "body": "Open your Platabox App"
+      "title": "Resumption!",
+      "body": "We just want to let you know that we have fully resumed operations and ready to take your orders. we are also giving 30% discount to all our lovely customers :)"
     }]);
     let tickets = [];
     (async () => {
@@ -256,47 +334,130 @@ const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists
 
 {scheduled: true}
 );
+ */
 
 
 
-//deactivate expired accounts
-const deactivate = cron.schedule("00 23 * * *", async () => {
-  console.log("account paused for payment");
-//find accounts
 
+//********DISCOUNT*******************
 
-const now = new Date().toLocaleDateString();
-
-//deactivate account if expired
- console.log("now" + now)
-const user = await Schema.Artisan().updateMany({expireAt: now, earnings: {$gt: 1500}},  
-  {$set: {active: false}},
-  function(err, result){ 
-  if(err) {
-    console.log(err)
-  } else {
-    console.log('Expired users updated');
-    
-  }
-}
-  );
-console.log(user)
+//2. check if today is not discount then disable
+const discountCheck = cron.schedule("00 00 * * *", async () => {
   
+  console.log("discount check initialized");
+//find accounts
+//standard date
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const nextday = now.getDate() + 7
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+const next_promo = month + '/' + nextday + '/' + year
+console.log("today: " + today);
+console.log("next promo: " + next_promo)
+
+  const get_users = await Schema.User().find({next_promo: { $ne: today }, pushToken: {$exists: true} })
+ console.log("users:" + get_users)
+
+ if(get_users){
+
+  await Schema.User().updateMany({next_promo: { $ne: today }, pushToken: {$exists: true}},  
+    {$set: {
+      promo: false
+    }
+  
+  },
+    function(err, result){ 
+    if(err) {
+      console.log(err)
+    } else {
+      console.log('updated discounts');
+    }
+    })
+  }
+ 
 },
 
 {scheduled: true}
 );
 
+
+//2. check if today is discount then enable 
+const discountCheck1 = cron.schedule("00 10 * * *", async () => {
+  
+  console.log("discount check initialized");
+//find accounts
+//standard date
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const nextday = now.getDate() + 7
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+const next_promo = month + '/' + nextday + '/' + year
+console.log("today: " + today);
+console.log("next promo: " + next_promo)
+
+  const get_users = await Schema.User().find({next_promo: today, pushToken: {$exists: true} })
+ console.log("users:" + get_users)
+
+ if(get_users){
+
+  await Schema.User().updateMany({next_promo: today, pushToken: {$exists: true}},  
+    {$set: {
+      promo: true,
+             promo_date: today,
+             next_promo: next_promo
+    }
+  
+  },
+    function(err, result){ 
+    if(err) {
+      console.log(err)
+    } else {
+      console.log('updated discounts');
+    }
+    })
+  }
+ 
+},
+
+{scheduled: true}
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // send discount notification
-const discount = cron.schedule("00 11 * * *", async () => {
+const discount = cron.schedule("00 14 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
+//standard date
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const nextday = now.getDate() + 1
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+const next_promo = month + '/' + nextday + '/' + year
+console.log("today: " + today);
+console.log("next promo: " + next_promo)
 
-const now = new Date().toLocaleDateString();
-console.log("now:" + now)
-
-  const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists: true} })
+  const get_users = await Schema.User().find({promo: true, pushToken: {$exists: true} })
  console.log("users:" + get_users)
 
   get_users.map(users => {
@@ -328,14 +489,21 @@ console.log("now:" + now)
 {scheduled: true}
 );
 
-const discount1 = cron.schedule("10 08 * * *", async () => {
+const discount1 = cron.schedule("00 09 * * *", async () => {
   
   console.log("discount notification initialized");
-//find accounts
+//find accounts//standard date
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const nextday = now.getDate() + 1
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+const next_promo = month + '/' + nextday + '/' + year
+console.log("today: " + today);
+console.log("next promo: " + next_promo)
 
-const now = new Date().toLocaleDateString();
-console.log("now:" + now)
-const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists: true} })
+const get_users = await Schema.User().find({promo: true, pushToken: {$exists: true} })
   console.log("users:" + get_users)
 
   get_users.map(users => {
@@ -368,45 +536,101 @@ const get_users = await Schema.User().find({next_promo: now, pushToken: {$exists
 );
 
 
+
+
+
+//FREE DISCOUNT**
 /**
-const notificationA = cron.schedule("7 11 * * *", async () => {
+ * const freeDiscount = cron.schedule("53 15 * * *", async () => {
   
-  console.log(" notification initialized");
-//find accounts
+  console.log("discount notification initialized");
+//find accountsfree 
 
+//standard date
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const nextday = now.getDate() + 1
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+const next_promo = month + '/' + nextday + '/' + year
+console.log("today: " + today);
+console.log("next promo: " + next_promo)
 
-  const get_users = await Schema.User().find({pushToken: {$exists: true} })
+  const get_users = await Schema.User().find({isConfirmed: true, pushToken: {$exists: true}})
  console.log("users:" + get_users)
 
-  get_users.map(users => {
- 
-    console.log("tokens:" + users.pushToken)
-    let chunks = expo.chunkPushNotifications([{
-      "to": [users.pushToken],
-      "sound": "default",
-      "title": "Slow Pick-up Time :(",
-      "body": "We apologize for slow pick-ups because of the ongoing protest which is causing roadblocks. Thank you :)"
-    }]);
-    let tickets = [];
-    (async () => {
-      for (let chunk of chunks) {
-        try {
-          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-          console.log(ticketChunk);
-          tickets.push(...ticketChunk);
-       
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    })();
+ if(get_users){
+
+  await Schema.User().updateMany({isConfirmed: true, pushToken: {$exists: true}},  
+    {$set: {
+      promo: true,
+             promo_date: today,
+             next_promo: next_promo
+    }
+  
+  },
+    function(err, result){ 
+    if(err) {
+      console.log(err)
+    } else {
+      console.log('Added free discounts');
+
+      //send notification for expiry
+      get_users.map(usr => {
+        console.log("tokens:" + usr.pushToken)
+        let chunks = expo.chunkPushNotifications([{
+          "to": [usr.pushToken],
+          "sound": "default",
+          "title": "Free 30% Discount!!",
+          "body": "you have been awarded a free 30% discount :)"
+        }]);
+        let tickets = [];
+        (async () => {
+          for (let chunk of chunks) {
+            try {
+              let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+              console.log(ticketChunk);
+              tickets.push(...ticketChunk);
+           
+            } catch (error) {
+              console.error(error);
+            }
+          }
+        })();
+    
+      })
+    }
     })
+  }
+ 
   
 },
 
 {scheduled: true}
 );
+
  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 const notificationB = cron.schedule("28 20 * * *", async () => {
@@ -450,7 +674,9 @@ const notificationB = cron.schedule("28 20 * * *", async () => {
 
 
 deleteU.start();
-discount2.start();
+//freeDiscount.start();
+discountCheck.start()
+discount1.start()
 deactivate.start();
 discount.start();
 discount1.start();
