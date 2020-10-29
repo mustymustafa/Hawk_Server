@@ -194,7 +194,24 @@ app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
 
 
 
+const now = new Date();
+const next = new Date();
+next.setDate(next.getDate() + 7)
 
+const month = now.getMonth() + 1
+const day = now.getDate()
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+
+const nmonth = next.getMonth() + 1
+const nday = next.getDate()
+const nyear = next.getFullYear()
+const next_promo = nmonth + '/' + nday + '/' + nyear
+
+console.log("now" + now)
+console.log("next " + next)
+console.log("today" + today)
+console.log("next promo " + next_promo)
 
 
 
@@ -221,7 +238,7 @@ const deleteU = cron.schedule("00 23 * * *", async () => {
 
 
 //deactivate expired accounts
-const deactivate = cron.schedule("00 23 * * *", async () => {
+const deactivate = cron.schedule("00 00 * * *", async () => {
   console.log("account paused for payment");
 //find accounts
 
@@ -350,12 +367,9 @@ const discountCheck = cron.schedule("00 00 * * *", async () => {
 const now = new Date();
 const month = now.getMonth() + 1
 const day = now.getDate()
-const nextday = now.getDate() + 7
 const year = now.getFullYear()
 const today = month + '/' + day + '/' + year
-const next_promo = month + '/' + nextday + '/' + year
-console.log("today: " + today);
-console.log("next promo: " + next_promo)
+
 
   const get_users = await Schema.User().find({next_promo: { $ne: today }, pushToken: {$exists: true} })
  console.log("users:" + get_users)
@@ -384,22 +398,28 @@ console.log("next promo: " + next_promo)
 
 
 //2. check if today is discount then enable 
-const discountCheck1 = cron.schedule("00 10 * * *", async () => {
+const discountCheck1 = cron.schedule("10 00 * * *", async () => {
   
   console.log("discount check initialized");
 //find accounts
+
 //standard date
 const now = new Date();
+const next = new Date();
+next.setDate(next.getDate() + 7)
+
 const month = now.getMonth() + 1
 const day = now.getDate()
-const nextday = now.getDate() + 7
 const year = now.getFullYear()
 const today = month + '/' + day + '/' + year
-const next_promo = month + '/' + nextday + '/' + year
-console.log("today: " + today);
-console.log("next promo: " + next_promo)
 
-  const get_users = await Schema.User().find({next_promo: today, pushToken: {$exists: true} })
+const nmonth = next.getMonth() + 1
+const nday = next.getDate()
+const nyear = next.getFullYear()
+const next_promo = nmonth + '/' + nday + '/' + nyear
+//
+
+ const get_users = await Schema.User().find({next_promo: today, pushToken: {$exists: true} })
  console.log("users:" + get_users)
 
  if(get_users){
@@ -540,8 +560,9 @@ const get_users = await Schema.User().find({promo: true, pushToken: {$exists: tr
 
 
 //FREE DISCOUNT**
-/**
- * const freeDiscount = cron.schedule("53 15 * * *", async () => {
+
+/** 
+ const freeDiscount = cron.schedule("20 23 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accountsfree 
@@ -550,12 +571,10 @@ const get_users = await Schema.User().find({promo: true, pushToken: {$exists: tr
 const now = new Date();
 const month = now.getMonth() + 1
 const day = now.getDate()
-const nextday = now.getDate() + 1
 const year = now.getFullYear()
 const today = month + '/' + day + '/' + year
-const next_promo = month + '/' + nextday + '/' + year
-console.log("today: " + today);
-console.log("next promo: " + next_promo)
+const next_promo = "10/30/2020"
+//
 
   const get_users = await Schema.User().find({isConfirmed: true, pushToken: {$exists: true}})
  console.log("users:" + get_users)
@@ -609,9 +628,8 @@ console.log("next promo: " + next_promo)
 
 {scheduled: true}
 );
-
- */
-
+**/
+ 
 
 
 
@@ -676,7 +694,7 @@ const notificationB = cron.schedule("28 20 * * *", async () => {
 deleteU.start();
 //freeDiscount.start();
 discountCheck.start()
-discount1.start()
+discountCheck1.start()
 deactivate.start();
 discount.start();
 discount1.start();
