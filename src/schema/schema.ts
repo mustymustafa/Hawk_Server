@@ -24,15 +24,16 @@ class Schema {
         return User;
     }
 
-    static History() {
-        const HistorySchema = new mongoose.Schema({
+    static Transaction() {
+        const TranSchema = new mongoose.Schema({
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
             amount: Number,
-            status: String
+            status: String,
+            date: String
 
         })
-        const History = mongoose.models.History || mongoose.model('History', HistorySchema)
-        return History
+        const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TranSchema)
+        return Transaction
     }
 
     static Artisan() {

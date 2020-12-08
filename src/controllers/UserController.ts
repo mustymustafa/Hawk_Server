@@ -18,6 +18,14 @@ import { Expo } from "expo-server-sdk";
 
 const expo = new Expo();
 
+//date initialization
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+
+
 /** 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -476,7 +484,40 @@ class UserController {
 
 
 
+//******PLATABOX WALLET */
 
+//FUND ACCOUNT
+static async fundWallet(request: Request, response: Response){
+  const{amount, uid} = request.body;
+  console.log(amount)
+  console.log(uid)
+
+  const user = await Schema.User().findOne({_id: uid});
+  console.log(user);
+
+  const new_amount = user.balance + amount
+
+  if(user){
+    //assign amount
+    await Schema.User()
+    .updateOne({
+      _id: uid,
+    }, {
+    $set: {
+      balance: new_amount,
+    }
+  });
+
+  }
+
+  await Schema.Transaction().create({
+    user: uid,
+    amount: amount,
+    status: 'funded',
+    date: today
+  })
+
+}
 
 
 

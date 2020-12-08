@@ -192,6 +192,17 @@ app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
 
 
 
+////////PLATABOX WALLET ROUTES///////
+app.post('api/v1/:uid/fund', UserController.fundWallet);
+
+
+
+
+
+
+
+
+
 
 
 const now = new Date();
