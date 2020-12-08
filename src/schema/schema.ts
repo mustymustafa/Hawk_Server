@@ -16,11 +16,23 @@ class Schema {
             promo: {type: Boolean, default: false},
             next_promo: String,
             promo_date: String,
-            createdAt: String
+            createdAt: String,
+            balance: Number
 
         })
         const User = mongoose.models.User || mongoose.model('User', UserSchema)
         return User;
+    }
+
+    static History() {
+        const HistorySchema = new mongoose.Schema({
+            user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
+            amount: Number,
+            status: String
+
+        })
+        const History = mongoose.models.History || mongoose.model('History', HistorySchema)
+        return History
     }
 
     static Artisan() {

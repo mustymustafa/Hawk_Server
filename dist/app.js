@@ -130,6 +130,21 @@ app.get('/api/v1/getdeliveires', JobController_1.default.Deliveries);
 app.get('/api/v1/getrides', JobController_1.default.Rides);
 app.post('/api/v1/:uid/activate', ArtisanController_1.default.adminActivate);
 app.post('/api/v1/:uid/deactivate', ArtisanController_1.default.deactivateAccount);
+const now = new Date();
+const next = new Date();
+next.setDate(next.getDate() + 7);
+const month = now.getMonth() + 1;
+const day = now.getDate();
+const year = now.getFullYear();
+const today = month + '/' + day + '/' + year;
+const nmonth = next.getMonth() + 1;
+const nday = next.getDate();
+const nyear = next.getFullYear();
+const next_promo = nmonth + '/' + nday + '/' + nyear;
+console.log("now" + now);
+console.log("next " + next);
+console.log("today" + today);
+console.log("next promo " + next_promo);
 //unfinished registration
 const deleteU = node_cron_1.default.schedule("00 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("registration deletion after a day");
@@ -139,60 +154,174 @@ const deleteU = node_cron_1.default.schedule("00 23 * * *", () => __awaiter(void
     const delete_user = yield schema_1.default.User().deleteMany({ isConfirmed: false });
     console.log("deleted:" + delete_user);
 }), { scheduled: true });
-const discount2 = node_cron_1.default.schedule("00 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("discount notification initialized");
-    //find accounts
-    const now = new Date().toLocaleDateString();
-    console.log("now:" + now);
-    const get_users = yield schema_1.default.User().find({ next_promo: now, pushToken: { $exists: true } });
-    console.log("users:" + get_users);
-    get_users.map(users => {
-        console.log("tokens:" + users.pushToken);
-        let chunks = expo.chunkPushNotifications([{
-                "to": [users.pushToken],
-                "sound": "default",
-                "title": "You have 30% discount today!",
-                "body": "Open your Platabox App"
-            }]);
-        let tickets = [];
-        (() => __awaiter(void 0, void 0, void 0, function* () {
-            for (let chunk of chunks) {
-                try {
-                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                    console.log(ticketChunk);
-                    tickets.push(...ticketChunk);
-                }
-                catch (error) {
-                    console.error(error);
-                }
-            }
-        }))();
-    });
-}), { scheduled: true });
 //deactivate expired accounts
-const deactivate = node_cron_1.default.schedule("00 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const deactivate = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("account paused for payment");
     //find accounts
-    const now = new Date().toLocaleDateString();
+    //standard date
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const nextday = now.getDate() + 1;
+    const year = now.getFullYear();
+    const today = month + '/' + day + '/' + year;
+    const next_promo = month + '/' + nextday + '/' + year;
+    console.log("today: " + today);
+    console.log("next promo: " + next_promo);
     //deactivate account if expired
-    console.log("now" + now);
-    const user = yield schema_1.default.Artisan().updateMany({ expireAt: now, earnings: { $gt: 1500 } }, { $set: { active: false } }, function (err, result) {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            console.log('Expired users updated');
-        }
-    });
+    //find the user's first 
+    const user = yield schema_1.default.Artisan().find({ expireAt: today, earnings: { $gt: 1500 } });
     console.log(user);
+    if (user) {
+        yield schema_1.default.Artisan().updateMany({ expireAt: today, earnings: { $gt: 1500 } }, { $set: { active: false } }, function (err, result) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log('Expired users updated');
+                //send notification for expiry
+                user.map(usr => {
+                    console.log("tokens:" + usr.pushToken);
+                    let chunks = expo.chunkPushNotifications([{
+                            "to": [usr.pushToken],
+                            "sound": "default",
+                            "title": "Account on hold",
+                            "body": "Please pay your 40% weeklu commission today to activate your account :)"
+                        }]);
+                    let tickets = [];
+                    (() => __awaiter(this, void 0, void 0, function* () {
+                        for (let chunk of chunks) {
+                            try {
+                                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                console.log(ticketChunk);
+                                tickets.push(...ticketChunk);
+                            }
+                            catch (error) {
+                                console.error(error);
+                            }
+                        }
+                    }))();
+                });
+            }
+        });
+    }
+}), { scheduled: true });
+/**
+ * const notificationA = cron.schedule("08 15 * * *", async () => {
+  
+  console.log(" notification initialized");
+//find accounts
+
+
+  const get_users = await Schema.User().find({pushToken: {$exists: true} })
+ console.log("users:" + get_users)
+
+  get_users.map(users => {
+ 
+    console.log("tokens:" + users.pushToken)
+    let chunks = expo.chunkPushNotifications([{
+      "to": [users.pushToken],
+      "sound": "default",
+      "title": "Resumption!",
+      "body": "We just want to let you know that we have fully resumed operations and ready to take your orders. we are also giving 30% discount to all our lovely customers :)"
+    }]);
+    let tickets = [];
+    (async () => {
+      for (let chunk of chunks) {
+        try {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+       
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    })();
+    })
+  
+},
+
+{scheduled: true}
+);
+ */
+//********DISCOUNT*******************
+//2. check if today is not discount then disable
+const discountCheck = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("discount check initialized");
+    //find accounts
+    //standard date
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const year = now.getFullYear();
+    const today = month + '/' + day + '/' + year;
+    const get_users = yield schema_1.default.User().find({ next_promo: { $ne: today }, pushToken: { $exists: true } });
+    console.log("users:" + get_users);
+    if (get_users) {
+        yield schema_1.default.User().updateMany({ next_promo: { $ne: today }, pushToken: { $exists: true } }, { $set: {
+                promo: false
+            }
+        }, function (err, result) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log('updated discounts');
+            }
+        });
+    }
+}), { scheduled: true });
+//2. check if today is discount then enable 
+const discountCheck1 = node_cron_1.default.schedule("10 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("discount check initialized");
+    //find accounts
+    //standard date
+    const now = new Date();
+    const next = new Date();
+    next.setDate(next.getDate() + 7);
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const year = now.getFullYear();
+    const today = month + '/' + day + '/' + year;
+    const nmonth = next.getMonth() + 1;
+    const nday = next.getDate();
+    const nyear = next.getFullYear();
+    const next_promo = nmonth + '/' + nday + '/' + nyear;
+    //
+    const get_users = yield schema_1.default.User().find({ next_promo: today, pushToken: { $exists: true } });
+    console.log("users:" + get_users);
+    if (get_users) {
+        yield schema_1.default.User().updateMany({ next_promo: today, pushToken: { $exists: true } }, { $set: {
+                promo: true,
+                promo_date: today,
+                next_promo: next_promo
+            }
+        }, function (err, result) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log('updated discounts');
+            }
+        });
+    }
 }), { scheduled: true });
 // send discount notification
-const discount = node_cron_1.default.schedule("00 11 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discount = node_cron_1.default.schedule("00 14 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount notification initialized");
     //find accounts
-    const now = new Date().toLocaleDateString();
-    console.log("now:" + now);
-    const get_users = yield schema_1.default.User().find({ next_promo: now, pushToken: { $exists: true } });
+    //standard date
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const nextday = now.getDate() + 1;
+    const year = now.getFullYear();
+    const today = month + '/' + day + '/' + year;
+    const next_promo = month + '/' + nextday + '/' + year;
+    console.log("today: " + today);
+    console.log("next promo: " + next_promo);
+    const get_users = yield schema_1.default.User().find({ promo: true, pushToken: { $exists: true } });
     console.log("users:" + get_users);
     get_users.map(users => {
         console.log("tokens:" + users.pushToken);
@@ -217,12 +346,19 @@ const discount = node_cron_1.default.schedule("00 11 * * *", () => __awaiter(voi
         }))();
     });
 }), { scheduled: true });
-const discount1 = node_cron_1.default.schedule("10 08 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discount1 = node_cron_1.default.schedule("00 09 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount notification initialized");
-    //find accounts
-    const now = new Date().toLocaleDateString();
-    console.log("now:" + now);
-    const get_users = yield schema_1.default.User().find({ next_promo: now, pushToken: { $exists: true } });
+    //find accounts//standard date
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const nextday = now.getDate() + 1;
+    const year = now.getFullYear();
+    const today = month + '/' + day + '/' + year;
+    const next_promo = month + '/' + nextday + '/' + year;
+    console.log("today: " + today);
+    console.log("next promo: " + next_promo);
+    const get_users = yield schema_1.default.User().find({ promo: true, pushToken: { $exists: true } });
     console.log("users:" + get_users);
     get_users.map(users => {
         console.log("tokens:" + users.pushToken);
@@ -247,45 +383,75 @@ const discount1 = node_cron_1.default.schedule("10 08 * * *", () => __awaiter(vo
         }))();
     });
 }), { scheduled: true });
+//FREE DISCOUNT**
 /**
-const notificationA = cron.schedule("7 11 * * *", async () => {
+ const freeDiscount = cron.schedule("20 23 * * *", async () => {
   
-  console.log(" notification initialized");
-//find accounts
+  console.log("discount notification initialized");
+//find accountsfree
 
+//standard date
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+const next_promo = "10/30/2020"
+//
 
-  const get_users = await Schema.User().find({pushToken: {$exists: true} })
+  const get_users = await Schema.User().find({isConfirmed: true, pushToken: {$exists: true}})
  console.log("users:" + get_users)
 
-  get_users.map(users => {
- 
-    console.log("tokens:" + users.pushToken)
-    let chunks = expo.chunkPushNotifications([{
-      "to": [users.pushToken],
-      "sound": "default",
-      "title": "Slow Pick-up Time :(",
-      "body": "We apologize for slow pick-ups because of the ongoing protest which is causing roadblocks. Thank you :)"
-    }]);
-    let tickets = [];
-    (async () => {
-      for (let chunk of chunks) {
-        try {
-          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-          console.log(ticketChunk);
-          tickets.push(...ticketChunk);
-       
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    })();
+ if(get_users){
+
+  await Schema.User().updateMany({isConfirmed: true, pushToken: {$exists: true}},
+    {$set: {
+      promo: true,
+             promo_date: today,
+             next_promo: next_promo
+    }
+  
+  },
+    function(err, result){
+    if(err) {
+      console.log(err)
+    } else {
+      console.log('Added free discounts');
+
+      //send notification for expiry
+      get_users.map(usr => {
+        console.log("tokens:" + usr.pushToken)
+        let chunks = expo.chunkPushNotifications([{
+          "to": [usr.pushToken],
+          "sound": "default",
+          "title": "Free 30% Discount!!",
+          "body": "you have been awarded a free 30% discount :)"
+        }]);
+        let tickets = [];
+        (async () => {
+          for (let chunk of chunks) {
+            try {
+              let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+              console.log(ticketChunk);
+              tickets.push(...ticketChunk);
+           
+            } catch (error) {
+              console.error(error);
+            }
+          }
+        })();
+    
+      })
+    }
     })
+  }
+ 
   
 },
 
 {scheduled: true}
 );
- */
+**/
 const notificationB = node_cron_1.default.schedule("28 20 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(" notification initialized");
     //find accounts
@@ -315,7 +481,9 @@ const notificationB = node_cron_1.default.schedule("28 20 * * *", () => __awaite
     });
 }), { scheduled: true });
 deleteU.start();
-discount2.start();
+//freeDiscount.start();
+discountCheck.start();
+discountCheck1.start();
 deactivate.start();
 discount.start();
 discount1.start();

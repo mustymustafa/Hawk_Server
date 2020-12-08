@@ -196,21 +196,30 @@ app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
 
 const now = new Date();
 const next = new Date();
+const tom = new Date();
 next.setDate(next.getDate() + 7)
+tom.setDate(next.getDate() + 1)
+
 
 const month = now.getMonth() + 1
 const day = now.getDate()
 const year = now.getFullYear()
 const today = month + '/' + day + '/' + year
 
+
+
 const nmonth = next.getMonth() + 1
 const nday = next.getDate()
 const nyear = next.getFullYear()
 const next_promo = nmonth + '/' + nday + '/' + nyear
 
-console.log("now" + now)
-console.log("next " + next)
+
+const tomorrow = month + '/' + (day+1) + '/' + year
+
+
+
 console.log("today" + today)
+console.log("tomorrow " + tomorrow)
 console.log("next promo " + next_promo)
 
 
@@ -398,7 +407,7 @@ const today = month + '/' + day + '/' + year
 
 
 //2. check if today is discount then enable 
-const discountCheck1 = cron.schedule("10 00 * * *", async () => {
+const discountCheck1 = cron.schedule("00 10 * * *", async () => {
   
   console.log("discount check initialized");
 //find accounts
@@ -462,7 +471,7 @@ const next_promo = nmonth + '/' + nday + '/' + nyear
 
 
 // send discount notification
-const discount = cron.schedule("00 14 * * *", async () => {
+const discount = cron.schedule("10 0 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
@@ -509,7 +518,7 @@ console.log("next promo: " + next_promo)
 {scheduled: true}
 );
 
-const discount1 = cron.schedule("00 09 * * *", async () => {
+const discount1 = cron.schedule("13 00 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts//standard date
@@ -646,6 +655,27 @@ const next_promo = "10/30/2020"
 
 
 
+//change everyone's discount date
+
+const users = async ()  => {
+  await Schema.User().updateMany({isConfirmed: true, pushToken: {$exists: true}},  
+    {$set: {
+      promo: true,
+             promo_date: today,
+             next_promo: tomorrow
+    }
+  
+  },
+    function(err, result){ 
+    if(err) {
+      console.log(err)
+    } else {
+      console.log('Added free discounts');
+}
+    })
+}
+//users();
+
 
 
 
@@ -695,7 +725,7 @@ deleteU.start();
 //freeDiscount.start();
 discountCheck.start()
 discountCheck1.start()
-deactivate.start();
+//deactivate.start();
 discount.start();
 discount1.start();
 
