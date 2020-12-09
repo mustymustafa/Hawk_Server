@@ -482,7 +482,7 @@ const next_promo = nmonth + '/' + nday + '/' + nyear
 
 
 // send discount notification
-const discount = cron.schedule("10 0 * * *", async () => {
+const discount = cron.schedule("10 00 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
