@@ -130,9 +130,13 @@ app.get('/api/v1/getdeliveires', JobController_1.default.Deliveries);
 app.get('/api/v1/getrides', JobController_1.default.Rides);
 app.post('/api/v1/:uid/activate', ArtisanController_1.default.adminActivate);
 app.post('/api/v1/:uid/deactivate', ArtisanController_1.default.deactivateAccount);
+////////PLATABOX WALLET ROUTES///////
+app.post('api/v1/:uid/fund', UserController_1.default.fundWallet);
 const now = new Date();
 const next = new Date();
+const tom = new Date();
 next.setDate(next.getDate() + 7);
+tom.setDate(next.getDate() + 1);
 const month = now.getMonth() + 1;
 const day = now.getDate();
 const year = now.getFullYear();
@@ -141,9 +145,9 @@ const nmonth = next.getMonth() + 1;
 const nday = next.getDate();
 const nyear = next.getFullYear();
 const next_promo = nmonth + '/' + nday + '/' + nyear;
-console.log("now" + now);
-console.log("next " + next);
+const tomorrow = month + '/' + (day + 1) + '/' + year;
 console.log("today" + today);
+console.log("tomorrow " + tomorrow);
 console.log("next promo " + next_promo);
 //unfinished registration
 const deleteU = node_cron_1.default.schedule("00 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
@@ -273,7 +277,7 @@ const discountCheck = node_cron_1.default.schedule("00 00 * * *", () => __awaite
     }
 }), { scheduled: true });
 //2. check if today is discount then enable 
-const discountCheck1 = node_cron_1.default.schedule("10 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discountCheck1 = node_cron_1.default.schedule("00 10 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount check initialized");
     //find accounts
     //standard date
@@ -308,7 +312,7 @@ const discountCheck1 = node_cron_1.default.schedule("10 00 * * *", () => __await
     }
 }), { scheduled: true });
 // send discount notification
-const discount = node_cron_1.default.schedule("00 14 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discount = node_cron_1.default.schedule("10 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount notification initialized");
     //find accounts
     //standard date
@@ -346,7 +350,7 @@ const discount = node_cron_1.default.schedule("00 14 * * *", () => __awaiter(voi
         }))();
     });
 }), { scheduled: true });
-const discount1 = node_cron_1.default.schedule("00 09 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discount1 = node_cron_1.default.schedule("13 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount notification initialized");
     //find accounts//standard date
     const now = new Date();
@@ -452,6 +456,23 @@ const next_promo = "10/30/2020"
 {scheduled: true}
 );
 **/
+//change everyone's discount date
+const users = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield schema_1.default.User().updateMany({ isConfirmed: true, pushToken: { $exists: true } }, { $set: {
+            promo: true,
+            promo_date: today,
+            next_promo: tomorrow
+        }
+    }, function (err, result) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log('Added free discounts');
+        }
+    });
+});
+users();
 const notificationB = node_cron_1.default.schedule("28 20 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(" notification initialized");
     //find accounts
@@ -484,7 +505,7 @@ deleteU.start();
 //freeDiscount.start();
 discountCheck.start();
 discountCheck1.start();
-deactivate.start();
+//deactivate.start();
 discount.start();
 discount1.start();
 //notificationA.start()

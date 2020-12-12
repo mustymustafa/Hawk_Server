@@ -23,6 +23,12 @@ const client = twilio_1.default(accountSid, authToken, {
 const schema_1 = __importDefault(require("../schema/schema"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
+//date initialization
+const now = new Date();
+const month = now.getMonth() + 1;
+const day = now.getDate();
+const year = now.getFullYear();
+const today = month + '/' + day + '/' + year;
 /**
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -428,6 +434,35 @@ class UserController {
                     message: 'something went wrong'
                 });
             }
+        });
+    }
+    //******PLATABOX WALLET */
+    //FUND ACCOUNT
+    static fundWallet(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { amount, uid } = request.body;
+            console.log(amount);
+            console.log(uid);
+            const user = yield schema_1.default.User().findOne({ _id: uid });
+            console.log(user);
+            const new_amount = user.balance + amount;
+            if (user) {
+                //assign amount
+                yield schema_1.default.User()
+                    .updateOne({
+                    _id: uid,
+                }, {
+                    $set: {
+                        balance: new_amount,
+                    }
+                });
+            }
+            yield schema_1.default.Transaction().create({
+                user: uid,
+                amount: amount,
+                status: 'funded',
+                date: today
+            });
         });
     }
 }

@@ -15,7 +15,7 @@ import Schema from './schema/schema';
 import Middleware from './middleware/Middleware';
 import UserController from './controllers/UserController'
 import ArtisanController from './controllers/ArtisanController'
- import {upload} from './util'
+import {upload} from './util'
 import JobController from './controllers/JobController';
 
 import { Expo } from "expo-server-sdk";
@@ -685,7 +685,7 @@ const users = async ()  => {
 }
     })
 }
-//users();
+users();
 
 
 

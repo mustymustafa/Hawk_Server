@@ -19,10 +19,21 @@ class Schema {
             promo: { type: Boolean, default: false },
             next_promo: String,
             promo_date: String,
-            createdAt: String
+            createdAt: String,
+            balance: Number
         });
         const User = mongoose_1.default.models.User || mongoose_1.default.model('User', UserSchema);
         return User;
+    }
+    static Transaction() {
+        const TranSchema = new mongoose_1.default.Schema({
+            user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
+            amount: Number,
+            status: String,
+            date: String
+        });
+        const Transaction = mongoose_1.default.models.Transaction || mongoose_1.default.model('Transaction', TranSchema);
+        return Transaction;
     }
     static Artisan() {
         const ArtisanSchema = new mongoose_1.default.Schema({
