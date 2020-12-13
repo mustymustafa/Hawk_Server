@@ -20,6 +20,10 @@ import JobController from './controllers/JobController';
 
 import { Expo } from "expo-server-sdk";
 const expo = new Expo();
+const Ravepay = require('ravepay');
+var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
+
+
 
 //database 
  mongoose.connect(
@@ -30,9 +34,6 @@ const expo = new Expo();
 
  
 const app = express();
-
-
-
 
 
 
@@ -750,6 +751,28 @@ discount1.start();
 
 //notificationA.start()
 //notificationB.start()
+
+
+
+
+
+const list_banks= async ()=> {
+	
+	try {
+		const response = await rave.Misc.getBanks(rave);
+		console.log(response);
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+//list_banks();
+
+
+
+
+
+
 
 
 
