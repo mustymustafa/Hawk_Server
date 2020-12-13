@@ -10,6 +10,9 @@ const client = twilio(accountSid, authToken,  {
 }); 
 
 
+
+
+
 import Schema from '../schema/schema';
 import Validator from '../validator/Validator';
 
@@ -17,6 +20,11 @@ import nodemailer from "nodemailer";
 import { Expo } from "expo-server-sdk";
 
 const expo = new Expo();
+
+const Ravepay = require('ravepay');
+var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
+
+
 
 //date initialization
 const now = new Date();

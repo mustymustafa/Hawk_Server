@@ -1,5 +1,5 @@
 if (process.env.NODE_ENV !== 'production') { require('dotenv').config() }
-import express from 'express';
+import express, { Request, Response }from 'express';
 import bodyParser from "body-parser";
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -30,6 +30,14 @@ const expo = new Expo();
 
  
 const app = express();
+
+
+
+
+
+
+
+
 
 
 

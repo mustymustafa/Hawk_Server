@@ -17,7 +17,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const http_1 = __importDefault(require("http"));
 const node_cron_1 = __importDefault(require("node-cron"));
@@ -33,7 +32,7 @@ const expo = new expo_server_sdk_1.Expo();
 mongoose_1.default.connect(`mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('database connected.....'))
     .catch((error) => console.log(error.toString()));
 const app = express_1.default();
-app.use(cors_1.default());
+//app.use(cors());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(cookie_parser_1.default());
@@ -472,7 +471,7 @@ const users = () => __awaiter(void 0, void 0, void 0, function* () {
         }
     });
 });
-users();
+//users();
 const notificationB = node_cron_1.default.schedule("28 20 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(" notification initialized");
     //find accounts
