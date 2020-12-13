@@ -528,6 +528,31 @@ static async fundWallet(request: Request, response: Response){
 }
 
 
+//WITHDRAW FUNDS
+static async withdrawFund(request: Request, response: Response){
+  const {bcode, amount, anumber} =  request.body;
+  //verify account number first
+
+  const transfer = async () => {
+    try {
+        const payload = {
+            "account_bank": bcode,
+            "account_number": anumber,
+            "amount": amount,
+            "narration": `Platabox Wallet Withdrawal of ${amount}`,
+            "currency": "NGN",
+            "reference":"pbwd-"+ Date.now()
+        }
+        const response = await rave.Transfer.initiate(payload)
+        console.log(response)
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+transfer();
+}
+
 
 
 
