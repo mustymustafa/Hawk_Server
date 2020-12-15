@@ -772,7 +772,7 @@ const list_banks= async ()=> {
 const transfer = async () => {
   try {
       const payload = {
-          "account_bank": "044",
+          "account_bank": "043",
           "account_number": "0695945271",
           "amount": 100,
           "narration": `Platabox Wallet Withdrawal of 200`,
@@ -780,9 +780,18 @@ const transfer = async () => {
           "reference":"pbwd-"+ Date.now()
       }
       const response = await rave.Transfer.initiate(payload)
-      console.log(response)
-      //response.fullname != 'N/A then account number is correct'
-      //response.complete_message
+      //console.log(response)
+      if(response.body.data.status === 'FAILED'){
+        console.log('transaction failed. Please try again later')
+      }
+
+      if(response.body.data.status === 'NEW'){
+        console.log('Transaction Successful')
+      }
+
+      if(response.body.data.fullname === 'N/A'){
+        console.log('Invalid account number')
+      }
 
   } catch (error) {
       console.log(error)

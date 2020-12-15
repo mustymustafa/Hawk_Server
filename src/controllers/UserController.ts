@@ -516,8 +516,6 @@ static async fundWallet(request: Request, response: Response){
     }
   });
 
-  }
-
   await Schema.Transaction().create({
     user: uid,
     amount: amount,
@@ -525,32 +523,78 @@ static async fundWallet(request: Request, response: Response){
     date: today
   })
 
+
+  } else {
+    console.log('User not found')
+  }
+
+
 }
 
 
 //WITHDRAW FUNDS
 static async withdrawFund(request: Request, response: Response){
-  const {bcode, amount, anumber} =  request.body;
+  const {uid, bcode, amount, anumber} =  request.body;
   //verify account number first
 
-  const transfer = async () => {
-    try {
-        const payload = {
-            "account_bank": bcode,
-            "account_number": anumber,
-            "amount": amount,
-            "narration": `Platabox Wallet Withdrawal of ${amount}`,
-            "currency": "NGN",
-            "reference":"pbwd-"+ Date.now()
-        }
-        const response = await rave.Transfer.initiate(payload)
-        console.log(response)
+  const user = await Schema.User().findOne({_id: uid});
+  console.log(user);
 
-    } catch (error) {
-        console.log(error)
+  const new_amount = user.balance - amount
+
+  if(user){
+
+  
+    const transfer = async () => {
+      try {
+          const payload = {
+              "account_bank": bcode,
+              "account_number": anumber,
+              "amount": amount,
+              "narration": `Platabox Wallet Withdrawal of ${amount}`,
+              "currency": "NGN",
+              "reference":"pbwd-"+ Date.now()
+          }
+          const response = await rave.Transfer.initiate(payload)
+          console.log(response)
+      } catch (error) {
+          console.log(error)
+      }
+  
+  
+  }
+  
+  
+  // if successful
+  // send success message
+  
+    //remove amount
+    await Schema.User()
+    .updateOne({
+      _id: uid,
+    }, {
+    $set: {
+      balance: new_amount,
     }
-}
-transfer();
+  });
+
+  await Schema.Transaction().create({
+    user: uid,
+    amount: amount,
+    status: 'withdrew',
+    date: today
+  })
+
+
+
+
+
+  }
+
+
+
+
+
 }
 
 
