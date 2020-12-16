@@ -523,9 +523,16 @@ static async fundWallet(request: Request, response: Response){
     date: today
   })
 
+  return  response.status(500).send({
+    message: 'Account Funded!'
+  });
 
   } else {
     console.log('User not found')
+    return  response.status(500).send({
+      message: 'User not found'
+    });
+    
   }
 
 
@@ -543,9 +550,6 @@ static async withdrawFund(request: Request, response: Response){
   const new_amount = user.balance - amount
 
   if(user){
-
-  
-    const transfer = async () => {
       try {
           const payload = {
               "account_bank": bcode,
@@ -557,38 +561,60 @@ static async withdrawFund(request: Request, response: Response){
           }
           const response = await rave.Transfer.initiate(payload)
           console.log(response)
-      } catch (error) {
-          console.log(error)
-      }
+
+          if(response.body.data.status === 'FAILED'){
+            console.log('transaction failed. Please try again later')
+            return  response.status(500).send({
+              message: 'Transaction failed. Please try again later'
+            });
+          }
+    
+          if(response.body.data.status === 'NEW'){
+            console.log('Transaction Successful')
+            // if successful
+            // send success message
   
-  
-  }
-  
-  
-  // if successful
-  // send success message
-  
-    //remove amount
-    await Schema.User()
-    .updateOne({
+            //remove amount
+          await Schema.User()
+          .updateOne({
       _id: uid,
     }, {
     $set: {
       balance: new_amount,
     }
-  });
+           });
 
-  await Schema.Transaction().create({
-    user: uid,
-    amount: amount,
-    status: 'withdrew',
-    date: today
-  })
+          await Schema.Transaction().create({
+          user: uid,
+          amount: amount,
+          status: 'withdrew',
+          date: today
+          })
+
+          return  response.status(200).send({
+            message: 'Transaction Successful'
+          });
+          }
+    
+          if(response.body.data.fullname === 'N/A'){
+            console.log('Invalid account number')
+            return  response.status(500).send({
+              message: 'Invalid account number'
+            });
+          }
+
+      } catch (error) {
+          console.log(error)
+      }
+  
+  
 
 
 
-
-
+  } else {
+    return  response.status(500).send({
+      message: 'User not found'
+    });
   }
 
 
