@@ -504,7 +504,7 @@ static async fundWallet(request: Request, response: Response){
   console.log(user);
 
   const new_amount = user.balance + amount
-
+  console.log("new amount " + new_amount)
   if(user){
     //assign amount
     await Schema.User()
@@ -523,7 +523,7 @@ static async fundWallet(request: Request, response: Response){
     date: today
   })
 
-  return  response.status(500).send({
+  return  response.status(200).send({
     message: 'Account Funded!'
   });
 
@@ -543,78 +543,75 @@ static async fundWallet(request: Request, response: Response){
 static async withdrawFund(request: Request, response: Response){
   const {uid, bcode, amount, anumber} =  request.body;
   //verify account number first
-
   const user = await Schema.User().findOne({_id: uid});
   console.log(user);
-
   const new_amount = user.balance - amount
 
-  if(user){
-      try {
-          const payload = {
-              "account_bank": bcode,
-              "account_number": anumber,
-              "amount": amount,
-              "narration": `Platabox Wallet Withdrawal of ${amount}`,
-              "currency": "NGN",
-              "reference":"pbwd-"+ Date.now()
-          }
-          const response = await rave.Transfer.initiate(payload)
-          console.log(response)
-
-          if(response.body.data.status === 'FAILED'){
-            console.log('transaction failed. Please try again later')
-            return  response.status(500).send({
-              message: 'Transaction failed. Please try again later'
-            });
-          }
-    
-          if(response.body.data.status === 'NEW'){
-            console.log('Transaction Successful')
-            // if successful
-            // send success message
-  
-            //remove amount
-          await Schema.User()
-          .updateOne({
-      _id: uid,
-    }, {
-    $set: {
-      balance: new_amount,
-    }
-           });
-
-          await Schema.Transaction().create({
-          user: uid,
-          amount: amount,
-          status: 'withdrew',
-          date: today
-          })
-
-          return  response.status(200).send({
-            message: 'Transaction Successful'
-          });
-          }
-    
-          if(response.body.data.fullname === 'N/A'){
-            console.log('Invalid account number')
-            return  response.status(500).send({
-              message: 'Invalid account number'
-            });
-          }
-
-      } catch (error) {
-          console.log(error)
-      }
-  
-  
-
-
-
-  } else {
-    return  response.status(500).send({
+  if(!user){
+    return response.status(401).send({
       message: 'User not found'
     });
+  
+  } else {
+    try {
+      const payload = {
+          "account_bank": bcode,
+          "account_number": anumber,
+          "amount": amount,
+          "narration": `Platabox Wallet Withdrawal of ${amount}`,
+          "currency": "NGN",
+          "reference":"pbwd-"+ Date.now()
+      }
+      const resp = await rave.Transfer.initiate(payload)
+      console.log(resp)
+
+      if(resp.body.data.status === 'FAILED'){
+        console.log('transaction failed. Please try again later')
+        return response.send({
+          message: 'Transaction failed. Please try again later'
+        });
+      }
+
+      if(resp.body.data.status === 'NEW'){
+        console.log('Transaction Successful')
+        // if successful
+        // send success message
+
+        //remove amount
+      await Schema.User()
+      .updateOne({
+  _id: uid,
+}, {
+$set: {
+  balance: new_amount,
+}
+       });
+
+      await Schema.Transaction().create({
+      user: uid,
+      amount: amount,
+      status: 'withdrew',
+      date: today
+      })
+
+      console.log('new amount ' + new_amount)
+    
+      return response.send({
+        message: 'Transaction Successful'
+      });
+      }
+
+      if(resp.body.data.fullname === 'N/A'){
+        console.log('Invalid account number')
+        return response.send({
+          message: 'Invalid account number'
+        });
+      }
+
+  } catch(error) {
+      console.log(error)
+  }
+
   }
 
 

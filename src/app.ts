@@ -46,7 +46,7 @@ const app = express();
 
 //app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 //app.use(express.static(path.join(__dirname, 'public')));
 
@@ -202,10 +202,19 @@ app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
 
 
 ////////PLATABOX WALLET ROUTES///////
-app.post('api/v1/:uid/fund', UserController.fundWallet);
+app.post('/api/v1/:uid/fund', UserController.fundWallet);
+app.post('/api/v1/:uid/withdraw', UserController.withdrawFund);
 
 
 
+//testing route
+app.get('/test', (request:Request, response:Response) => {
+  response.send('working')
+})
+
+app.post('/testpost', (request:Request, response:Response) => {
+  response.send('working')
+})
 
 
 
