@@ -204,7 +204,7 @@ app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
 ////////PLATABOX WALLET ROUTES///////
 app.post('/api/v1/:uid/fund', UserController.fundWallet);
 app.post('/api/v1/:uid/withdraw', UserController.withdrawFund);
-app.post('/api/v1/:uid/transfeRequest', UserController.transfeRequests);
+app.post('/api/v1/:uid/transferRequest', UserController.transfeRequests);
 app.post('/api/v1/:uid/updateTransfer', UserController.updateTransfer);
 
 
@@ -825,7 +825,7 @@ app.set('port', port);
 
 const server = http.createServer(app);
 server.listen(port, ()=> {
-    console.log("server running.....")
+    console.log("server running on ....." + port)
 });
 
 

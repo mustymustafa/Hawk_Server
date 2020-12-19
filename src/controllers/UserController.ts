@@ -638,7 +638,7 @@ static async transfeRequests(request: Request, response: Response){
 
     try {
       const user = await Schema.User().findOne({_id: uid});
-      const admin = await Schema.User().findOne({fullname: 'mustafa mohammed'})
+      const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
       console.log(user);
       console.log(admin)
 
