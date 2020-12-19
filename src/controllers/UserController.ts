@@ -500,13 +500,17 @@ static async fundWallet(request: Request, response: Response){
   console.log(amount)
   console.log(uid)
 
+
+    try {
+
   const user = await Schema.User().findOne({_id: uid});
   console.log(user);
 
   const new_amount = user.balance + amount
   console.log("new amount " + new_amount)
+
   if(user){
-    //assign amount
+    //update amount
     await Schema.User()
     .updateOne({
       _id: uid,
@@ -527,13 +531,21 @@ static async fundWallet(request: Request, response: Response){
     message: 'Account Funded!'
   });
 
-  } else {
-    console.log('User not found')
-    return  response.status(500).send({
-      message: 'User not found'
-    });
-    
-  }
+} else {
+  console.log('User not found')
+  return  response.status(500).send({
+    message: 'User not found'
+  });
+  
+}
+
+} catch(err){
+  console.log(err)
+  return  response.status(500).send({
+    message: 'An error occured'
+  });
+}
+
 
 
 }
@@ -611,6 +623,146 @@ balance: new_amount,
       });
   }
 }
+
+
+//MANUALLY TRANSFER FUNDS THROUGH BANK TRANSFER
+//SAVE THE TRANSFER REQUESTS HERE
+static async transfeRequests(request: Request, response: Response){
+  const{amount, uid, anumber, bank} = request.body;
+  console.log(bank)
+  console.log(anumber)
+  console.log(uid)
+
+
+
+
+    try {
+      const user = await Schema.User().findOne({_id: uid});
+      const admin = await Schema.User().findOne({fullname: 'mustafa mohammed'})
+      console.log(user);
+      console.log(admin)
+
+    if(user){
+      //SAVE THE TRANSFER REQUEST
+    await Schema.Transfers().create({
+      user: uid,
+      amount: amount,
+      anumber: anumber,
+      bank: bank,
+      date: today
+    })
+
+    if(admin){
+
+ //notify admin
+let chunks = expo.chunkPushNotifications([{
+  "to": admin.pushToken,
+  "sound": "default",
+  "channelId": "notification-sound-channel",
+  "title": "Transfer Request!",
+  "body": `Please attend to the transfer request ASAP!.`
+}]);
+let tickets = [];
+(async () => {
+  for (let chunk of chunks) {
+    try {
+      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+      console.log(ticketChunk);
+      tickets.push(...ticketChunk);
+   
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})();
+  
+    }
+    return response.status(200).send({
+      message: 'Transfer Request Funded!'
+    });
+  } else {
+    console.log('User not found')
+    return  response.status(500).send({
+      message: 'User not found'
+    });
+    
+  }
+
+  }catch(err){
+    console.log(err)
+    return  response.status(500).send({
+      message: 'An error occured'
+    });
+  }
+
+  
+
+
 }
+
+//UPDATE A TRANSFER REQUEST
+static async updateTransfer(request: Request, response: Response){
+  const{amount, uid} = request.body;
+  console.log(amount)
+  console.log(uid)
+
+
+  
+    try {
+      const user = await Schema.User().findOne({_id: uid});
+      console.log(user);
+    
+      const new_amount = user.balance - amount
+      console.log("new amount " + new_amount)
+      if(user){
+        //update amount
+    await Schema.User()
+    .updateOne({
+      _id: uid,
+    }, {
+    $set: {
+      balance: new_amount,
+    }
+  });
+
+  await Schema.Transaction().create({
+    user: uid,
+    amount: amount,
+    status: 'withdraw',
+    date: today
+  })
+
+  return  response.status(200).send({
+    message: 'Re-Funded!'
+  });
+} else {
+  console.log('User not found')
+  return  response.status(500).send({
+    message: 'User not found'
+  });
+  
+}
+
+} catch(err){
+  console.log(err)
+  return  response.status(500).send({
+    message: 'An error occured'
+  });
+}
+
+ 
+
+}
+
+
+
+
+
+
+}
+
+
+
+
 
 export default UserController;

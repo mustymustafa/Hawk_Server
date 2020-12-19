@@ -204,6 +204,9 @@ app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
 ////////PLATABOX WALLET ROUTES///////
 app.post('/api/v1/:uid/fund', UserController.fundWallet);
 app.post('/api/v1/:uid/withdraw', UserController.withdrawFund);
+app.post('/api/v1/:uid/transfeRequest', UserController.transfeRequests);
+app.post('/api/v1/:uid/updateTransfer', UserController.updateTransfer);
+
 
 
 

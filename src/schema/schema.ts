@@ -36,6 +36,20 @@ class Schema {
         return Transaction
     }
 
+    static Transfers() {
+        const TranSchema = new mongoose.Schema({
+            user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
+            amount: Number,
+            anumber: Number,
+            bank: String,
+            date: String
+
+        })
+        const Transfer = mongoose.models.Transfer || mongoose.model('Transfer', TranSchema)
+        return Transfer
+    }
+    
+
     static Artisan() {
         const ArtisanSchema = new mongoose.Schema({
             name: String,
