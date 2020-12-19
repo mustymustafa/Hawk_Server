@@ -543,89 +543,74 @@ static async fundWallet(request: Request, response: Response){
 static async withdrawFund(request: Request, response: Response){
   const {uid, bcode, amount, anumber} =  request.body;
   //verify account number first
+  
+  try {
   const user = await Schema.User().findOne({_id: uid});
   console.log(user);
   const new_amount = user.balance - amount
 
-  if(!user){
-    return response.status(401).send({
-      message: 'User not found'
+  if(user){
+    const payload = {
+      "account_bank": bcode,
+      "account_number": anumber,
+      "amount": amount,
+      "narration": `Platabox Wallet Withdrawal of ${amount}`,
+      "currency": "NGN",
+      "reference":"pbwd-"+ Date.now()
+  }
+  const resp = await rave.Transfer.initiate(payload)
+  console.log(resp)
+
+  if(resp.body.data.status === 'FAILED'){
+    console.log('transaction failed. Please try again later')
+    return response.send({
+      message: 'Transaction failed. Please try again later'
     });
-  
-  } else {
-    try {
-      const payload = {
-          "account_bank": bcode,
-          "account_number": anumber,
-          "amount": amount,
-          "narration": `Platabox Wallet Withdrawal of ${amount}`,
-          "currency": "NGN",
-          "reference":"pbwd-"+ Date.now()
-      }
-      const resp = await rave.Transfer.initiate(payload)
-      console.log(resp)
+  }
 
-      if(resp.body.data.status === 'FAILED'){
-        console.log('transaction failed. Please try again later')
-        return response.send({
-          message: 'Transaction failed. Please try again later'
-        });
-      }
+  if(resp.body.data.status === 'NEW'){
+    console.log('Transaction Successful')
+    // if successful
+    // send success message
 
-      if(resp.body.data.status === 'NEW'){
-        console.log('Transaction Successful')
-        // if successful
-        // send success message
-
-        //remove amount
-      await Schema.User()
-      .updateOne({
-  _id: uid,
+    //remove amount
+  await Schema.User()
+  .updateOne({
+_id: uid,
 }, {
 $set: {
-  balance: new_amount,
+balance: new_amount,
 }
-       });
+   });
 
-      await Schema.Transaction().create({
-      user: uid,
-      amount: amount,
-      status: 'withdrew',
-      date: today
-      })
+  await Schema.Transaction().create({
+  user: uid,
+  amount: amount,
+  status: 'withdraw',
+  date: today
+  })
 
-      console.log('new amount ' + new_amount)
-    
-      return response.send({
-        message: 'Transaction Successful'
-      });
-      }
+  console.log('new amount ' + new_amount)
 
-      if(resp.body.data.fullname === 'N/A'){
-        console.log('Invalid account number')
-        return response.send({
-          message: 'Invalid account number'
-        });
-      }
+  return response.send({
+    message: 'Transaction Successful'
+  });
+  }
 
+  if(resp.body.data.fullname === 'N/A'){
+    console.log('Invalid account number')
+    return response.send({
+      message: 'Invalid account number'
+    });
+  }  
+  }  
   } catch(error) {
       console.log(error)
+      return response.status(401).send({
+        message: 'User not found'
+      });
   }
-
-  }
-
-
-
-
-
 }
-
-
-
-
-
-
-  
 }
 
 export default UserController;
