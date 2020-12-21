@@ -567,7 +567,7 @@ static async withdrawFund(request: Request, response: Response){
   if(user){
     //check if amount the amount is greatr than the limit
     if(amount > limit){
-      return response.send({message: `The specified amount is more than your available balance: ${user.balance}`})
+      return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
     }
 
     else {
