@@ -560,8 +560,19 @@ static async withdrawFund(request: Request, response: Response){
   const user = await Schema.User().findOne({_id: uid});
   console.log(user);
   const new_amount = user.balance - amount
+  const limit = user.balance - 50
+  console.log(limit)
+
 
   if(user){
+    //check if amount the amount is greatr than the limit
+    if(amount > limit){
+      return response.send({message: `The specified amount is more than your available balance: ${user.balance}`})
+    }
+
+    else {
+
+    
     const payload = {
       "account_bank": bcode,
       "account_number": anumber,
@@ -616,6 +627,7 @@ balance: new_amount,
     });
   }  
   }  
+}
   } catch(error) {
       console.log(error)
       return response.status(401).send({
