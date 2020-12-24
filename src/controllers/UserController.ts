@@ -21,7 +21,7 @@ import { Expo } from "expo-server-sdk";
 
 const expo = new Expo();
 
-const Ravepay = require('ravepay');
+const Ravepay = require('flutterwave-node');
 var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 
 
