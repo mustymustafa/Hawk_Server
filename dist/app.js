@@ -28,13 +28,15 @@ const util_1 = require("./util");
 const JobController_1 = __importDefault(require("./controllers/JobController"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
+const Ravepay = require('ravepay');
+var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 //database 
 mongoose_1.default.connect(`mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('database connected.....'))
     .catch((error) => console.log(error.toString()));
 const app = express_1.default();
 //app.use(cors());
 app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: false }));
+app.use(express_1.default.urlencoded({ extended: true }));
 app.use(cookie_parser_1.default());
 //app.use(express.static(path.join(__dirname, 'public')));
 //routes
@@ -130,7 +132,17 @@ app.get('/api/v1/getrides', JobController_1.default.Rides);
 app.post('/api/v1/:uid/activate', ArtisanController_1.default.adminActivate);
 app.post('/api/v1/:uid/deactivate', ArtisanController_1.default.deactivateAccount);
 ////////PLATABOX WALLET ROUTES///////
-app.post('api/v1/:uid/fund', UserController_1.default.fundWallet);
+app.post('/api/v1/:uid/fund', UserController_1.default.fundWallet);
+app.post('/api/v1/:uid/withdraw', UserController_1.default.withdrawFund);
+app.post('/api/v1/:uid/transferRequest', UserController_1.default.transfeRequests);
+app.post('/api/v1/:uid/updateTransfer', UserController_1.default.updateTransfer);
+//testing route
+app.get('/test', (request, response) => {
+    response.send('working');
+});
+app.post('/testpost', (request, response) => {
+    response.send('working');
+});
 const now = new Date();
 const next = new Date();
 const tom = new Date();
@@ -509,11 +521,48 @@ discount.start();
 discount1.start();
 //notificationA.start()
 //notificationB.start()
+const list_banks = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield rave.Misc.getBanks(rave);
+        console.log(response);
+    }
+    catch (error) {
+        console.log(error);
+    }
+});
+//list_banks();
+const transfer = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const payload = {
+            "account_bank": "043",
+            "account_number": "0695945271",
+            "amount": 100,
+            "narration": `Platabox Wallet Withdrawal of 200`,
+            "currency": "NGN",
+            "reference": "pbwd-" + Date.now()
+        };
+        const response = yield rave.Transfer.initiate(payload);
+        //console.log(response)
+        if (response.body.data.status === 'FAILED') {
+            console.log('transaction failed. Please try again later');
+        }
+        if (response.body.data.status === 'NEW') {
+            console.log('Transaction Successful');
+        }
+        if (response.body.data.fullname === 'N/A') {
+            console.log('Invalid account number');
+        }
+    }
+    catch (error) {
+        console.log(error);
+    }
+});
+//transfer();
 //seedArtisan();
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
 app.set('port', port);
 const server = http_1.default.createServer(app);
 server.listen(port, () => {
-    console.log("server running.....");
+    console.log("server running on ....." + port);
 });

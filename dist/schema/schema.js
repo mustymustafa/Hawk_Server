@@ -35,6 +35,17 @@ class Schema {
         const Transaction = mongoose_1.default.models.Transaction || mongoose_1.default.model('Transaction', TranSchema);
         return Transaction;
     }
+    static Transfers() {
+        const TranSchema = new mongoose_1.default.Schema({
+            user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
+            amount: Number,
+            anumber: Number,
+            bank: String,
+            date: String
+        });
+        const Transfer = mongoose_1.default.models.Transfer || mongoose_1.default.model('Transfer', TranSchema);
+        return Transfer;
+    }
     static Artisan() {
         const ArtisanSchema = new mongoose_1.default.Schema({
             name: String,

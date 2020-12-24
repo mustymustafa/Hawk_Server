@@ -445,26 +445,228 @@ class UserController {
             const { amount, uid } = request.body;
             console.log(amount);
             console.log(uid);
-            const user = yield schema_1.default.User().findOne({ _id: uid });
-            console.log(user);
-            const new_amount = user.balance + amount;
-            if (user) {
-                //assign amount
-                yield schema_1.default.User()
-                    .updateOne({
-                    _id: uid,
-                }, {
-                    $set: {
-                        balance: new_amount,
-                    }
+            try {
+                const user = yield schema_1.default.User().findOne({ _id: uid });
+                console.log(user);
+                const new_amount = user.balance + amount;
+                console.log("new amount " + new_amount);
+                if (user) {
+                    //update amount
+                    yield schema_1.default.User()
+                        .updateOne({
+                        _id: uid,
+                    }, {
+                        $set: {
+                            balance: new_amount,
+                        }
+                    });
+                    yield schema_1.default.Transaction().create({
+                        user: uid,
+                        amount: amount,
+                        status: 'funded',
+                        date: today
+                    });
+                    return response.status(200).send({
+                        message: 'Account Funded!'
+                    });
+                }
+                else {
+                    console.log('User not found');
+                    return response.status(500).send({
+                        message: 'User not found'
+                    });
+                }
+            }
+            catch (err) {
+                console.log(err);
+                return response.status(500).send({
+                    message: 'An error occured'
                 });
             }
-            yield schema_1.default.Transaction().create({
-                user: uid,
-                amount: amount,
-                status: 'funded',
-                date: today
-            });
+        });
+    }
+    //WITHDRAW FUNDS
+    static withdrawFund(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid, bcode, amount, anumber } = request.body;
+            //verify account number first
+            try {
+                const user = yield schema_1.default.User().findOne({ _id: uid });
+                console.log(user);
+                const new_amount = user.balance - amount;
+                const limit = user.balance - 50;
+                console.log(limit);
+                if (user) {
+                    //check if amount the amount is greatr than the limit
+                    if (amount > limit) {
+                        return response.send({ message: `The specified amount is more than your withdrawal limit: ${limit}` });
+                    }
+                    else {
+                        const payload = {
+                            "account_bank": bcode,
+                            "account_number": anumber,
+                            "amount": amount,
+                            "narration": `Platabox Wallet Withdrawal of ${amount}`,
+                            "currency": "NGN",
+                            "reference": "pbwd-" + Date.now()
+                        };
+                        const resp = yield rave.Transfer.initiate(payload);
+                        console.log(resp);
+                        if (resp.body.data.status === 'FAILED') {
+                            console.log('transaction failed. Please try again later');
+                            return response.send({
+                                message: 'Transaction failed. Please try again later'
+                            });
+                        }
+                        if (resp.body.data.status === 'NEW') {
+                            console.log('Transaction Successful');
+                            // if successful
+                            // send success message
+                            //remove amount
+                            yield schema_1.default.User()
+                                .updateOne({
+                                _id: uid,
+                            }, {
+                                $set: {
+                                    balance: new_amount,
+                                }
+                            });
+                            yield schema_1.default.Transaction().create({
+                                user: uid,
+                                amount: amount,
+                                status: 'withdraw',
+                                date: today
+                            });
+                            console.log('new amount ' + new_amount);
+                            return response.send({
+                                message: 'Transaction Successful'
+                            });
+                        }
+                        if (resp.body.data.fullname === 'N/A') {
+                            console.log('Invalid account number');
+                            return response.send({
+                                message: 'Invalid account number'
+                            });
+                        }
+                    }
+                }
+            }
+            catch (error) {
+                console.log(error);
+                return response.status(401).send({
+                    message: 'User not found'
+                });
+            }
+        });
+    }
+    //MANUALLY TRANSFER FUNDS THROUGH BANK TRANSFER
+    //SAVE THE TRANSFER REQUESTS HERE
+    static transfeRequests(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { amount, uid, anumber, bank } = request.body;
+            console.log(bank);
+            console.log(anumber);
+            console.log(uid);
+            try {
+                const user = yield schema_1.default.User().findOne({ _id: uid });
+                const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
+                console.log(user);
+                console.log(admin);
+                if (user) {
+                    //SAVE THE TRANSFER REQUEST
+                    yield schema_1.default.Transfers().create({
+                        user: uid,
+                        amount: amount,
+                        anumber: anumber,
+                        bank: bank,
+                        date: today
+                    });
+                    if (admin) {
+                        //notify admin
+                        let chunks = expo.chunkPushNotifications([{
+                                "to": admin.pushToken,
+                                "sound": "default",
+                                "channelId": "notification-sound-channel",
+                                "title": "Transfer Request!",
+                                "body": `Please attend to the transfer request ASAP!.`
+                            }]);
+                        let tickets = [];
+                        (() => __awaiter(this, void 0, void 0, function* () {
+                            for (let chunk of chunks) {
+                                try {
+                                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                    console.log(ticketChunk);
+                                    tickets.push(...ticketChunk);
+                                }
+                                catch (error) {
+                                    console.error(error);
+                                }
+                            }
+                        }))();
+                    }
+                    return response.status(200).send({
+                        message: 'Transfer Request Funded!'
+                    });
+                }
+                else {
+                    console.log('User not found');
+                    return response.status(500).send({
+                        message: 'User not found'
+                    });
+                }
+            }
+            catch (err) {
+                console.log(err);
+                return response.status(500).send({
+                    message: 'An error occured'
+                });
+            }
+        });
+    }
+    //UPDATE A TRANSFER REQUEST
+    static updateTransfer(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { amount, uid } = request.body;
+            console.log(amount);
+            console.log(uid);
+            try {
+                const user = yield schema_1.default.User().findOne({ _id: uid });
+                console.log(user);
+                const new_amount = user.balance - amount;
+                console.log("new amount " + new_amount);
+                if (user) {
+                    //update amount
+                    yield schema_1.default.User()
+                        .updateOne({
+                        _id: uid,
+                    }, {
+                        $set: {
+                            balance: new_amount,
+                        }
+                    });
+                    yield schema_1.default.Transaction().create({
+                        user: uid,
+                        amount: amount,
+                        status: 'withdraw',
+                        date: today
+                    });
+                    return response.status(200).send({
+                        message: 'Re-Funded!'
+                    });
+                }
+                else {
+                    console.log('User not found');
+                    return response.status(500).send({
+                        message: 'User not found'
+                    });
+                }
+            }
+            catch (err) {
+                console.log(err);
+                return response.status(500).send({
+                    message: 'An error occured'
+                });
+            }
         });
     }
 }
