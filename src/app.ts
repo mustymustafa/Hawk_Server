@@ -720,7 +720,7 @@ const notificationB = cron.schedule("28 20 * * *", async () => {
 
 
   const get_users = await Schema.Artisan().find({pushToken: {$exists: true} })
- console.log("users:" + get_users)
+  console.log("users:" + get_users)
 
   get_users.map(users => {
  
@@ -752,6 +752,42 @@ const notificationB = cron.schedule("28 20 * * *", async () => {
 );
 
 
+
+//gen notification
+
+const genNot = async () => {
+  
+  const get_users = await Schema.User().find({pushToken: {$exists: true} })
+  console.log("users:" + get_users)
+
+  get_users.map(users => {
+ 
+    console.log("tokens:" + users.pushToken)
+    let chunks = expo.chunkPushNotifications([{
+      "to": [users.pushToken],
+      "sound": "default",
+      "title": "Christmas Break",
+      "body": "Dear lovely customers, we want to inform you that we will be closed from the 25th of December till the 3rd of January. Have a wonderful Christmas and a Happy New Year! :)"
+    }]);
+    let tickets = [];
+    (async () => {
+      for (let chunk of chunks) {
+        try {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+       
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    })();
+    })
+  
+  }
+
+
+//genNot()
 
 deleteU.start();
 //freeDiscount.start();
