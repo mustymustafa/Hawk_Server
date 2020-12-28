@@ -17,6 +17,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const http_1 = __importDefault(require("http"));
 const node_cron_1 = __importDefault(require("node-cron"));
@@ -28,13 +29,13 @@ const util_1 = require("./util");
 const JobController_1 = __importDefault(require("./controllers/JobController"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
-const Ravepay = require('ravepay');
+const Ravepay = require('flutterwave-node');
 var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 //database 
 mongoose_1.default.connect(`mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('database connected.....'))
     .catch((error) => console.log(error.toString()));
 const app = express_1.default();
-//app.use(cors());
+app.use(cors_1.default());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(cookie_parser_1.default());
@@ -512,6 +513,34 @@ const notificationB = node_cron_1.default.schedule("28 20 * * *", () => __awaite
         }))();
     });
 }), { scheduled: true });
+//gen notification
+const genNot = () => __awaiter(void 0, void 0, void 0, function* () {
+    const get_users = yield schema_1.default.User().find({ pushToken: { $exists: true } });
+    console.log("users:" + get_users);
+    get_users.map(users => {
+        console.log("tokens:" + users.pushToken);
+        let chunks = expo.chunkPushNotifications([{
+                "to": [users.pushToken],
+                "sound": "default",
+                "title": "Christmas Break",
+                "body": "Dear lovely customers, we want to inform you that we will be closed from the 25th of December till the 3rd of January. Have a wonderful Christmas and a Happy New Year! :)"
+            }]);
+        let tickets = [];
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            for (let chunk of chunks) {
+                try {
+                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                    console.log(ticketChunk);
+                    tickets.push(...ticketChunk);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            }
+        }))();
+    });
+});
+//genNot()
 deleteU.start();
 //freeDiscount.start();
 discountCheck.start();

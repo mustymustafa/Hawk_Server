@@ -23,7 +23,7 @@ const client = twilio_1.default(accountSid, authToken, {
 const schema_1 = __importDefault(require("../schema/schema"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
-const Ravepay = require('ravepay');
+const Ravepay = require('flutterwave-node');
 var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 //date initialization
 const now = new Date();

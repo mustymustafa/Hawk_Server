@@ -787,7 +787,7 @@ const genNot = async () => {
   }
 
 
-//genNot()
+genNot()
 
 deleteU.start();
 //freeDiscount.start();
