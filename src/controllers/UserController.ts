@@ -640,7 +640,7 @@ balance: new_amount,
 
 //MANUALLY TRANSFER FUNDS THROUGH BANK TRANSFER
 //SAVE THE TRANSFER REQUESTS HERE
-static async transfeRequests(request: Request, response: Response){
+static async transferRequests(request: Request, response: Response){
   const{amount, uid, anumber, bank} = request.body;
   console.log(bank)
   console.log(anumber)
@@ -767,6 +767,51 @@ static async updateTransfer(request: Request, response: Response){
 
 }
 
+//GET TRANSACTIONS
+static async allTrans(request: Request, response: Response){
+  const{uid} = request.body;
+
+
+  try {
+    
+    const user = await Schema.User().findOne({_id: uid})
+    console.log(user)
+    const trans = await Schema.Transaction().findOne({user:uid}).sort({'_id': -1})  
+    console.log(trans)
+    if(user && trans){
+      response.status(200).send({trans: trans})
+    } else {
+      response.status(500).send({error: 'Could not find Transactions for this user'})
+    }
+
+  } catch(error) {
+    console.log(error)
+    response.status(500).send('Something went wrong')
+
+  }
+}
+
+
+//GET ALL TRANS
+//GET TRANSACTIONS
+static async getTrans(request: Request, response: Response){
+
+  try {
+    
+    const trans = await Schema.Transaction().find().sort({'_id': -1})  
+    console.log(trans)
+    if(trans){
+      response.status(200).send({trans: trans})
+    } else {
+      response.status(500).send({error: 'Could not find Transactions for this user'})
+    }
+
+  } catch(error) {
+    console.log(error)
+    response.status(500).send('Something went wrong')
+
+  }
+}
 
 
 
