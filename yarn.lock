@@ -967,6 +967,21 @@ finalhandler@~1.1.2:
     statuses "~1.5.0"
     unpipe "~1.0.0"
 
+flutterwave-node-v3@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/flutterwave-node-v3/-/flutterwave-node-v3-1.0.6.tgz#90a0753211e7fc251ea258db13d2711fa597a732"
+  integrity sha512-Ig8N4GsLEK8HRrB8XRj8eeXyaLNBEvT6kq/KhUwDh0c/JWvwDMxVHMcJUQrcx9UEPjyTFxFE02IJ8w1SKTYfYg==
+  dependencies:
+    axios "^0.19.2"
+    bluebird "^3.5.0"
+    chai-as-promised-also-chain "^1.0.2"
+    md5 "2.2.1"
+    morx "0.0.5"
+    node-forge "0.10.0"
+    q "1.5.0"
+    request "^2.88.2"
+    sha.js "2.4.8"
+
 flutterwave-node@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/flutterwave-node/-/flutterwave-node-1.2.0.tgz#a71637f6f6cb98f818eaa7c7954dc595cd670511"
@@ -1789,6 +1804,11 @@ node-fetch@^2.6.0:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
+node-forge@0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
+  integrity sha512-PPmu8eEeG9saEUvI97fm4OYxXVB6bFvyNTyiUOBichBpFG8A1Ljw3bY62+5oOjDEMHRnd0Y7HQ+x7uzxOzC6JA==
+
 node-forge@0.7.1:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.7.1.tgz#9da611ea08982f4b94206b3beb4cc9665f20c300"
@@ -2165,7 +2185,7 @@ registry-url@^5.0.0:
   dependencies:
     rc "^1.2.8"
 
-request@^2.88.0:
+request@^2.88.0, request@^2.88.2:
   version "2.88.2"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
   integrity sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==

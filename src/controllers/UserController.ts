@@ -21,8 +21,8 @@ import { Expo } from "expo-server-sdk";
 
 const expo = new Expo();
 
-const Ravepay = require('flutterwave-node');
-var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
+const Flutterwave = require('flutterwave-node-v3');
+const rave = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 
 
 
@@ -579,6 +579,7 @@ static async withdrawFund(request: Request, response: Response){
       "amount": amount,
       "narration": `Platabox Wallet Withdrawal of ${amount}`,
       "currency": "NGN",
+      "debit_currency": "NGN",
       "reference":"pbwd-"+ Date.now()
   }
   const resp = await rave.Transfer.initiate(payload)

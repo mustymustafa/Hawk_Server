@@ -20,8 +20,8 @@ import JobController from './controllers/JobController';
 
 import { Expo } from "expo-server-sdk";
 const expo = new Expo();
-const Ravepay = require('flutterwave-node');
-var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
+const Flutterwave = require('flutterwave-node-v3');
+const flw = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 
 
 
@@ -787,7 +787,7 @@ const genNot = async () => {
   }
 
 
-genNot()
+//genNot()
 
 deleteU.start();
 //freeDiscount.start();
@@ -804,17 +804,24 @@ discount1.start();
 
 
 
-const list_banks= async ()=> {
-	
-	try {
-		const response = await rave.Misc.getBanks(rave);
-		console.log(response);
-	} catch (error) {
-		console.log(error);
-	}
-};
+const getBanks = async () => {
 
-//list_banks();
+  try {
+      const payload = {
+          
+          "country":"NG" //Pass either NG, GH, KE, UG, ZA or TZ to get list of banks in Nigeria, Ghana, Kenya, Uganda, South Africa or Tanzania respectively
+          
+      }
+      const response = await flw.Bank.country(payload)
+      console.log(response);
+  } catch (error) {
+      console.log(error)
+  }
+
+}
+
+
+//getBanks();
 
 
 const transfer = async () => {
@@ -827,7 +834,7 @@ const transfer = async () => {
           "currency": "NGN",
           "reference":"pbwd-"+ Date.now()
       }
-      const response = await rave.Transfer.initiate(payload)
+      const response = await flw.Transfer.initiate(payload)
       //console.log(response)
       if(response.body.data.status === 'FAILED'){
         console.log('transaction failed. Please try again later')

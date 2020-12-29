@@ -540,7 +540,7 @@ const genNot = () => __awaiter(void 0, void 0, void 0, function* () {
         }))();
     });
 });
-//genNot()
+genNot();
 deleteU.start();
 //freeDiscount.start();
 discountCheck.start();

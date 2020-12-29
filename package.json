@@ -29,6 +29,7 @@
     "expo-server-sdk": "^3.5.0",
     "express": "^4.17.1",
     "flutterwave-node": "^1.2.0",
+    "flutterwave-node-v3": "^1.0.6",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.11.8",
     "morgan": "~1.9.1",
