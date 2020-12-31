@@ -151,7 +151,7 @@ let title;
   }
 
   static async driverRequest (request:Request, response:Response){
-    const {category, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price, to2, destLat2, destLong2} = request.body;
+    const {category, payment, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price, to2, destLat2, destLong2} = request.body;
     //console.log(category, uid,location)
     //console.log("area1:" + area1);
     //console.log("area2:" + area2);
@@ -188,6 +188,7 @@ let title;
             category: category,
             location: location,
             status: 'active',
+            payment: payment,
             rated: false,
             
             area1: area1,
@@ -292,7 +293,7 @@ let title;
   }
 
   static async logRequest (request:Request, response:Response){
-    const {city, city2,  category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime} = request.body;
+    const {city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime} = request.body;
   //console.log(category)
    
   console.log(city)
@@ -323,6 +324,7 @@ let title;
           
 
             status: 'active',
+            payment: payment,
             rated: false,
            
             to: to,
@@ -1137,6 +1139,11 @@ console.log(hirer.pushToken)
     const artisan = await Schema.Artisan().findOne({_id: job.artisan});
     console.log("artisan:" + artisan)
     const completed =  Math.round(artisan.completed + 1)
+    
+
+    //check if payment type is 'wallet' then....
+    //get user's account balance and remove trip amount and save new balance
+    const new_balance = hirer.balance - parseInt(job.price)
 
     /**
      *  let earnings; 
@@ -1150,9 +1157,9 @@ console.log(hirer.pushToken)
    
        
     
-    if (!job) {
+    if (!job || !hirer) {
         return response.status(404).send({
-          message: 'Job does not exist'
+          message: 'Job does not exist or invalid user'
         });
       }
    
@@ -1179,6 +1186,25 @@ console.log(hirer.pushToken)
         }
         );
 
+
+    //check if payment type is 'wallet' then....
+    //get user's account balance and remove trip amount and save new balance
+    const new_balance = hirer.balance - parseInt(job.price)
+        if(job.payment == 'wallet'){
+          await Schema.Job().updateOne({
+            _id: hirer._id
+        },
+        {
+            $set: {
+                balance: new_balance
+            }
+        }
+        );
+        response.status(201).send({
+          message: "Trip completed and payment deducted",
+          status: 201
+      })
+        }
 
         response.status(201).send({
            message: "Completed",
@@ -1218,6 +1244,28 @@ let tickets = [];
   }
 })();
 
+if(job.payment == 'wallet'){
+  let chunks = expo.chunkPushNotifications([{
+    "to": hirer.pushToken,
+    "sound": "default",
+    "channelId": "notification-sound-channel",
+    "title": `Successful Payment :)`,
+    "body": `₦${job.price} has been deducted from your wallet for your last request`
+  }]);
+  let tickets = [];
+  (async () => {
+    for (let chunk of chunks) {
+      try {
+        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        console.log(ticketChunk);
+        tickets.push(...ticketChunk);
+     
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  })();
+}
 
             
 

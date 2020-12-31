@@ -660,9 +660,16 @@ static async transferRequests(request: Request, response: Response){
       const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
       console.log(user);
       console.log(admin)
+      const limit = parseInt(user.balance) - 50
 
     if(user){
       //SAVE THE TRANSFER REQUEST
+      if(anumber.length > 10 || anumber.length < 10){
+        return response.send({message: "Account number should be 10 digits"})
+    }
+      if(amount > limit){
+        return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
+    }
     await Schema.Transfers().create({
       user: uid,
       amount: amount,

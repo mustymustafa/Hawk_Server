@@ -118,6 +118,7 @@ class Schema {
             pTime: String,
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
             artisan: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
+            payment: String,
             artisan_name: String,
             location:  String,
             to: String, 
