@@ -838,16 +838,16 @@ const transfer = async () => {
           "reference":"pbwd-"+ Date.now()
       }
       const response = await flw.Transfer.initiate(payload)
-      //console.log(response)
-      if(response.body.data.status === 'FAILED'){
+      console.log(response)
+      if(response.data.status === 'FAILED'){
         console.log('transaction failed. Please try again later')
       }
 
-      if(response.body.data.status === 'NEW'){
+      if(response.data.status === 'NEW'){
         console.log('Transaction Successful')
       }
 
-      if(response.body.data.fullname === 'N/A'){
+      if(response.data.fullname === 'N/A'){
         console.log('Invalid account number')
       }
 
@@ -855,7 +855,7 @@ const transfer = async () => {
       console.log(error)
   }
 }
-//transfer();
+transfer();
 
 
 

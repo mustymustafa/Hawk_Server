@@ -506,7 +506,7 @@ static async fundWallet(request: Request, response: Response){
   const user = await Schema.User().findOne({_id: uid});
   console.log(user);
 
-  const new_amount = user.balance + amount
+  const new_amount = parseInt(user.balance) + parseInt(amount)
   console.log("new amount " + new_amount)
 
   if(user){
@@ -559,16 +559,19 @@ static async withdrawFund(request: Request, response: Response){
   try {
   const user = await Schema.User().findOne({_id: uid});
   console.log(user);
-  const new_amount = user.balance - amount
-  const limit = user.balance - 50
+  const new_amount = parseInt(user.balance) - parseInt(amount)
+  const limit = parseInt(user.balance) - 50
   console.log(limit)
 
 
   if(user){
     //check if amount the amount is greatr than the limit
+    if(anumber.length > 10 || anumber.length < 10){
+      return response.send({message: "Account number should be 10 digits"})
+  }
     if(amount > limit){
       return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
-    }
+  }
 
     else {
 
@@ -585,14 +588,14 @@ static async withdrawFund(request: Request, response: Response){
   const resp = await rave.Transfer.initiate(payload)
   console.log(resp)
 
-  if(resp.body.data.status === 'FAILED'){
+  if(resp.data.status === 'FAILED'){
     console.log('transaction failed. Please try again later')
     return response.send({
       message: 'Transaction failed. Please try again later'
     });
   }
 
-  if(resp.body.data.status === 'NEW'){
+  if(resp.data.status === 'NEW'){
     console.log('Transaction Successful')
     // if successful
     // send success message
@@ -621,18 +624,21 @@ balance: new_amount,
   });
   }
 
-  if(resp.body.data.fullname === 'N/A'){
+  if(resp.data.fullname === 'N/A'){
     console.log('Invalid account number')
     return response.send({
       message: 'Invalid account number'
     });
   }  
   }  
+}  else {
+  return response.send({message: "User not found"})
+  
 }
   } catch(error) {
       console.log(error)
       return response.status(401).send({
-        message: 'User not found'
+        message: 'Something went wrong. please try again'
       });
   }
 }
