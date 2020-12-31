@@ -587,11 +587,16 @@ static async withdrawFund(request: Request, response: Response){
   }
   const resp = await rave.Transfer.initiate(payload)
   console.log(resp)
-
+  if(resp.data.fullname === 'N/A'){
+    console.log('Invalid account number')
+    return response.send({
+      message: 'Invalid account number'
+    });
+  }  
   if(resp.data.status === 'FAILED'){
     console.log('transaction failed. Please try again later')
     return response.send({
-      message: 'Transaction failed. Please try again later'
+      message: 'Transaction failed. Please check your account details and try again'
     });
   }
 
@@ -624,12 +629,7 @@ balance: new_amount,
   });
   }
 
-  if(resp.data.fullname === 'N/A'){
-    console.log('Invalid account number')
-    return response.send({
-      message: 'Invalid account number'
-    });
-  }  
+ 
   }  
 }  else {
   return response.send({message: "User not found"})
