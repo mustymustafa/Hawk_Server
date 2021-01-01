@@ -313,11 +313,11 @@ let title;
     console.log(payment)
 
     if(!user){
-      return response.status(400).send({error: "User not found"})
+      return response.status(404).send({error: "User not found"})
     }
 
     if(payment == 'wallet' && parseInt(user.balnace) < parseInt(price)){
-      return response.status(400).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
+      return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
     } else {
 
     
