@@ -188,12 +188,12 @@ const today = month + '/' + day + '/' + year
     const user = await Schema.User().findOne({_id: uid});
     console.log(parseInt(price));
     console.log(user.balance);
-    console.log(payment == 'wallet' && user.balnace < parseInt(price))
+    console.log(payment == 'wallet' && user.balnace < price)
 
   
     try {
 
-      if(payment == 'wallet' && user.balnace < parseInt(price)){
+      if(payment == 'wallet' && user.balnace < price){
           return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
         }
   
@@ -207,7 +207,6 @@ const today = month + '/' + day + '/' + year
         //console.log("end:" + endAt)
         //console.log("now:" + now)
 
-        /** 
       const job =  await Schema.Job().create({
             user: uid,
           
@@ -319,7 +318,7 @@ const today = month + '/' + day + '/' + year
 
      })
      
-   **/
+   
       
   
     
