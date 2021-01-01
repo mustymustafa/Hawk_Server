@@ -32,129 +32,6 @@ const today = month + '/' + day + '/' + year
  class JobController {
 
 
-  static async createJob (request:Request, response:Response){
-    const {category, uid, location, description, area1, area2} = request.body;
-    console.log(category, uid,location, description)
-    console.log("area1:" + area1);
-    console.log("area2:" + area2);
-    
-
-    let savedTokens;
-
-
-    try {
-        if(!description){
-            console.log("no desc")
-            return  response.status(409).send({
-                message: 'Please enter a description',
-              });
-        } 
-        if(!location){
-            console.log("no loc")
-            return  response.status(409).send({
-                message: 'Please enter a location',
-              });
-        } 
-       
-                 //find user{}
-//                 const user = await Schema.User().findById({_id: uid})
-  //               .populate({path: 'user', model: Schema.Job() }).exec()
-     
-       // console.log(user);
-
-        //create job
-        const dt = new Date()
-        //const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
-        //console.log(createdAt)
-        //console.log("end:" + endAt)
-        //console.log("now:" + now)
-
-        await Schema.Job().create({
-            user: uid,
-            category: category,
-            location: location,
-            description: description,
-            status: 'active',
-            rated: false,
-            area1: area1,
-            area2: area2,
-            createdAt: today,
-            
-            active: true
-
-        })
- 
-        response.status(201).send({
-            message: 'Job created successfully',
-            status: 201
-          });
-
-
-let title;
-        
-     const artisan = await Schema.Artisan().findOne({category: category})
-     
-     if(category === 'driver'){
-       title = 'Ride Request'
-     }
-
-     if (category === 'log' || category === 'shop'){
-       title = 'Dispatch Rider Request'
-     }
-      const artis = artisan.pushToken;
-
-      savedTokens = artis;
-      
-      console.log(artis)
-      if (!artisan) {
-        return response.status(404).send({
-          message: 'No artisans found'
-        });
-      }
-     
-      
-
-
-      //send notification
-  
-      let chunks = expo.chunkPushNotifications([{
-        "to": savedTokens,
-        "sound": "default",
-        "channelId": "notification-sound-channel",
-        "title": title,
-        "body": "Open your Platabox App"
-      }]);
-      let tickets = [];
-      (async () => {
-        for (let chunk of chunks) {
-          try {
-            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-            console.log(ticketChunk);
-            tickets.push(...ticketChunk);
-         
-          } catch (error) {
-            console.error(error);
-          }
-        }
-      })();
-
-      
-
-      
-  
- 
-      
-  
-    
-    } catch(error){
-        console.log(error.toString());
-        response.status(500).send({
-          message: "Somenthing went wrong"
-        })
-    }
-
-
-  }
 
   static async driverRequest (request:Request, response:Response){
     const {category, payment, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price, to2, destLat2, destLong2} = request.body;
@@ -311,7 +188,7 @@ let title;
     const user = await Schema.User().findOne({_id: uid});
     console.log(parseInt(price));
     console.log(user.balance);
-    console.log(payment == 'wallet')
+    console.log(payment == 'wallet' && user.balnace < parseInt(price))
 
   
     try {
@@ -330,6 +207,7 @@ let title;
         //console.log("end:" + endAt)
         //console.log("now:" + now)
 
+        /** 
       const job =  await Schema.Job().create({
             user: uid,
           
@@ -441,7 +319,7 @@ let title;
 
      })
      
-   
+   **/
       
   
     
