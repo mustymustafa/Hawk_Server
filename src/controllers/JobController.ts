@@ -192,13 +192,13 @@ const today = month + '/' + day + '/' + year
     console.log(typeof(parseInt(price)))
     console.log(user.balance);
     console.log(user.balnace < parseInt(price))
-    console.log(payment == 'wallet' && user.balnace < parseInt(price))
+    console.log(payment == 'wallet' && parseInt(price) > user.balnace)
 
   
     try {
 
       if(payment == 'wallet'){
-        if(user.balnace < parseInt(price)){
+        if(parseInt(price) > user.balnace){
           return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
         
       }
