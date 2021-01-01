@@ -318,7 +318,9 @@ let title;
 
     if(payment == 'wallet' && parseInt(user.balnace) < parseInt(price)){
       return response.status(400).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
-    }
+    } else {
+
+    
     try {
 
 
@@ -452,7 +454,7 @@ let title;
           message: "Somenthing went wrong"
         })
     }
-
+  }
 
   }
 
