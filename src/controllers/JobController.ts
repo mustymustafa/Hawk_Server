@@ -1141,9 +1141,7 @@ console.log(hirer.pushToken)
     const completed =  Math.round(artisan.completed + 1)
     
 
-    //check if payment type is 'wallet' then....
-    //get user's account balance and remove trip amount and save new balance
-    const new_balance = hirer.balance - parseInt(job.price)
+
 
     /**
      *  let earnings; 
@@ -1200,10 +1198,6 @@ console.log(hirer.pushToken)
             }
         }
         );
-        response.status(201).send({
-          message: "Trip completed and payment deducted",
-          status: 201
-      })
         }
 
         response.status(201).send({
