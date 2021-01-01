@@ -1201,6 +1201,7 @@ console.log(hirer.pushToken)
         }
         );
         const new_balance = hirer.balance - parseInt(job.price)
+        console.log(new_balance)
         if(job.payment == 'wallet'){
           await Schema.Job().updateOne({
             _id: hirer._id
