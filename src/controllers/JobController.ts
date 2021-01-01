@@ -22,6 +22,12 @@ var transporter = nodemailer.createTransport({
  });
 
 
+ //date initialization
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
 
  class JobController {
 
@@ -72,7 +78,7 @@ var transporter = nodemailer.createTransport({
             rated: false,
             area1: area1,
             area2: area2,
-            createdAt: dt,
+            createdAt: today,
             
             active: true
 
@@ -209,7 +215,7 @@ let title;
             time: time,
             price: price,
             distance: distance,
-            createdAt: dt,
+            createdAt: today,
             active: true
 
         })
@@ -300,7 +306,18 @@ let title;
 
     let savedTokens;
 
+    //check if it's a wallet payment
+    //verify if user has enough money
+    const user = await Schema.User().findOne({_id: uid});
+    console.log(user);
 
+    if(!user){
+      return response.status(400).send({error: "User not found"})
+    }
+
+    if(parseInt(user.balnace) < parseInt(price)){
+      return response.status(400).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
+    }
     try {
 
 
@@ -353,7 +370,7 @@ let title;
             time: time,
             price: price,
             distance: distance,
-            createdAt: createdAt,
+            createdAt: today,
             endAt: endAt,
             now: now,
             active: true
@@ -1183,11 +1200,7 @@ console.log(hirer.pushToken)
           }
         }
         );
-
-
-    //check if payment type is 'wallet' then....
-    //get user's account balance and remove trip amount and save new balance
-    const new_balance = hirer.balance - parseInt(job.price)
+        const new_balance = hirer.balance - parseInt(job.price)
         if(job.payment == 'wallet'){
           await Schema.Job().updateOne({
             _id: hirer._id
@@ -1198,23 +1211,18 @@ console.log(hirer.pushToken)
             }
         }
         );
+        await Schema.Transaction().create({
+          user: hirer._id,
+          amount: job.price,
+          status: 'withdraw',
+          date: today
+          })
         }
-
         response.status(201).send({
            message: "Completed",
            status: 201
        })
     
-       
-
-
-
-
-
-
-
-
-
 //send notification
 
 let chunks = expo.chunkPushNotifications([{
@@ -1244,7 +1252,7 @@ if(job.payment == 'wallet'){
     "sound": "default",
     "channelId": "notification-sound-channel",
     "title": `Successful Payment :)`,
-    "body": `₦${job.price} has been deducted from your wallet for your last request`
+    "body": `₦ ${job.price} has been deducted from your wallet for your last request`
   }]);
   let tickets = [];
   (async () => {
@@ -1277,6 +1285,9 @@ if(job.payment == 'wallet'){
   }
 
   
+
+
+
 
   static async artisanJobs(request:Request, response:Response) {
     const {uid} = request.body; 
