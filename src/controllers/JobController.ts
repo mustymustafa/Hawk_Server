@@ -186,26 +186,8 @@ const today = month + '/' + day + '/' + year
     //check if it's a wallet payment
     //verify if user has enough money
     const user = await Schema.User().findOne({_id: uid});
-    console.log(payment == 'wallet')
-    console.log(parseInt(price));
-    console.log(typeof(user.balance));
-    console.log(typeof(parseInt(price)))
-    console.log(user.balance);
-    console.log(user.balnace < parseInt(price))
-    console.log(payment == 'wallet' && parseInt(price) > user.balnace)
 
-  
     try {
-
-      if(payment == 'wallet'){
-        if(Number(price) > Number(user.balnace)){
-          return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
-        
-      }
-        
-        }
-  
-
         //create job
         const dt = new Date()
         const now = dt.setMinutes( dt.getMinutes());
