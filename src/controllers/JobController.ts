@@ -189,6 +189,7 @@ const today = month + '/' + day + '/' + year
     console.log(payment == 'wallet')
     console.log(parseInt(price));
     console.log(user.balance);
+    console.log(user.balnace < parseInt(price))
     console.log(payment == 'wallet' && user.balnace < parseInt(price))
 
   
