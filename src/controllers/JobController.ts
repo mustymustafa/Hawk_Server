@@ -313,17 +313,13 @@ let title;
     console.log(user.balance);
     console.log(payment == 'wallet')
 
-    if(payment == 'wallet'){
-      if(user.balnace < parseInt(price)){
-        return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
-    
-      }
-    
-    } 
-
-    
+  
     try {
 
+      if(payment == 'wallet' && user.balnace < parseInt(price)){
+          return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
+        }
+  
 
         //create job
         const dt = new Date()
