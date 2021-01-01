@@ -188,6 +188,8 @@ const today = month + '/' + day + '/' + year
     const user = await Schema.User().findOne({_id: uid});
     console.log(payment == 'wallet')
     console.log(parseInt(price));
+    console.log(typeof(user.balance));
+    console.log(typeof(parseInt(price)))
     console.log(user.balance);
     console.log(user.balnace < parseInt(price))
     console.log(payment == 'wallet' && user.balnace < parseInt(price))
