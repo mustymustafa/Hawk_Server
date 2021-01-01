@@ -118,7 +118,7 @@ app.get('/api/v1/drivers', ArtisanController.getDrivers);
 //push notification
 app.post('/api/v1/token/:uid', UserController.savePushToken);
 
-app.post('/api/v1/jobrequest', JobController.createJob);
+//app.post('/api/v1/jobrequest', JobController.createJob);
 app.post('/api/v1/driverrequest', JobController.driverRequest);
 app.post('/api/v1/logrequest', JobController.logRequest);
 
