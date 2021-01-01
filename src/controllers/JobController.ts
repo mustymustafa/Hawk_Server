@@ -315,7 +315,7 @@ let title;
       return response.status(400).send({error: "User not found"})
     }
 
-    if(parseInt(user.balnace) < parseInt(price)){
+    if(payment == 'wallet' && parseInt(user.balnace) < parseInt(price)){
       return response.status(400).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
     }
     try {
