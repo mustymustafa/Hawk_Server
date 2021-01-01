@@ -309,7 +309,8 @@ let title;
     //check if it's a wallet payment
     //verify if user has enough money
     const user = await Schema.User().findOne({_id: uid});
-    console.log(user);
+    console.log(user.balance);
+    console.log(payment)
 
     if(!user){
       return response.status(400).send({error: "User not found"})
