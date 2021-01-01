@@ -198,7 +198,7 @@ const today = month + '/' + day + '/' + year
     try {
 
       if(payment == 'wallet'){
-        if(parseInt(price) > user.balnace){
+        if(Number(price) > Number(user.balnace)){
           return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
         
       }
