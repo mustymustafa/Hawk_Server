@@ -58,7 +58,7 @@ const today = month + '/' + day + '/' + year
 
       if(payment == 'wallet' && price > user.balance){
         console.log("You don't have sufficient balance in your wallet. Please fund your wallet and try again")
-          return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
+          return response.send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
         
       }
 
