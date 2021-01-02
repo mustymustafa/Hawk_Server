@@ -52,8 +52,15 @@ const today = month + '/' + day + '/' + year
 
     let savedTokens;
 
+    const user = await Schema.User().findOne({_id: uid});
 
     try {
+
+      if(payment == 'wallet' && price > user.balance){
+        console.log("You don't have sufficient balance in your wallet. Please fund your wallet and try again")
+          return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
+        
+      }
 
 
         //create job
@@ -183,11 +190,18 @@ const today = month + '/' + day + '/' + year
 
     let savedTokens;
 
-    //check if it's a wallet payment
-    //verify if user has enough money
+    
     const user = await Schema.User().findOne({_id: uid});
 
     try {
+
+      //check if it's a wallet payment
+    //verify if user has enough money
+    if(payment == 'wallet' && price > user.balance){
+        console.log("You don't have sufficient balance in your wallet. Please fund your wallet and try again")
+          return response.status(500).send({error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again"})
+        
+      }
         //create job
         const dt = new Date()
         const now = dt.setMinutes( dt.getMinutes());
