@@ -1550,12 +1550,12 @@ static async getDriverRegistartion(request: Request, response: Response) {
           message: 'User does not exist'
         });
       }
-      if (user.pushToken === token) {
+     /**  if (user.pushToken === token) {
         console.log("token exists already")
         return response.status(404).send({
           message: 'token exists already'
         });
-      }
+      }*/
       await Schema.Artisan()
         .updateOne({
           _id: user._id,
@@ -1775,12 +1775,12 @@ static async withdrawFund(request: Request, response: Response){
     // send success message
 
     //remove amount
-  await Schema.User()
+  await Schema.Artisan()
   .updateOne({
 _id: uid,
 }, {
 $set: {
-balance: new_amount,
+earnings: new_amount,
 }
    });
 
@@ -1825,11 +1825,11 @@ static async transferRequests(request: Request, response: Response){
 
 
     try {
-      const user = await Schema.User().findOne({_id: uid});
+      const user = await Schema.Artisan().findOne({_id: uid});
       const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
       console.log(user);
       console.log(admin)
-      const limit = parseInt(user.balance) - 50
+      const limit = parseInt(user.earnings) - 50
 
     if(user){
       //SAVE THE TRANSFER REQUEST
@@ -1904,10 +1904,10 @@ static async updateTransfer(request: Request, response: Response){
 
   
     try {
-      const user = await Schema.User().findOne({_id: uid});
+      const user = await Schema.Artisan().findOne({_id: uid});
       console.log(user);
     
-      const new_amount = user.balance - amount
+      const new_amount = user.earnings - amount
       console.log("new amount " + new_amount)
       if(user){
         //update amount
@@ -1916,7 +1916,7 @@ static async updateTransfer(request: Request, response: Response){
       _id: uid,
     }, {
     $set: {
-      balance: new_amount,
+      earnings: new_amount,
     }
   });
 
@@ -1956,7 +1956,7 @@ static async allTrans(request: Request, response: Response){
 
   try {
     
-    const user = await Schema.User().findOne({_id: uid})
+    const user = await Schema.Artisan().findOne({_id: uid})
     console.log(user)
     const trans = await Schema.Transaction().findOne({user:uid}).sort({'_id': -1})  
     console.log(trans)
