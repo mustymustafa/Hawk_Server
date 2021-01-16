@@ -208,6 +208,11 @@ app.post('/api/v1/:uid/transferRequest', UserController.transferRequests);
 app.post('/api/v1/:uid/updateTransfer', UserController.updateTransfer);
 app.post('/api/v1/:uid/getTrans', UserController.getTrans);
 app.get('/api/v1/getTransactions', UserController.allTrans);
+//PLATABOX DRIVER WALLET
+app.post('/api/v1/:uid/driverwithdraw', ArtisanController.withdrawFund);
+app.post('/api/v1/:uid/drivertransferRequest', ArtisanController.transferRequests);
+app.post('/api/v1/:uid/driverupdateTransfer', ArtisanController.updateTransfer);
+app.post('/api/v1/:uid/drivergetTrans', ArtisanController.allTrans);
 
 
 
@@ -442,7 +447,7 @@ const today = month + '/' + day + '/' + year
 
 
 //2. check if today is discount then enable 
-const discountCheck1 = cron.schedule("00 10 * * *", async () => {
+const discountCheck1 = cron.schedule("10 00 * * *", async () => {
   
   console.log("discount check initialized");
 //find accounts
@@ -506,7 +511,7 @@ const next_promo = nmonth + '/' + nday + '/' + nyear
 
 
 // send discount notification
-const discount = cron.schedule("10 00 * * *", async () => {
+const discount = cron.schedule("00 10 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts
@@ -553,7 +558,7 @@ console.log("next promo: " + next_promo)
 {scheduled: true}
 );
 
-const discount1 = cron.schedule("13 00 * * *", async () => {
+const discount1 = cron.schedule("00 13 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accounts//standard date
@@ -605,8 +610,8 @@ const get_users = await Schema.User().find({promo: true, pushToken: {$exists: tr
 
 //FREE DISCOUNT**
 
-/** 
- const freeDiscount = cron.schedule("20 23 * * *", async () => {
+
+ const freeDiscount = cron.schedule("16 01 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accountsfree 
@@ -615,9 +620,12 @@ const get_users = await Schema.User().find({promo: true, pushToken: {$exists: tr
 const now = new Date();
 const month = now.getMonth() + 1
 const day = now.getDate()
+const nextday = now.getDate() + 1
 const year = now.getFullYear()
 const today = month + '/' + day + '/' + year
-const next_promo = "10/30/2020"
+const next_promo = month + '/' + nextday + '/' + year
+console.log("today: " + today);
+console.log("next promo: " + next_promo)
 //
 
   const get_users = await Schema.User().find({isConfirmed: true, pushToken: {$exists: true}})
@@ -672,7 +680,7 @@ const next_promo = "10/30/2020"
 
 {scheduled: true}
 );
-**/
+
  
 
 

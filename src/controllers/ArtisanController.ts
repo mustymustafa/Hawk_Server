@@ -13,6 +13,18 @@ import { Expo } from "expo-server-sdk";
 
 const expo = new Expo();
 
+const Flutterwave = require('flutterwave-node-v3');
+const rave = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
+
+
+
+//date initialization
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+
 
 
 import Schema from '../schema/schema';
@@ -1230,8 +1242,6 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
     var total = 0;
 
-    var expire = false;
-
     const { uid } = request.params;
     console.log(uid)
 
@@ -1259,25 +1269,25 @@ static async getDriverRegistartion(request: Request, response: Response) {
       
         console.log('total earnings:' + user.earnings)
         //amount to pay
-        var pay = Math.round(user.earnings * 0.40);
+        var pay = Math.round(user.earnings * 0.20);
         console.log('pay' + pay)
 
 
-        const dt = new Date();
-        const today = dt.toLocaleDateString();
+
 
         console.log("TODAY:" + today)
 
-        if(user.expireAt === today){
+        /**if(user.expireAt === today){
           expire = true
-        }
-        console.log("EXPIRIED?" + expire)
+        }*/
+
+        //console.log("EXPIRIED?" + expire)
         response.status(200).send({
           user,
           rating: rate,
           earning: user.earnings,
           pay: pay,
-          expired: expire
+          expired:false
 
         });
         // console.log(user)
@@ -1314,8 +1324,8 @@ static async getDriverRegistartion(request: Request, response: Response) {
           {
             $set: {
               active: true,
-              expireAt: now.toLocaleDateString(),
-              earnings: 0
+              //expireAt: now.toLocaleDateString(),
+              //earnings: 0
             }
           }
 
@@ -1586,8 +1596,8 @@ static async getDriverRegistartion(request: Request, response: Response) {
           {
             $set: {
               active: true,
-              expireAt: now.toLocaleDateString(),
-              earnings: 0
+              //expireAt: now.toLocaleDateString(),
+              //earnings: 0
             }
           }
 
@@ -1659,7 +1669,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
           {
             $set: {
               active: false,
-              expireAt: ''
+              //expireAt: ''
             }
           }
 
@@ -1707,6 +1717,263 @@ static async getDriverRegistartion(request: Request, response: Response) {
     }
 
   }
+
+  //PLATABOX WALLET
+
+//WITHDRAW FUNDS
+static async withdrawFund(request: Request, response: Response){
+  const {uid, bcode, amount, anumber} =  request.body;
+  //verify account number first
+  
+  try {
+  const user = await Schema.Artisan().findOne({_id: uid});
+  console.log(user);
+  const new_amount = parseInt(user.earnings) - parseInt(amount)
+  const limit = parseInt(user.earnings) - 50
+  console.log(limit)
+
+
+  if(user){
+    //check if amount the amount is greatr than the limit
+    if(anumber.length > 10 || anumber.length < 10){
+      return response.send({message: "Account number should be 10 digits"})
+  }
+    if(amount > limit){
+      return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
+  }
+
+    else {
+
+    
+    const payload = {
+      "account_bank": bcode,
+      "account_number": anumber,
+      "amount": amount,
+      "narration": `Platabox Wallet Withdrawal of ${amount}`,
+      "currency": "NGN",
+      "debit_currency": "NGN",
+      "reference":"pbwd-"+ Date.now()
+  }
+  const resp = await rave.Transfer.initiate(payload)
+  console.log(resp)
+  if(resp.data.fullname === 'N/A'){
+    console.log('Invalid account number')
+    return response.send({
+      message: 'Invalid account number'
+    });
+  }  
+  if(resp.data.status === 'FAILED'){
+    console.log('transaction failed. Please try again later')
+    return response.send({
+      message: 'Transaction failed. Please check your account details and try again'
+    });
+  }
+
+  if(resp.data.status === 'NEW'){
+    console.log('Transaction Successful')
+    // if successful
+    // send success message
+
+    //remove amount
+  await Schema.User()
+  .updateOne({
+_id: uid,
+}, {
+$set: {
+balance: new_amount,
+}
+   });
+
+  await Schema.Transaction().create({
+  user: uid,
+  amount: amount,
+  status: 'withdraw',
+  date: today
+  })
+
+  console.log('new amount ' + new_amount)
+
+  return response.send({
+    message: 'Transaction Successful'
+  });
+  }
+
+ 
+  }  
+}  else {
+  return response.send({message: "User not found"})
+  
+}
+  } catch(error) {
+      console.log(error)
+      return response.status(401).send({
+        message: 'Something went wrong. please try again'
+      });
+  }
+}
+
+
+//MANUALLY TRANSFER FUNDS THROUGH BANK TRANSFER
+//SAVE THE TRANSFER REQUESTS HERE
+static async transferRequests(request: Request, response: Response){
+  const{amount, uid, anumber, bank} = request.body;
+  console.log(bank)
+  console.log(anumber)
+  console.log(uid)
+
+
+
+
+    try {
+      const user = await Schema.User().findOne({_id: uid});
+      const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
+      console.log(user);
+      console.log(admin)
+      const limit = parseInt(user.balance) - 50
+
+    if(user){
+      //SAVE THE TRANSFER REQUEST
+      if(anumber.length > 10 || anumber.length < 10){
+        return response.send({message: "Account number should be 10 digits"})
+    }
+      if(amount > limit){
+        return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
+    }
+    await Schema.Transfers().create({
+      user: uid,
+      amount: amount,
+      anumber: anumber,
+      bank: bank,
+      date: today
+    })
+
+    if(admin){
+
+ //notify admin
+let chunks = expo.chunkPushNotifications([{
+  "to": admin.pushToken,
+  "sound": "default",
+  "channelId": "notification-sound-channel",
+  "title": "Transfer Request!",
+  "body": `Please attend to the transfer request ASAP!.`
+}]);
+let tickets = [];
+(async () => {
+  for (let chunk of chunks) {
+    try {
+      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+      console.log(ticketChunk);
+      tickets.push(...ticketChunk);
+   
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})();
+  
+    }
+    return response.status(200).send({
+      message: 'Transfer Request Funded!'
+    });
+  } else {
+    console.log('User not found')
+    return  response.status(500).send({
+      message: 'User not found'
+    });
+    
+  }
+
+  }catch(err){
+    console.log(err)
+    return  response.status(500).send({
+      message: 'An error occured'
+    });
+  }
+
+  
+
+
+}
+
+//UPDATE A TRANSFER REQUEST
+static async updateTransfer(request: Request, response: Response){
+  const{amount, uid} = request.body;
+  console.log(amount)
+  console.log(uid)
+
+
+  
+    try {
+      const user = await Schema.User().findOne({_id: uid});
+      console.log(user);
+    
+      const new_amount = user.balance - amount
+      console.log("new amount " + new_amount)
+      if(user){
+        //update amount
+    await Schema.User()
+    .updateOne({
+      _id: uid,
+    }, {
+    $set: {
+      balance: new_amount,
+    }
+  });
+
+  await Schema.Transaction().create({
+    user: uid,
+    amount: amount,
+    status: 'withdraw',
+    date: today
+  })
+
+  return  response.status(200).send({
+    message: 'Re-Funded!'
+  });
+} else {
+  console.log('User not found')
+  return  response.status(500).send({
+    message: 'User not found'
+  });
+  
+}
+
+} catch(err){
+  console.log(err)
+  return  response.status(500).send({
+    message: 'An error occured'
+  });
+}
+
+ 
+
+}
+
+//GET TRANSACTIONS
+static async allTrans(request: Request, response: Response){
+  const{uid} = request.body;
+
+
+  try {
+    
+    const user = await Schema.User().findOne({_id: uid})
+    console.log(user)
+    const trans = await Schema.Transaction().findOne({user:uid}).sort({'_id': -1})  
+    console.log(trans)
+    if(user && trans){
+      response.status(200).send({trans: trans})
+    } else {
+      response.status(500).send({error: 'Could not find Transactions for this user'})
+    }
+
+  } catch(error) {
+    console.log(error)
+    response.status(500).send('Something went wrong')
+
+  }
+}
+
+
 
 
 }

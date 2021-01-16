@@ -103,7 +103,7 @@ class Schema {
             isConfirmed: Boolean,
             isActivated: Boolean,
             createdAt: String,
-            expireAt: String,
+            //expireAt: String,
             active: {type: Boolean, default: false}
              
 
