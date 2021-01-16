@@ -1523,8 +1523,6 @@ static async getDriverRegistartion(request: Request, response: Response) {
 }
 
 
-
-
   static async savePushToken(request: Request, response: Response) {
 
     const { uid } = request.params;
@@ -1550,12 +1548,12 @@ static async getDriverRegistartion(request: Request, response: Response) {
           message: 'User does not exist'
         });
       }
-     /**  if (user.pushToken === token) {
+      if (user.pushToken === token) {
         console.log("token exists already")
         return response.status(404).send({
           message: 'token exists already'
         });
-      }*/
+      }
       await Schema.Artisan()
         .updateOne({
           _id: user._id,
@@ -1573,10 +1571,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
     }
   }
 
-
-
   //ADMIN ACTIVATE
-
    static async adminActivate(request: Request, response: Response) {
     const { uid } = request.params
     //const expire =  addWeek(new Date(), 1).toLocaleDateString();
