@@ -28,6 +28,7 @@ class Schema {
         const TranSchema = new mongoose.Schema({
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
             amount: Number,
+            anumber: Number,
             status: String,
             date: String
 

@@ -1782,6 +1782,7 @@ earnings: new_amount,
   await Schema.Transaction().create({
   user: uid,
   amount: amount,
+  anumber: anumber,
   status: 'withdraw',
   date: today
   })
