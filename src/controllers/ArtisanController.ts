@@ -1270,7 +1270,9 @@ static async getDriverRegistartion(request: Request, response: Response) {
         console.log('total earnings:' + user.earnings)
         //amount to pay
         var pay = Math.round(user.earnings * 0.20);
+        const available = parseInt(user.earnings) - pay
         console.log('pay' + pay)
+        console.log('available' + available)
 
 
 
@@ -1287,6 +1289,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
           rating: rate,
           earning: user.earnings,
           pay: pay,
+          available: available,
           expired:false
 
         });
@@ -1726,9 +1729,10 @@ static async withdrawFund(request: Request, response: Response){
 
  
   const pay = Math.round(user.earnings * 0.20);
+  const available = parseInt(user.earnings) - pay
   const new_amount = parseInt(user.earnings) - parseInt(amount)
 
-  const limit = pay - 50
+  const limit = available - 50
   console.log(limit)
 
 
