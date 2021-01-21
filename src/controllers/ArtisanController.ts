@@ -1954,7 +1954,7 @@ static async allTrans(request: Request, response: Response){
     
     const user = await Schema.Artisan().findOne({_id: uid})
     console.log(user)
-    const trans = await Schema.DTransaction().findOne({user:uid}).sort({'_id': -1})  
+    const trans = await Schema.DTransaction().find({user:uid}).sort({'_id': -1})  
     console.log(trans)
     if(user && trans){
       response.status(200).send({trans: trans})
