@@ -17,7 +17,7 @@ class Schema {
             next_promo: String,
             promo_date: String,
             createdAt: String,
-            balance: Number
+            balance: {type: Number, default: 0}
 
         })
         const User = mongoose.models.User || mongoose.model('User', UserSchema)
