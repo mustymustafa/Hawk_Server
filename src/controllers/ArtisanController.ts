@@ -1723,8 +1723,12 @@ static async withdrawFund(request: Request, response: Response){
   try {
   const user = await Schema.Artisan().findOne({_id: uid});
   console.log(user);
+
+ 
+  const pay = Math.round(user.earnings * 0.20);
   const new_amount = parseInt(user.earnings) - parseInt(amount)
-  const limit = parseInt(user.earnings) - 50
+
+  const limit = pay - 50
   console.log(limit)
 
 

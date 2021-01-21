@@ -122,6 +122,7 @@ class Schema {
             completed: {type: Number, default: 0},
             rating: [Number],
             earnings: {type: Number, default: 0},
+   
 
             comments: [String],
             area1: String,
