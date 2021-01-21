@@ -798,6 +798,45 @@ const genNot = async () => {
   }
 
 
+
+
+  const setBalance = async () => {
+  
+    console.log("balance initialized");
+  //find accountsfree 
+  
+
+  
+    const get_users = await Schema.User().find({isConfirmed: true, pushToken: {$exists: true}})
+   console.log("users:" + get_users)
+  
+   if(get_users){
+  
+    await Schema.User().updateMany({isConfirmed: true, pushToken: {$exists: true}},  
+      {$set: {
+        balance: 0,
+            
+      }
+    
+    },
+      function(err, result){ 
+      if(err) {
+        console.log(err)
+      } else {
+        console.log('Added balance');
+  
+      }
+      })
+    }
+  }
+  
+  //setBalance();
+
+  
+
+
+
+
 //genNot()
 
 deleteU.start();
