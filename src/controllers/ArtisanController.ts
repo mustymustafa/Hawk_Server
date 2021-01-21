@@ -1779,7 +1779,7 @@ earnings: new_amount,
 }
    });
 
-  await Schema.Transaction().create({
+  await Schema.DTransaction().create({
   user: uid,
   amount: amount,
   anumber: anumber,
@@ -1835,7 +1835,7 @@ static async transferRequests(request: Request, response: Response){
       if(amount > limit){
         return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
     }
-    await Schema.Transfers().create({
+    await Schema.DTransaction().create({
       user: uid,
       amount: amount,
       anumber: anumber,
@@ -1907,7 +1907,7 @@ static async updateTransfer(request: Request, response: Response){
       console.log("new amount " + new_amount)
       if(user){
         //update amount
-    await Schema.User()
+    await Schema.Artisan()
     .updateOne({
       _id: uid,
     }, {
@@ -1916,7 +1916,7 @@ static async updateTransfer(request: Request, response: Response){
     }
   });
 
-  await Schema.Transaction().create({
+  await Schema.DTransaction().create({
     user: uid,
     amount: amount,
     status: 'withdraw',
@@ -1954,7 +1954,7 @@ static async allTrans(request: Request, response: Response){
     
     const user = await Schema.Artisan().findOne({_id: uid})
     console.log(user)
-    const trans = await Schema.Transaction().findOne({user:uid}).sort({'_id': -1})  
+    const trans = await Schema.DTransaction().findOne({user:uid}).sort({'_id': -1})  
     console.log(trans)
     if(user && trans){
       response.status(200).send({trans: trans})

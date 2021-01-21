@@ -37,6 +37,19 @@ class Schema {
         return Transaction
     }
 
+    static DTransaction() {
+        const TranSchema = new mongoose.Schema({
+            user: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
+            amount: Number,
+            anumber: Number,
+            status: String,
+            date: String
+
+        })
+        const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TranSchema)
+        return Transaction
+    }
+
     static Transfers() {
         const TranSchema = new mongoose.Schema({
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
@@ -49,6 +62,20 @@ class Schema {
         const Transfer = mongoose.models.Transfer || mongoose.model('Transfer', TranSchema)
         return Transfer
     }
+
+    static DTransfers() {
+        const TranSchema = new mongoose.Schema({
+            user: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
+            amount: Number,
+            anumber: Number,
+            bank: String,
+            date: String
+
+        })
+        const Transfer = mongoose.models.Transfer || mongoose.model('Transfer', TranSchema)
+        return Transfer
+    }
+    
     
 
     static Artisan() {
