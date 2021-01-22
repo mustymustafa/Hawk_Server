@@ -912,7 +912,7 @@ const transfer = async () => {
 //transfer();
 
 
-const getBalance = async () => {
+
 
   var options = {
     'method': 'GET',
@@ -927,10 +927,10 @@ const getBalance = async () => {
       console.log(error)
     };
   
-    console.log(response.body.split(":")[5].split(",")[0]);
+  console.log(response.body.split(":")[5].split(",")[0]);
   });
-}
-getBalance();
+
+
 
 
 

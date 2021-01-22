@@ -1726,7 +1726,7 @@ static async withdrawFund(req: Request, response: Response){
 
 
   //check balance in platabox account
-  const getBalance = async () => {
+
   var options = {
     'method': 'GET',
     'url': 'https://api.flutterwave.com/v3/balances/NGN',
@@ -1736,14 +1736,16 @@ static async withdrawFund(req: Request, response: Response){
     }
   };
 
-  request(options, function (error, response) { 
+  request(options, function (error, resp) { 
     if(error){
       console.log(error)
     };
   
-    return parseInt(response.body.split(":")[5].split(",")[0])
+    console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
+     if(parseInt(resp.body.split(":")[5].split(",")[0]) < amount){
+     return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
+     }
   });
-}
   
   try {
   const user = await Schema.Artisan().findOne({_id: uid});
@@ -1767,9 +1769,7 @@ static async withdrawFund(req: Request, response: Response){
       return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
   }
 
-  if(getBalance() < amount){
-    return response.send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
-  }
+  
 
     else {
 
@@ -1851,26 +1851,25 @@ static async transferRequests(req: Request, response: Response){
   console.log(anumber)
   console.log(uid)
 
-  const getBalance = async () => {
-    var options = {
-      'method': 'GET',
-      'url': 'https://api.flutterwave.com/v3/balances/NGN',
-      'headers': {
-        'Authorization': `Bearer ${process.env.SECRET_KEY}`,
-        'Content-Type': 'application/json'
-      }
+  var options = {
+    'method': 'GET',
+    'url': 'https://api.flutterwave.com/v3/balances/NGN',
+    'headers': {
+      'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+      'Content-Type': 'application/json'
+    }
+  };
+
+  request(options, function (error, resp) { 
+    if(error){
+      console.log(error)
     };
   
-    request(options, function (error, response) { 
-      if(error){
-        console.log(error)
-      };
-    
-      return parseInt(response.body.split(":")[5].split(",")[0])
-    });
-  }
-    
-
+    console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
+     if(parseInt(resp.body.split(":")[5].split(",")[0]) < amount){
+     return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
+     }
+  });
 
     try {
       const user = await Schema.Artisan().findOne({_id: uid});
@@ -1888,10 +1887,7 @@ static async transferRequests(req: Request, response: Response){
         return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
     }
 
-    console.log('getB ' + getBalance())
-    if(getBalance() < amount){
-      return response.send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
-    }
+
 
     await Schema.DTransaction().create({
       user: uid,
