@@ -1772,8 +1772,8 @@ static async withdrawFund(req: Request, response: Response){
        "to": admin.pushToken,
        "sound": "default",
        "channelId": "notification-sound-channel",
-       "title": "Transfer Request!",
-       "body": `Please attend to the transfer request ASAP!.`
+       "title": "Insufficient wallet Balance!",
+         "body": `Check wallet balance ASAP!.`
      }]);
      let tickets = [];
      (async () => {
@@ -1920,8 +1920,8 @@ static async transferRequests(req: Request, response: Response){
          "to": admin.pushToken,
          "sound": "default",
          "channelId": "notification-sound-channel",
-         "title": "Transfer Request!",
-         "body": `Please attend to the transfer request ASAP!.`
+         "title": "Insufficient wallet Balance!",
+         "body": `Check wallet balance ASAP!.`
        }]);
        let tickets = [];
        (async () => {
