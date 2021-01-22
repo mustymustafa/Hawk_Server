@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import http from 'http';
+import request from 'request'
 
 import cron from 'node-cron';
 
@@ -19,6 +20,7 @@ import {upload} from './util'
 import JobController from './controllers/JobController';
 
 import { Expo } from "expo-server-sdk";
+
 const expo = new Expo();
 const Flutterwave = require('flutterwave-node-v3');
 const flw = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
@@ -835,6 +837,9 @@ const genNot = async () => {
   
 
 
+  //get balance from FW
+
+
 
 
 //genNot()
@@ -862,6 +867,8 @@ const getBanks = async () => {
           "country":"NG" //Pass either NG, GH, KE, UG, ZA or TZ to get list of banks in Nigeria, Ghana, Kenya, Uganda, South Africa or Tanzania respectively
           
       }
+
+      
       const response = await flw.Bank.country(payload)
       console.log(response);
   } catch (error) {
@@ -905,7 +912,25 @@ const transfer = async () => {
 //transfer();
 
 
+const getBalance = async () => {
 
+  var options = {
+    'method': 'GET',
+    'url': 'https://api.flutterwave.com/v3/balances/NGN',
+    'headers': {
+      'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+      'Content-Type': 'application/json'
+    }
+  };
+  request(options, function (error, response) { 
+    if(error){
+      console.log(error)
+    };
+  
+    console.log(response.body.split(":")[5].split(",")[0]);
+  });
+}
+getBalance();
 
 
 

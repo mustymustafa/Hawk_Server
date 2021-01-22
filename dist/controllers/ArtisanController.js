@@ -22,6 +22,14 @@ const client = twilio_1.default(accountSid, authToken, {
 });
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
+const Flutterwave = require('flutterwave-node-v3');
+const rave = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
+//date initialization
+const now = new Date();
+const month = now.getMonth() + 1;
+const day = now.getDate();
+const year = now.getFullYear();
+const today = month + '/' + day + '/' + year;
 const schema_1 = __importDefault(require("../schema/schema"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 var transporter = nodemailer_1.default.createTransport({
@@ -946,7 +954,6 @@ class ArtisanController {
     static userDetails(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             var total = 0;
-            var expire = false;
             const { uid } = request.params;
             console.log(uid);
             try {
@@ -965,21 +972,22 @@ class ArtisanController {
                     //get total amount
                     console.log('total earnings:' + user.earnings);
                     //amount to pay
-                    var pay = Math.round(user.earnings * 0.40);
+                    var pay = Math.round(user.earnings * 0.20);
+                    const available = parseInt(user.earnings) - pay;
                     console.log('pay' + pay);
-                    const dt = new Date();
-                    const today = dt.toLocaleDateString();
+                    console.log('available' + available);
                     console.log("TODAY:" + today);
-                    if (user.expireAt === today) {
-                        expire = true;
-                    }
-                    console.log("EXPIRIED?" + expire);
+                    /**if(user.expireAt === today){
+                      expire = true
+                    }*/
+                    //console.log("EXPIRIED?" + expire)
                     response.status(200).send({
                         user,
                         rating: rate,
                         earning: user.earnings,
                         pay: pay,
-                        expired: expire
+                        available: available,
+                        expired: false
                     });
                     // console.log(user)
                 }
@@ -1012,8 +1020,6 @@ class ArtisanController {
                     yield schema_1.default.Artisan().updateOne({ _id: uid }, {
                         $set: {
                             active: true,
-                            expireAt: now.toLocaleDateString(),
-                            earnings: 0
                         }
                     });
                     response.status(200).send({
@@ -1192,12 +1198,12 @@ class ArtisanController {
                         message: 'User does not exist'
                     });
                 }
-                if (user.pushToken === token) {
-                    console.log("token exists already");
-                    return response.status(404).send({
-                        message: 'token exists already'
-                    });
-                }
+                /**if (user.pushToken === token) {
+                  console.log("token exists already")
+                  return response.status(404).send({
+                    message: 'token exists already'
+                  });
+                }*/
                 yield schema_1.default.Artisan()
                     .updateOne({
                     _id: user._id,
@@ -1231,8 +1237,6 @@ class ArtisanController {
                     yield schema_1.default.Artisan().updateOne({ _id: uid }, {
                         $set: {
                             active: true,
-                            expireAt: now.toLocaleDateString(),
-                            earnings: 0
                         }
                     });
                     response.status(200).send({
@@ -1287,7 +1291,6 @@ class ArtisanController {
                     yield schema_1.default.Artisan().updateOne({ _id: uid }, {
                         $set: {
                             active: false,
-                            expireAt: ''
                         }
                     });
                     response.status(200).send({
@@ -1324,6 +1327,230 @@ class ArtisanController {
             }
             catch (error) {
                 response.status(404).send({ error: 'could not complete your request at the moment' });
+            }
+        });
+    }
+    //PLATABOX WALLET
+    //WITHDRAW FUNDS
+    static withdrawFund(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid, bcode, amount, anumber } = request.body;
+            //verify account number first
+            try {
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                console.log(user);
+                const pay = Math.round(user.earnings * 0.20);
+                const available = parseInt(user.earnings) - pay;
+                const new_amount = parseInt(user.earnings) - parseInt(amount);
+                const limit = available - 50;
+                console.log(limit);
+                if (user) {
+                    //check if amount the amount is greatr than the limit
+                    if (anumber.length > 10 || anumber.length < 10) {
+                        return response.send({ message: "Account number should be 10 digits" });
+                    }
+                    if (amount > limit) {
+                        return response.send({ message: `The specified amount is more than your withdrawal limit: ${limit}` });
+                    }
+                    else {
+                        const payload = {
+                            "account_bank": bcode,
+                            "account_number": anumber,
+                            "amount": amount,
+                            "narration": `Platabox Wallet Withdrawal of ${amount}`,
+                            "currency": "NGN",
+                            "debit_currency": "NGN",
+                            "reference": "pbwd-" + Date.now()
+                        };
+                        const resp = yield rave.Transfer.initiate(payload);
+                        console.log(resp);
+                        if (resp.data.fullname === 'N/A') {
+                            console.log('Invalid account number');
+                            return response.send({
+                                message: 'Invalid account number'
+                            });
+                        }
+                        if (resp.data.status === 'FAILED') {
+                            console.log('transaction failed. Please try again later');
+                            return response.send({
+                                message: 'Transaction failed. Please check your account details and try again'
+                            });
+                        }
+                        if (resp.data.status === 'NEW') {
+                            console.log('Transaction Successful');
+                            // if successful
+                            // send success message
+                            //remove amount
+                            yield schema_1.default.Artisan()
+                                .updateOne({
+                                _id: uid,
+                            }, {
+                                $set: {
+                                    earnings: new_amount,
+                                }
+                            });
+                            yield schema_1.default.DTransaction().create({
+                                user: uid,
+                                amount: amount,
+                                anumber: anumber,
+                                status: 'withdraw',
+                                date: today
+                            });
+                            console.log('new amount ' + new_amount);
+                            return response.send({
+                                message: 'Transaction Successful'
+                            });
+                        }
+                    }
+                }
+                else {
+                    return response.send({ message: "User not found" });
+                }
+            }
+            catch (error) {
+                console.log(error);
+                return response.status(401).send({
+                    message: 'Something went wrong. please try again'
+                });
+            }
+        });
+    }
+    //MANUALLY TRANSFER FUNDS THROUGH BANK TRANSFER
+    //SAVE THE TRANSFER REQUESTS HERE
+    static transferRequests(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { amount, uid, anumber, bank } = request.body;
+            console.log(bank);
+            console.log(anumber);
+            console.log(uid);
+            try {
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
+                console.log(user);
+                console.log(admin);
+                const limit = parseInt(user.earnings) - 50;
+                if (user) {
+                    //SAVE THE TRANSFER REQUEST
+                    if (anumber.length > 10 || anumber.length < 10) {
+                        return response.send({ message: "Account number should be 10 digits" });
+                    }
+                    if (amount > limit) {
+                        return response.send({ message: `The specified amount is more than your withdrawal limit: ${limit}` });
+                    }
+                    yield schema_1.default.DTransaction().create({
+                        user: uid,
+                        amount: amount,
+                        anumber: anumber,
+                        bank: bank,
+                        date: today
+                    });
+                    if (admin) {
+                        //notify admin
+                        let chunks = expo.chunkPushNotifications([{
+                                "to": admin.pushToken,
+                                "sound": "default",
+                                "channelId": "notification-sound-channel",
+                                "title": "Transfer Request!",
+                                "body": `Please attend to the transfer request ASAP!.`
+                            }]);
+                        let tickets = [];
+                        (() => __awaiter(this, void 0, void 0, function* () {
+                            for (let chunk of chunks) {
+                                try {
+                                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                    console.log(ticketChunk);
+                                    tickets.push(...ticketChunk);
+                                }
+                                catch (error) {
+                                    console.error(error);
+                                }
+                            }
+                        }))();
+                    }
+                    return response.status(200).send({
+                        message: 'Transfer Request Funded!'
+                    });
+                }
+                else {
+                    console.log('User not found');
+                    return response.status(500).send({
+                        message: 'User not found'
+                    });
+                }
+            }
+            catch (err) {
+                console.log(err);
+                return response.status(500).send({
+                    message: 'An error occured'
+                });
+            }
+        });
+    }
+    //UPDATE A TRANSFER REQUEST
+    static updateTransfer(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { amount, uid } = request.body;
+            console.log(amount);
+            console.log(uid);
+            try {
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                console.log(user);
+                const new_amount = user.earnings - amount;
+                console.log("new amount " + new_amount);
+                if (user) {
+                    //update amount
+                    yield schema_1.default.Artisan()
+                        .updateOne({
+                        _id: uid,
+                    }, {
+                        $set: {
+                            earnings: new_amount,
+                        }
+                    });
+                    yield schema_1.default.DTransaction().create({
+                        user: uid,
+                        amount: amount,
+                        status: 'withdraw',
+                        date: today
+                    });
+                    return response.status(200).send({
+                        message: 'Re-Funded!'
+                    });
+                }
+                else {
+                    console.log('User not found');
+                    return response.status(500).send({
+                        message: 'User not found'
+                    });
+                }
+            }
+            catch (err) {
+                console.log(err);
+                return response.status(500).send({
+                    message: 'An error occured'
+                });
+            }
+        });
+    }
+    //GET TRANSACTIONS
+    static allTrans(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.body;
+            try {
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                console.log(user);
+                const trans = yield schema_1.default.DTransaction().find({ user: uid }).sort({ '_id': -1 });
+                console.log(trans);
+                if (user && trans) {
+                    response.status(200).send({ trans: trans });
+                }
+                else {
+                    response.status(500).send({ error: 'Could not find Transactions for this user' });
+                }
+            }
+            catch (error) {
+                console.log(error);
+                response.status(500).send('Something went wrong');
             }
         });
     }

@@ -20,7 +20,7 @@ class Schema {
             next_promo: String,
             promo_date: String,
             createdAt: String,
-            balance: Number
+            balance: { type: Number, default: 0 }
         });
         const User = mongoose_1.default.models.User || mongoose_1.default.model('User', UserSchema);
         return User;
@@ -29,6 +29,18 @@ class Schema {
         const TranSchema = new mongoose_1.default.Schema({
             user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
             amount: Number,
+            anumber: Number,
+            status: String,
+            date: String
+        });
+        const Transaction = mongoose_1.default.models.Transaction || mongoose_1.default.model('Transaction', TranSchema);
+        return Transaction;
+    }
+    static DTransaction() {
+        const TranSchema = new mongoose_1.default.Schema({
+            user: { type: MongooseSchema.Types.ObjectId, ref: 'Artisan' },
+            amount: Number,
+            anumber: Number,
             status: String,
             date: String
         });
@@ -38,6 +50,17 @@ class Schema {
     static Transfers() {
         const TranSchema = new mongoose_1.default.Schema({
             user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
+            amount: Number,
+            anumber: Number,
+            bank: String,
+            date: String
+        });
+        const Transfer = mongoose_1.default.models.Transfer || mongoose_1.default.model('Transfer', TranSchema);
+        return Transfer;
+    }
+    static DTransfers() {
+        const TranSchema = new mongoose_1.default.Schema({
+            user: { type: MongooseSchema.Types.ObjectId, ref: 'Artisan' },
             amount: Number,
             anumber: Number,
             bank: String,
@@ -92,7 +115,7 @@ class Schema {
             isConfirmed: Boolean,
             isActivated: Boolean,
             createdAt: String,
-            expireAt: String,
+            //expireAt: String,
             active: { type: Boolean, default: false }
         });
         const Artisan = mongoose_1.default.models.Artisan || mongoose_1.default.model('Artisan', ArtisanSchema);
@@ -104,6 +127,7 @@ class Schema {
             pTime: String,
             user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
             artisan: { type: MongooseSchema.Types.ObjectId, ref: 'Artisan' },
+            payment: String,
             artisan_name: String,
             location: String,
             to: String,

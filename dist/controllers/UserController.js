@@ -23,8 +23,8 @@ const client = twilio_1.default(accountSid, authToken, {
 const schema_1 = __importDefault(require("../schema/schema"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
-const Ravepay = require('flutterwave-node');
-var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
+const Flutterwave = require('flutterwave-node-v3');
+const rave = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 //date initialization
 const now = new Date();
 const month = now.getMonth() + 1;
@@ -448,7 +448,7 @@ class UserController {
             try {
                 const user = yield schema_1.default.User().findOne({ _id: uid });
                 console.log(user);
-                const new_amount = user.balance + amount;
+                const new_amount = parseInt(user.balance) + parseInt(amount);
                 console.log("new amount " + new_amount);
                 if (user) {
                     //update amount
@@ -493,11 +493,14 @@ class UserController {
             try {
                 const user = yield schema_1.default.User().findOne({ _id: uid });
                 console.log(user);
-                const new_amount = user.balance - amount;
-                const limit = user.balance - 50;
+                const new_amount = parseInt(user.balance) - parseInt(amount);
+                const limit = parseInt(user.balance) - 50;
                 console.log(limit);
                 if (user) {
                     //check if amount the amount is greatr than the limit
+                    if (anumber.length > 10 || anumber.length < 10) {
+                        return response.send({ message: "Account number should be 10 digits" });
+                    }
                     if (amount > limit) {
                         return response.send({ message: `The specified amount is more than your withdrawal limit: ${limit}` });
                     }
@@ -508,17 +511,24 @@ class UserController {
                             "amount": amount,
                             "narration": `Platabox Wallet Withdrawal of ${amount}`,
                             "currency": "NGN",
+                            "debit_currency": "NGN",
                             "reference": "pbwd-" + Date.now()
                         };
                         const resp = yield rave.Transfer.initiate(payload);
                         console.log(resp);
-                        if (resp.body.data.status === 'FAILED') {
-                            console.log('transaction failed. Please try again later');
+                        if (resp.data.fullname === 'N/A') {
+                            console.log('Invalid account number');
                             return response.send({
-                                message: 'Transaction failed. Please try again later'
+                                message: 'Invalid account number'
                             });
                         }
-                        if (resp.body.data.status === 'NEW') {
+                        if (resp.data.status === 'FAILED') {
+                            console.log('transaction failed. Please try again later');
+                            return response.send({
+                                message: 'Transaction failed. Please check your account details and try again'
+                            });
+                        }
+                        if (resp.data.status === 'NEW') {
                             console.log('Transaction Successful');
                             // if successful
                             // send success message
@@ -542,26 +552,23 @@ class UserController {
                                 message: 'Transaction Successful'
                             });
                         }
-                        if (resp.body.data.fullname === 'N/A') {
-                            console.log('Invalid account number');
-                            return response.send({
-                                message: 'Invalid account number'
-                            });
-                        }
                     }
+                }
+                else {
+                    return response.send({ message: "User not found" });
                 }
             }
             catch (error) {
                 console.log(error);
                 return response.status(401).send({
-                    message: 'User not found'
+                    message: 'Something went wrong. please try again'
                 });
             }
         });
     }
     //MANUALLY TRANSFER FUNDS THROUGH BANK TRANSFER
     //SAVE THE TRANSFER REQUESTS HERE
-    static transfeRequests(request, response) {
+    static transferRequests(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { amount, uid, anumber, bank } = request.body;
             console.log(bank);
@@ -572,8 +579,15 @@ class UserController {
                 const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
                 console.log(user);
                 console.log(admin);
+                const limit = parseInt(user.balance) - 50;
                 if (user) {
                     //SAVE THE TRANSFER REQUEST
+                    if (anumber.length > 10 || anumber.length < 10) {
+                        return response.send({ message: "Account number should be 10 digits" });
+                    }
+                    if (amount > limit) {
+                        return response.send({ message: `The specified amount is more than your withdrawal limit: ${limit}` });
+                    }
                     yield schema_1.default.Transfers().create({
                         user: uid,
                         amount: amount,
@@ -666,6 +680,48 @@ class UserController {
                 return response.status(500).send({
                     message: 'An error occured'
                 });
+            }
+        });
+    }
+    //GET TRANSACTIONS
+    static allTrans(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.body;
+            try {
+                const user = yield schema_1.default.User().findOne({ _id: uid });
+                console.log(user);
+                const trans = yield schema_1.default.Transaction().find({ user: uid }).sort({ '_id': -1 });
+                console.log(trans);
+                if (user && trans) {
+                    response.status(200).send({ trans: trans });
+                }
+                else {
+                    response.status(500).send({ error: 'Could not find Transactions for this user' });
+                }
+            }
+            catch (error) {
+                console.log(error);
+                response.status(500).send('Something went wrong');
+            }
+        });
+    }
+    //GET ALL TRANS
+    //GET TRANSACTIONS
+    static getTrans(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const trans = yield schema_1.default.Transaction().find().sort({ '_id': -1 });
+                console.log(trans);
+                if (trans) {
+                    response.status(200).send({ trans: trans });
+                }
+                else {
+                    response.status(500).send({ error: 'Could not find Transactions for this user' });
+                }
+            }
+            catch (error) {
+                console.log(error);
+                response.status(500).send('Something went wrong');
             }
         });
     }

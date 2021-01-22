@@ -23,102 +23,16 @@ var transporter = nodemailer_1.default.createTransport({
         pass: process.env.PASS
     }
 });
+//date initialization
+const now = new Date();
+const month = now.getMonth() + 1;
+const day = now.getDate();
+const year = now.getFullYear();
+const today = month + '/' + day + '/' + year;
 class JobController {
-    static createJob(request, response) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { category, uid, location, description, area1, area2 } = request.body;
-            console.log(category, uid, location, description);
-            console.log("area1:" + area1);
-            console.log("area2:" + area2);
-            let savedTokens;
-            try {
-                if (!description) {
-                    console.log("no desc");
-                    return response.status(409).send({
-                        message: 'Please enter a description',
-                    });
-                }
-                if (!location) {
-                    console.log("no loc");
-                    return response.status(409).send({
-                        message: 'Please enter a location',
-                    });
-                }
-                //find user{}
-                //                 const user = await Schema.User().findById({_id: uid})
-                //               .populate({path: 'user', model: Schema.Job() }).exec()
-                // console.log(user);
-                //create job
-                const dt = new Date();
-                //const endAt =  dt.setMinutes( dt.getMinutes() + 30 );
-                //console.log(createdAt)
-                //console.log("end:" + endAt)
-                //console.log("now:" + now)
-                yield schema_1.default.Job().create({
-                    user: uid,
-                    category: category,
-                    location: location,
-                    description: description,
-                    status: 'active',
-                    rated: false,
-                    area1: area1,
-                    area2: area2,
-                    createdAt: dt,
-                    active: true
-                });
-                response.status(201).send({
-                    message: 'Job created successfully',
-                    status: 201
-                });
-                let title;
-                const artisan = yield schema_1.default.Artisan().findOne({ category: category });
-                if (category === 'driver') {
-                    title = 'Ride Request';
-                }
-                if (category === 'log' || category === 'shop') {
-                    title = 'Dispatch Rider Request';
-                }
-                const artis = artisan.pushToken;
-                savedTokens = artis;
-                console.log(artis);
-                if (!artisan) {
-                    return response.status(404).send({
-                        message: 'No artisans found'
-                    });
-                }
-                //send notification
-                let chunks = expo.chunkPushNotifications([{
-                        "to": savedTokens,
-                        "sound": "default",
-                        "channelId": "notification-sound-channel",
-                        "title": title,
-                        "body": "Open your Platabox App"
-                    }]);
-                let tickets = [];
-                (() => __awaiter(this, void 0, void 0, function* () {
-                    for (let chunk of chunks) {
-                        try {
-                            let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                            console.log(ticketChunk);
-                            tickets.push(...ticketChunk);
-                        }
-                        catch (error) {
-                            console.error(error);
-                        }
-                    }
-                }))();
-            }
-            catch (error) {
-                console.log(error.toString());
-                response.status(500).send({
-                    message: "Somenthing went wrong"
-                });
-            }
-        });
-    }
     static driverRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { category, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price, to2, destLat2, destLong2 } = request.body;
+            const { category, payment, uid, location, area1, area2, lat, long, destLat, destLong, to, from, time, distance, price, to2, destLat2, destLong2 } = request.body;
             //console.log(category, uid,location)
             //console.log("area1:" + area1);
             //console.log("area2:" + area2);
@@ -132,7 +46,12 @@ class JobController {
             //console.log("distance:" + distance);
             //console.log("price:" + price);
             let savedTokens;
+            const user = yield schema_1.default.User().findOne({ _id: uid });
             try {
+                if (payment == 'wallet' && price > user.balance) {
+                    console.log("You don't have sufficient balance in your wallet. Please fund your wallet and try again");
+                    return response.send({ error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again" });
+                }
                 //create job
                 const dt = new Date();
                 // console.log(createdAt)
@@ -143,6 +62,7 @@ class JobController {
                     category: category,
                     location: location,
                     status: 'active',
+                    payment: payment,
                     rated: false,
                     area1: area1,
                     area2: area2,
@@ -158,7 +78,7 @@ class JobController {
                     time: time,
                     price: price,
                     distance: distance,
-                    createdAt: dt,
+                    createdAt: today,
                     active: true
                 });
                 console.log("job id!!!!" + job.id);
@@ -209,11 +129,18 @@ class JobController {
     }
     static logRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { city, city2, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime } = request.body;
+            const { city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime } = request.body;
             //console.log(category)
             console.log(city);
             let savedTokens;
+            const user = yield schema_1.default.User().findOne({ _id: uid });
             try {
+                //check if it's a wallet payment
+                //verify if user has enough money
+                if (payment == 'wallet' && price > user.balance) {
+                    console.log("You don't have sufficient balance in your wallet. Please fund your wallet and try again");
+                    return response.status(500).send({ error: "You don't have sufficient balance in your wallet. Please fund your wallet and try again" });
+                }
                 //create job
                 const dt = new Date();
                 const now = dt.setMinutes(dt.getMinutes());
@@ -229,6 +156,7 @@ class JobController {
                     city: city,
                     city2: city2,
                     status: 'active',
+                    payment: payment,
                     rated: false,
                     to: to,
                     to2: to2,
@@ -252,7 +180,7 @@ class JobController {
                     time: time,
                     price: price,
                     distance: distance,
-                    createdAt: createdAt,
+                    createdAt: today,
                     endAt: endAt,
                     now: now,
                     active: true
@@ -750,9 +678,9 @@ class JobController {
               earnings =  job.price;
             }
              */
-            if (!job) {
+            if (!job || !hirer) {
                 return response.status(404).send({
-                    message: 'Job does not exist'
+                    message: 'Job does not exist or invalid user'
                 });
             }
             try {
@@ -772,6 +700,23 @@ class JobController {
                         completed: completed
                     }
                 });
+                const new_balance = hirer.balance - parseInt(job.price);
+                console.log(new_balance);
+                if (job.payment == 'wallet') {
+                    yield schema_1.default.User().updateOne({
+                        _id: hirer._id
+                    }, {
+                        $set: {
+                            balance: new_balance
+                        }
+                    });
+                    yield schema_1.default.Transaction().create({
+                        user: hirer._id,
+                        amount: job.price,
+                        status: 'withdraw',
+                        date: today
+                    });
+                }
                 response.status(201).send({
                     message: "Completed",
                     status: 201
@@ -797,6 +742,28 @@ class JobController {
                         }
                     }
                 }))();
+                if (job.payment == 'wallet') {
+                    let chunks = expo.chunkPushNotifications([{
+                            "to": hirer.pushToken,
+                            "sound": "default",
+                            "channelId": "notification-sound-channel",
+                            "title": `Successful Payment :)`,
+                            "body": `₦ ${job.price} has been deducted from your wallet for your last request`
+                        }]);
+                    let tickets = [];
+                    (() => __awaiter(this, void 0, void 0, function* () {
+                        for (let chunk of chunks) {
+                            try {
+                                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                console.log(ticketChunk);
+                                tickets.push(...ticketChunk);
+                            }
+                            catch (error) {
+                                console.error(error);
+                            }
+                        }
+                    }))();
+                }
             }
             catch (error) {
                 console.log(error);

@@ -29,8 +29,8 @@ const util_1 = require("./util");
 const JobController_1 = __importDefault(require("./controllers/JobController"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
-const Ravepay = require('flutterwave-node');
-var rave = new Ravepay(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
+const Flutterwave = require('flutterwave-node-v3');
+const flw = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 //database 
 mongoose_1.default.connect(`mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('database connected.....'))
     .catch((error) => console.log(error.toString()));
@@ -83,7 +83,7 @@ app.get('/api/v1/user/:uid', UserController_1.default.userDetails);
 app.get('/api/v1/drivers', ArtisanController_1.default.getDrivers);
 //push notification
 app.post('/api/v1/token/:uid', UserController_1.default.savePushToken);
-app.post('/api/v1/jobrequest', JobController_1.default.createJob);
+//app.post('/api/v1/jobrequest', JobController.createJob);
 app.post('/api/v1/driverrequest', JobController_1.default.driverRequest);
 app.post('/api/v1/logrequest', JobController_1.default.logRequest);
 //Artisan controller
@@ -135,8 +135,15 @@ app.post('/api/v1/:uid/deactivate', ArtisanController_1.default.deactivateAccoun
 ////////PLATABOX WALLET ROUTES///////
 app.post('/api/v1/:uid/fund', UserController_1.default.fundWallet);
 app.post('/api/v1/:uid/withdraw', UserController_1.default.withdrawFund);
-app.post('/api/v1/:uid/transferRequest', UserController_1.default.transfeRequests);
+app.post('/api/v1/:uid/transferRequest', UserController_1.default.transferRequests);
 app.post('/api/v1/:uid/updateTransfer', UserController_1.default.updateTransfer);
+app.post('/api/v1/:uid/getTrans', UserController_1.default.getTrans);
+app.get('/api/v1/getTransactions', UserController_1.default.allTrans);
+//PLATABOX DRIVER WALLET
+app.post('/api/v1/:uid/driverwithdraw', ArtisanController_1.default.withdrawFund);
+app.post('/api/v1/:uid/drivertransferRequest', ArtisanController_1.default.transferRequests);
+app.post('/api/v1/:uid/driverupdateTransfer', ArtisanController_1.default.updateTransfer);
+app.post('/api/v1/:uid/drivergetTrans', ArtisanController_1.default.allTrans);
 //testing route
 app.get('/test', (request, response) => {
     response.send('working');
@@ -289,7 +296,7 @@ const discountCheck = node_cron_1.default.schedule("00 00 * * *", () => __awaite
     }
 }), { scheduled: true });
 //2. check if today is discount then enable 
-const discountCheck1 = node_cron_1.default.schedule("00 10 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discountCheck1 = node_cron_1.default.schedule("10 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount check initialized");
     //find accounts
     //standard date
@@ -324,7 +331,7 @@ const discountCheck1 = node_cron_1.default.schedule("00 10 * * *", () => __await
     }
 }), { scheduled: true });
 // send discount notification
-const discount = node_cron_1.default.schedule("10 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discount = node_cron_1.default.schedule("00 10 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount notification initialized");
     //find accounts
     //standard date
@@ -362,7 +369,7 @@ const discount = node_cron_1.default.schedule("10 00 * * *", () => __awaiter(voi
         }))();
     });
 }), { scheduled: true });
-const discount1 = node_cron_1.default.schedule("13 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const discount1 = node_cron_1.default.schedule("00 13 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("discount notification initialized");
     //find accounts//standard date
     const now = new Date();
@@ -400,74 +407,61 @@ const discount1 = node_cron_1.default.schedule("13 00 * * *", () => __awaiter(vo
     });
 }), { scheduled: true });
 //FREE DISCOUNT**
-/**
- const freeDiscount = cron.schedule("20 23 * * *", async () => {
-  
-  console.log("discount notification initialized");
-//find accountsfree
-
-//standard date
-const now = new Date();
-const month = now.getMonth() + 1
-const day = now.getDate()
-const year = now.getFullYear()
-const today = month + '/' + day + '/' + year
-const next_promo = "10/30/2020"
-//
-
-  const get_users = await Schema.User().find({isConfirmed: true, pushToken: {$exists: true}})
- console.log("users:" + get_users)
-
- if(get_users){
-
-  await Schema.User().updateMany({isConfirmed: true, pushToken: {$exists: true}},
-    {$set: {
-      promo: true,
-             promo_date: today,
-             next_promo: next_promo
-    }
-  
-  },
-    function(err, result){
-    if(err) {
-      console.log(err)
-    } else {
-      console.log('Added free discounts');
-
-      //send notification for expiry
-      get_users.map(usr => {
-        console.log("tokens:" + usr.pushToken)
-        let chunks = expo.chunkPushNotifications([{
-          "to": [usr.pushToken],
-          "sound": "default",
-          "title": "Free 30% Discount!!",
-          "body": "you have been awarded a free 30% discount :)"
-        }]);
-        let tickets = [];
-        (async () => {
-          for (let chunk of chunks) {
-            try {
-              let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-              console.log(ticketChunk);
-              tickets.push(...ticketChunk);
-           
-            } catch (error) {
-              console.error(error);
+const freeDiscount = node_cron_1.default.schedule("16 01 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("discount notification initialized");
+    //find accountsfree 
+    //standard date
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const nextday = now.getDate() + 1;
+    const year = now.getFullYear();
+    const today = month + '/' + day + '/' + year;
+    const next_promo = month + '/' + nextday + '/' + year;
+    console.log("today: " + today);
+    console.log("next promo: " + next_promo);
+    //
+    const get_users = yield schema_1.default.User().find({ isConfirmed: true, pushToken: { $exists: true } });
+    console.log("users:" + get_users);
+    if (get_users) {
+        yield schema_1.default.User().updateMany({ isConfirmed: true, pushToken: { $exists: true } }, { $set: {
+                promo: true,
+                promo_date: today,
+                next_promo: next_promo
             }
-          }
-        })();
-    
-      })
+        }, function (err, result) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log('Added free discounts');
+                //send notification for expiry
+                get_users.map(usr => {
+                    console.log("tokens:" + usr.pushToken);
+                    let chunks = expo.chunkPushNotifications([{
+                            "to": [usr.pushToken],
+                            "sound": "default",
+                            "title": "Free 30% Discount!!",
+                            "body": "you have been awarded a free 30% discount :)"
+                        }]);
+                    let tickets = [];
+                    (() => __awaiter(this, void 0, void 0, function* () {
+                        for (let chunk of chunks) {
+                            try {
+                                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                console.log(ticketChunk);
+                                tickets.push(...ticketChunk);
+                            }
+                            catch (error) {
+                                console.error(error);
+                            }
+                        }
+                    }))();
+                });
+            }
+        });
     }
-    })
-  }
- 
-  
-},
-
-{scheduled: true}
-);
-**/
+}), { scheduled: true });
 //change everyone's discount date
 const users = () => __awaiter(void 0, void 0, void 0, function* () {
     yield schema_1.default.User().updateMany({ isConfirmed: true, pushToken: { $exists: true } }, { $set: {
@@ -540,7 +534,28 @@ const genNot = () => __awaiter(void 0, void 0, void 0, function* () {
         }))();
     });
 });
-genNot();
+const setBalance = () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("balance initialized");
+    //find accountsfree 
+    const get_users = yield schema_1.default.User().find({ isConfirmed: true, pushToken: { $exists: true } });
+    console.log("users:" + get_users);
+    if (get_users) {
+        yield schema_1.default.User().updateMany({ isConfirmed: true, pushToken: { $exists: true } }, { $set: {
+                balance: 0,
+            }
+        }, function (err, result) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log('Added balance');
+            }
+        });
+    }
+});
+//setBalance();
+//get balance from FW
+//genNot()
 deleteU.start();
 //freeDiscount.start();
 discountCheck.start();
@@ -550,16 +565,19 @@ discount.start();
 discount1.start();
 //notificationA.start()
 //notificationB.start()
-const list_banks = () => __awaiter(void 0, void 0, void 0, function* () {
+const getBanks = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield rave.Misc.getBanks(rave);
+        const payload = {
+            "country": "NG" //Pass either NG, GH, KE, UG, ZA or TZ to get list of banks in Nigeria, Ghana, Kenya, Uganda, South Africa or Tanzania respectively
+        };
+        const response = yield flw.Bank.country(payload);
         console.log(response);
     }
     catch (error) {
         console.log(error);
     }
 });
-//list_banks();
+//getBanks();
 const transfer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const payload = {
@@ -570,15 +588,15 @@ const transfer = () => __awaiter(void 0, void 0, void 0, function* () {
             "currency": "NGN",
             "reference": "pbwd-" + Date.now()
         };
-        const response = yield rave.Transfer.initiate(payload);
-        //console.log(response)
-        if (response.body.data.status === 'FAILED') {
+        const response = yield flw.Transfer.initiate(payload);
+        console.log(response);
+        if (response.data.status === 'FAILED') {
             console.log('transaction failed. Please try again later');
         }
-        if (response.body.data.status === 'NEW') {
+        if (response.data.status === 'NEW') {
             console.log('Transaction Successful');
         }
-        if (response.body.data.fullname === 'N/A') {
+        if (response.data.fullname === 'N/A') {
             console.log('Invalid account number');
         }
     }
@@ -587,6 +605,16 @@ const transfer = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 //transfer();
+const getBalance = () => __awaiter(void 0, void 0, void 0, function* () {
+    http_1.default.request({ host: 'https://api.flutterwave.com/v3/balances/NGN', method: 'GET', headers: {
+            'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+            'Content-Type': 'application/json'
+        } }, (res) => {
+        console.log("Connected");
+        console.log(res);
+    });
+});
+getBalance();
 //seedArtisan();
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
