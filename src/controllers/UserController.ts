@@ -596,7 +596,7 @@ static async withdrawFund(req: Request, response: Response){
   }
 
   if(getBalance() < amount){
-    return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
+    return response.send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
   }
 
 
