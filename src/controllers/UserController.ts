@@ -672,15 +672,32 @@ balance: new_amount,
 
 //MANUALLY TRANSFER FUNDS THROUGH BANK TRANSFER
 //SAVE THE TRANSFER REQUESTS HERE
-static async transferRequests(request: Request, response: Response){
-  const{amount, uid, anumber, bank} = request.body;
+static async transferRequests(req: Request, response: Response){
+  const{amount, uid, anumber, bank} = req.body;
   console.log(bank)
   console.log(anumber)
   console.log(uid)
 
+  //check balance in platabox account
+  const getBalance = async () => {
 
+    var options = {
+      'method': 'GET',
+      'url': 'https://api.flutterwave.com/v3/balances/NGN',
+      'headers': {
+        'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    };
 
-
+    request(options, function (error, response) { 
+      if(error){
+        console.log(error)
+      };
+    
+      return parseInt(response.body.split(":")[5].split(",")[0])
+    });
+  }
     try {
       const user = await Schema.User().findOne({_id: uid});
       const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
@@ -696,6 +713,11 @@ static async transferRequests(request: Request, response: Response){
       if(amount > limit){
         return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
     }
+
+    if(getBalance() < amount){
+      return response.send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
+    }
+  
     await Schema.Transfers().create({
       user: uid,
       amount: amount,

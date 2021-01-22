@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from "express";
-
+import request from 'request';
 import twilio from 'twilio';
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -1719,9 +1719,31 @@ static async getDriverRegistartion(request: Request, response: Response) {
   //PLATABOX WALLET
 
 //WITHDRAW FUNDS
-static async withdrawFund(request: Request, response: Response){
-  const {uid, bcode, amount, anumber} =  request.body;
-  //verify account number first
+static async withdrawFund(req: Request, response: Response){
+  const {uid, bcode, amount, anumber} =  req.body;
+
+
+
+
+  //check balance in platabox account
+  const getBalance = async () => {
+  var options = {
+    'method': 'GET',
+    'url': 'https://api.flutterwave.com/v3/balances/NGN',
+    'headers': {
+      'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+      'Content-Type': 'application/json'
+    }
+  };
+
+  request(options, function (error, response) { 
+    if(error){
+      console.log(error)
+    };
+  
+    return parseInt(response.body.split(":")[5].split(",")[0])
+  });
+}
   
   try {
   const user = await Schema.Artisan().findOne({_id: uid});
@@ -1743,6 +1765,10 @@ static async withdrawFund(request: Request, response: Response){
   }
     if(amount > limit){
       return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
+  }
+
+  if(getBalance() < amount){
+    return response.send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
   }
 
     else {
@@ -1819,20 +1845,38 @@ earnings: new_amount,
 
 //MANUALLY TRANSFER FUNDS THROUGH BANK TRANSFER
 //SAVE THE TRANSFER REQUESTS HERE
-static async transferRequests(request: Request, response: Response){
-  const{amount, uid, anumber, bank} = request.body;
+static async transferRequests(req: Request, response: Response){
+  const{amount, uid, anumber, bank} = req.body;
   console.log(bank)
   console.log(anumber)
   console.log(uid)
 
-
+  const getBalance = async () => {
+    var options = {
+      'method': 'GET',
+      'url': 'https://api.flutterwave.com/v3/balances/NGN',
+      'headers': {
+        'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    };
+  
+    request(options, function (error, response) { 
+      if(error){
+        console.log(error)
+      };
+    
+      return parseInt(response.body.split(":")[5].split(",")[0])
+    });
+  }
+    
 
 
     try {
       const user = await Schema.Artisan().findOne({_id: uid});
       const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
-      console.log(user);
-      console.log(admin)
+      //console.log(user);
+      //console.log(admin)
       const limit = parseInt(user.earnings) - 50
 
     if(user){
@@ -1843,6 +1887,12 @@ static async transferRequests(request: Request, response: Response){
       if(amount > limit){
         return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
     }
+
+    console.log('getB ' + getBalance())
+    if(getBalance() < amount){
+      return response.send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
+    }
+
     await Schema.DTransaction().create({
       user: uid,
       amount: amount,
@@ -1877,7 +1927,7 @@ let tickets = [];
   
     }
     return response.status(200).send({
-      message: 'Transfer Request Funded!'
+      message: 'Transfer Request Sent!'
     });
   } else {
     console.log('User not found')
@@ -1900,12 +1950,31 @@ let tickets = [];
 }
 
 //UPDATE A TRANSFER REQUEST
-static async updateTransfer(request: Request, response: Response){
-  const{amount, uid} = request.body;
+static async updateTransfer(req: Request, response: Response){
+  const{amount, uid} = req.body;
   console.log(amount)
   console.log(uid)
 
 
+  const getBalance = async () => {
+    var options = {
+      'method': 'GET',
+      'url': 'https://api.flutterwave.com/v3/balances/NGN',
+      'headers': {
+        'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    };
+  
+    request(options, function (error, response) { 
+      if(error){
+        console.log(error)
+      };
+    
+      return parseInt(response.body.split(":")[5].split(",")[0])
+    });
+  }
+    
   
     try {
       const user = await Schema.Artisan().findOne({_id: uid});
