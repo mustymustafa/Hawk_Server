@@ -580,6 +580,7 @@ static async withdrawFund(req: Request, response: Response){
    
   try {
   const user = await Schema.User().findOne({_id: uid});
+  const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
   console.log(user);
   const new_amount = parseInt(user.balance) - parseInt(amount)
   const limit = parseInt(user.balance) - 50
@@ -594,6 +595,31 @@ static async withdrawFund(req: Request, response: Response){
       return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
   }
   if(balance < amount){
+    if(admin){
+
+      //notify admin
+     let chunks = expo.chunkPushNotifications([{
+       "to": admin.pushToken,
+       "sound": "default",
+       "channelId": "notification-sound-channel",
+       "title": "Transfer Request!",
+       "body": `Please attend to the transfer request ASAP!.`
+     }]);
+     let tickets = [];
+     (async () => {
+       for (let chunk of chunks) {
+         try {
+           let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+           console.log(ticketChunk);
+           tickets.push(...ticketChunk);
+        
+         } catch (error) {
+           console.error(error);
+         }
+       }
+     })();
+       
+         }
     return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
     }
  
@@ -715,6 +741,31 @@ static async transferRequests(req: Request, response: Response){
     }
 
     if(balance < amount){
+      if(admin){
+
+        //notify admin
+       let chunks = expo.chunkPushNotifications([{
+         "to": admin.pushToken,
+         "sound": "default",
+         "channelId": "notification-sound-channel",
+         "title": "Transfer Request!",
+         "body": `Please attend to the transfer request ASAP!.`
+       }]);
+       let tickets = [];
+       (async () => {
+         for (let chunk of chunks) {
+           try {
+             let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+             console.log(ticketChunk);
+             tickets.push(...ticketChunk);
+          
+           } catch (error) {
+             console.error(error);
+           }
+         }
+       })();
+         
+           }
       return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
       }
     
