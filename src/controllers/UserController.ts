@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from "express";
 
+import request from 'request';
 import twilio from 'twilio';
 const accountSid = process.env.TWILIO_SID; 
 const authToken = process.env.TWILIO_AUTH_TOKEN; 
@@ -552,9 +553,30 @@ static async fundWallet(request: Request, response: Response){
 
 
 //WITHDRAW FUNDS
-static async withdrawFund(request: Request, response: Response){
-  const {uid, bcode, amount, anumber} =  request.body;
-  //verify account number first
+static async withdrawFund(req: Request, response: Response){
+  const {uid, bcode, amount, anumber} =  req.body;
+  
+
+  //check balance in platabox account
+  const getBalance = async () => {
+
+    var options = {
+      'method': 'GET',
+      'url': 'https://api.flutterwave.com/v3/balances/NGN',
+      'headers': {
+        'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    request(options, function (error, response) { 
+      if(error){
+        console.log(error)
+      };
+    
+      return parseInt(response.body.split(":")[5].split(",")[0])
+    });
+  }
   
   try {
   const user = await Schema.User().findOne({_id: uid});
@@ -573,9 +595,13 @@ static async withdrawFund(request: Request, response: Response){
       return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
   }
 
-    else {
+  if(getBalance() < amount){
+    return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
+  }
 
-    
+
+ 
+    else {
     const payload = {
       "account_bank": bcode,
       "account_number": anumber,
