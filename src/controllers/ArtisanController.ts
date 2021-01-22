@@ -1947,6 +1947,7 @@ static async transferRequests(req: Request, response: Response){
       user: uid,
       amount: amount,
       anumber: anumber,
+      status: 'transfer',
       bank: bank,
       date: today
     })

@@ -775,6 +775,7 @@ static async transferRequests(req: Request, response: Response){
       amount: amount,
       anumber: anumber,
       bank: bank,
+      status: 'transfer',
       date: today
     })
 
