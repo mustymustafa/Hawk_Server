@@ -570,6 +570,14 @@ static async withdrawFund(req: Request, response: Response){
 
 
 
+  request(options, async (error, resp) => { 
+    if(error){
+      console.log(error)
+    };
+  
+    console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
+    var balance =  parseInt(resp.body.split(":")[5].split(",")[0])
+   
   try {
   const user = await Schema.User().findOne({_id: uid});
   console.log(user);
@@ -577,16 +585,6 @@ static async withdrawFund(req: Request, response: Response){
   const limit = parseInt(user.balance) - 50
   console.log(limit)
 
-  request(options, function (error, resp) { 
-    if(error){
-      console.log(error)
-    };
-  
-    console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
-     if(parseInt(resp.body.split(":")[5].split(",")[0]) < amount){
-     return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
-     }
-  });
   if(user){
     //check if amount the amount is greatr than the limit
     if(anumber.length > 10 || anumber.length < 10){
@@ -595,7 +593,9 @@ static async withdrawFund(req: Request, response: Response){
     if(amount > limit){
       return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
   }
-
+  if(balance < amount){
+    return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
+    }
  
 
  
@@ -665,6 +665,8 @@ balance: new_amount,
         message: 'Something went wrong. please try again'
       });
   }
+
+});
 }
 
 
@@ -688,8 +690,14 @@ static async transferRequests(req: Request, response: Response){
       }
     };
 
-  
-  
+    request(options, async (error, resp) => { 
+      if(error){
+        console.log(error)
+      };
+    
+      console.log(parseInt(resp.body.split(":")[5].split(",")[0]))
+      var balance =  parseInt(resp.body.split(":")[5].split(",")[0])
+
     try {
       const user = await Schema.User().findOne({_id: uid});
       const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
@@ -697,17 +705,6 @@ static async transferRequests(req: Request, response: Response){
       console.log(admin)
       const limit = parseInt(user.balance) - 50
 
-      request(options, function (error, resp) { 
-        if(error){
-          console.log(error)
-        };
-      
-        console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
-         if(parseInt(resp.body.split(":")[5].split(",")[0]) < amount){
-         return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
-         }
-      });
-      
     if(user){
       //SAVE THE TRANSFER REQUEST
       if(anumber.length > 10 || anumber.length < 10){
@@ -717,6 +714,9 @@ static async transferRequests(req: Request, response: Response){
         return response.send({message: `The specified amount is more than your withdrawal limit: ${limit}`})
     }
 
+    if(balance < amount){
+      return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
+      }
     
   
     await Schema.Transfers().create({
@@ -771,7 +771,8 @@ let tickets = [];
   }
 
   
-
+});
+  
 
 }
 
