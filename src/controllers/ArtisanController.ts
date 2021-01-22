@@ -1736,6 +1736,11 @@ static async withdrawFund(req: Request, response: Response){
     }
   };
 
+
+  try {
+  const user = await Schema.Artisan().findOne({_id: uid});
+  console.log(user);
+
   request(options, function (error, resp) { 
     if(error){
       console.log(error)
@@ -1747,11 +1752,6 @@ static async withdrawFund(req: Request, response: Response){
      }
   });
   
-  try {
-  const user = await Schema.Artisan().findOne({_id: uid});
-  console.log(user);
-
- 
   const pay = Math.round(user.earnings * 0.20);
   const available = parseInt(user.earnings) - pay
   const new_amount = parseInt(user.earnings) - parseInt(amount)
@@ -1860,16 +1860,7 @@ static async transferRequests(req: Request, response: Response){
     }
   };
 
-  request(options, function (error, resp) { 
-    if(error){
-      console.log(error)
-    };
-  
-    console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
-     if(parseInt(resp.body.split(":")[5].split(",")[0]) < amount){
-     return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
-     }
-  });
+
 
     try {
       const user = await Schema.Artisan().findOne({_id: uid});
@@ -1877,6 +1868,17 @@ static async transferRequests(req: Request, response: Response){
       //console.log(user);
       //console.log(admin)
       const limit = parseInt(user.earnings) - 50
+
+      request(options, function (error, resp) { 
+        if(error){
+          console.log(error)
+        };
+      
+        console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
+         if(parseInt(resp.body.split(":")[5].split(",")[0]) < amount){
+         return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
+         }
+      });
 
     if(user){
       //SAVE THE TRANSFER REQUEST

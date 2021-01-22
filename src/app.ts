@@ -914,21 +914,7 @@ const transfer = async () => {
 
 
 
-  var options = {
-    'method': 'GET',
-    'url': 'https://api.flutterwave.com/v3/balances/NGN',
-    'headers': {
-      'Authorization': `Bearer ${process.env.SECRET_KEY}`,
-      'Content-Type': 'application/json'
-    }
-  };
-  request(options, function (error, response) { 
-    if(error){
-      console.log(error)
-    };
   
-  console.log(response.body.split(":")[5].split(",")[0]);
-  });
 
 
 

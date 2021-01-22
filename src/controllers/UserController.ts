@@ -568,6 +568,15 @@ static async withdrawFund(req: Request, response: Response){
     }
   };
 
+
+
+  try {
+  const user = await Schema.User().findOne({_id: uid});
+  console.log(user);
+  const new_amount = parseInt(user.balance) - parseInt(amount)
+  const limit = parseInt(user.balance) - 50
+  console.log(limit)
+
   request(options, function (error, resp) { 
     if(error){
       console.log(error)
@@ -578,15 +587,6 @@ static async withdrawFund(req: Request, response: Response){
      return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
      }
   });
-
-  try {
-  const user = await Schema.User().findOne({_id: uid});
-  console.log(user);
-  const new_amount = parseInt(user.balance) - parseInt(amount)
-  const limit = parseInt(user.balance) - 50
-  console.log(limit)
-
-
   if(user){
     //check if amount the amount is greatr than the limit
     if(anumber.length > 10 || anumber.length < 10){
@@ -688,16 +688,7 @@ static async transferRequests(req: Request, response: Response){
       }
     };
 
-    request(options, function (error, resp) { 
-      if(error){
-        console.log(error)
-      };
-    
-      console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
-       if(parseInt(resp.body.split(":")[5].split(",")[0]) < amount){
-       return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
-       }
-    });
+  
   
     try {
       const user = await Schema.User().findOne({_id: uid});
@@ -706,6 +697,17 @@ static async transferRequests(req: Request, response: Response){
       console.log(admin)
       const limit = parseInt(user.balance) - 50
 
+      request(options, function (error, resp) { 
+        if(error){
+          console.log(error)
+        };
+      
+        console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
+         if(parseInt(resp.body.split(":")[5].split(",")[0]) < amount){
+         return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
+         }
+      });
+      
     if(user){
       //SAVE THE TRANSFER REQUEST
       if(anumber.length > 10 || anumber.length < 10){
