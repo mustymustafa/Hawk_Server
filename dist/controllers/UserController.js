@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const request_1 = __importDefault(require("request"));
 const twilio_1 = __importDefault(require("twilio"));
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -486,155 +487,242 @@ class UserController {
         });
     }
     //WITHDRAW FUNDS
-    static withdrawFund(request, response) {
+    static withdrawFund(req, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { uid, bcode, amount, anumber } = request.body;
-            //verify account number first
-            try {
-                const user = yield schema_1.default.User().findOne({ _id: uid });
-                console.log(user);
-                const new_amount = parseInt(user.balance) - parseInt(amount);
-                const limit = parseInt(user.balance) - 50;
-                console.log(limit);
-                if (user) {
-                    //check if amount the amount is greatr than the limit
-                    if (anumber.length > 10 || anumber.length < 10) {
-                        return response.send({ message: "Account number should be 10 digits" });
-                    }
-                    if (amount > limit) {
-                        return response.send({ message: `The specified amount is more than your withdrawal limit: ${limit}` });
+            const { uid, bcode, amount, anumber } = req.body;
+            //check balance in platabox account
+            var options = {
+                'method': 'GET',
+                'url': 'https://api.flutterwave.com/v3/balances/NGN',
+                'headers': {
+                    'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            request_1.default(options, (error, resp) => __awaiter(this, void 0, void 0, function* () {
+                if (error) {
+                    console.log(error);
+                }
+                ;
+                console.log(parseInt(resp.body.split(":")[5].split(",")[0]));
+                var balance = parseInt(resp.body.split(":")[5].split(",")[0]);
+                try {
+                    const user = yield schema_1.default.User().findOne({ _id: uid });
+                    const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
+                    console.log(user);
+                    const new_amount = parseInt(user.balance) - parseInt(amount);
+                    const limit = parseInt(user.balance) - 50;
+                    console.log(limit);
+                    if (user) {
+                        //check if amount the amount is greatr than the limit
+                        if (anumber.length > 10 || anumber.length < 10) {
+                            return response.send({ message: "Account number should be 10 digits" });
+                        }
+                        if (amount > limit) {
+                            return response.send({ message: `The specified amount is more than your withdrawal limit: ${limit}` });
+                        }
+                        if (balance < amount) {
+                            if (admin) {
+                                //notify admin
+                                let chunks = expo.chunkPushNotifications([{
+                                        "to": admin.pushToken,
+                                        "sound": "default",
+                                        "channelId": "notification-sound-channel",
+                                        "title": "Insufficient wallet Balance!",
+                                        "body": `Check wallet balance ASAP!.`
+                                    }]);
+                                let tickets = [];
+                                (() => __awaiter(this, void 0, void 0, function* () {
+                                    for (let chunk of chunks) {
+                                        try {
+                                            let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                            console.log(ticketChunk);
+                                            tickets.push(...ticketChunk);
+                                        }
+                                        catch (error) {
+                                            console.error(error);
+                                        }
+                                    }
+                                }))();
+                            }
+                            return response.status(400).send({ message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)' });
+                        }
+                        else {
+                            const payload = {
+                                "account_bank": bcode,
+                                "account_number": anumber,
+                                "amount": amount,
+                                "narration": `Platabox Wallet Withdrawal of ${amount}`,
+                                "currency": "NGN",
+                                "debit_currency": "NGN",
+                                "reference": "pbwd-" + Date.now()
+                            };
+                            const resp = yield rave.Transfer.initiate(payload);
+                            console.log(resp);
+                            if (resp.data.fullname === 'N/A') {
+                                console.log('Invalid account number');
+                                return response.send({
+                                    message: 'Invalid account number'
+                                });
+                            }
+                            if (resp.data.status === 'FAILED') {
+                                console.log('transaction failed. Please try again later');
+                                return response.send({
+                                    message: 'Transaction failed. Please check your account details and try again'
+                                });
+                            }
+                            if (resp.data.status === 'NEW') {
+                                console.log('Transaction Successful');
+                                // if successful
+                                // send success message
+                                //remove amount
+                                yield schema_1.default.User()
+                                    .updateOne({
+                                    _id: uid,
+                                }, {
+                                    $set: {
+                                        balance: new_amount,
+                                    }
+                                });
+                                yield schema_1.default.Transaction().create({
+                                    user: uid,
+                                    amount: amount,
+                                    status: 'withdraw',
+                                    date: today
+                                });
+                                console.log('new amount ' + new_amount);
+                                return response.send({
+                                    message: 'Transaction Successful'
+                                });
+                            }
+                        }
                     }
                     else {
-                        const payload = {
-                            "account_bank": bcode,
-                            "account_number": anumber,
-                            "amount": amount,
-                            "narration": `Platabox Wallet Withdrawal of ${amount}`,
-                            "currency": "NGN",
-                            "debit_currency": "NGN",
-                            "reference": "pbwd-" + Date.now()
-                        };
-                        const resp = yield rave.Transfer.initiate(payload);
-                        console.log(resp);
-                        if (resp.data.fullname === 'N/A') {
-                            console.log('Invalid account number');
-                            return response.send({
-                                message: 'Invalid account number'
-                            });
-                        }
-                        if (resp.data.status === 'FAILED') {
-                            console.log('transaction failed. Please try again later');
-                            return response.send({
-                                message: 'Transaction failed. Please check your account details and try again'
-                            });
-                        }
-                        if (resp.data.status === 'NEW') {
-                            console.log('Transaction Successful');
-                            // if successful
-                            // send success message
-                            //remove amount
-                            yield schema_1.default.User()
-                                .updateOne({
-                                _id: uid,
-                            }, {
-                                $set: {
-                                    balance: new_amount,
-                                }
-                            });
-                            yield schema_1.default.Transaction().create({
-                                user: uid,
-                                amount: amount,
-                                status: 'withdraw',
-                                date: today
-                            });
-                            console.log('new amount ' + new_amount);
-                            return response.send({
-                                message: 'Transaction Successful'
-                            });
-                        }
+                        return response.send({ message: "User not found" });
                     }
                 }
-                else {
-                    return response.send({ message: "User not found" });
+                catch (error) {
+                    console.log(error);
+                    return response.status(401).send({
+                        message: 'Something went wrong. please try again'
+                    });
                 }
-            }
-            catch (error) {
-                console.log(error);
-                return response.status(401).send({
-                    message: 'Something went wrong. please try again'
-                });
-            }
+            }));
         });
     }
     //MANUALLY TRANSFER FUNDS THROUGH BANK TRANSFER
     //SAVE THE TRANSFER REQUESTS HERE
-    static transferRequests(request, response) {
+    static transferRequests(req, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { amount, uid, anumber, bank } = request.body;
+            const { amount, uid, anumber, bank } = req.body;
             console.log(bank);
             console.log(anumber);
             console.log(uid);
-            try {
-                const user = yield schema_1.default.User().findOne({ _id: uid });
-                const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
-                console.log(user);
-                console.log(admin);
-                const limit = parseInt(user.balance) - 50;
-                if (user) {
-                    //SAVE THE TRANSFER REQUEST
-                    if (anumber.length > 10 || anumber.length < 10) {
-                        return response.send({ message: "Account number should be 10 digits" });
-                    }
-                    if (amount > limit) {
-                        return response.send({ message: `The specified amount is more than your withdrawal limit: ${limit}` });
-                    }
-                    yield schema_1.default.Transfers().create({
-                        user: uid,
-                        amount: amount,
-                        anumber: anumber,
-                        bank: bank,
-                        date: today
-                    });
-                    if (admin) {
-                        //notify admin
-                        let chunks = expo.chunkPushNotifications([{
-                                "to": admin.pushToken,
-                                "sound": "default",
-                                "channelId": "notification-sound-channel",
-                                "title": "Transfer Request!",
-                                "body": `Please attend to the transfer request ASAP!.`
-                            }]);
-                        let tickets = [];
-                        (() => __awaiter(this, void 0, void 0, function* () {
-                            for (let chunk of chunks) {
-                                try {
-                                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                                    console.log(ticketChunk);
-                                    tickets.push(...ticketChunk);
-                                }
-                                catch (error) {
-                                    console.error(error);
-                                }
+            //check balance in platabox account
+            var options = {
+                'method': 'GET',
+                'url': 'https://api.flutterwave.com/v3/balances/NGN',
+                'headers': {
+                    'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            request_1.default(options, (error, resp) => __awaiter(this, void 0, void 0, function* () {
+                if (error) {
+                    console.log(error);
+                }
+                ;
+                console.log(parseInt(resp.body.split(":")[5].split(",")[0]));
+                var balance = parseInt(resp.body.split(":")[5].split(",")[0]);
+                try {
+                    const user = yield schema_1.default.User().findOne({ _id: uid });
+                    const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
+                    console.log(user);
+                    console.log(admin);
+                    const limit = parseInt(user.balance) - 50;
+                    if (user) {
+                        //SAVE THE TRANSFER REQUEST
+                        if (anumber.length > 10 || anumber.length < 10) {
+                            return response.send({ message: "Account number should be 10 digits" });
+                        }
+                        if (amount > limit) {
+                            return response.send({ message: `The specified amount is more than your withdrawal limit: ${limit}` });
+                        }
+                        if (balance < amount) {
+                            if (admin) {
+                                //notify admin
+                                let chunks = expo.chunkPushNotifications([{
+                                        "to": admin.pushToken,
+                                        "sound": "default",
+                                        "channelId": "notification-sound-channel",
+                                        "title": "Insufficient wallet Balance!",
+                                        "body": `Check wallet balance ASAP!.`
+                                    }]);
+                                let tickets = [];
+                                (() => __awaiter(this, void 0, void 0, function* () {
+                                    for (let chunk of chunks) {
+                                        try {
+                                            let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                            console.log(ticketChunk);
+                                            tickets.push(...ticketChunk);
+                                        }
+                                        catch (error) {
+                                            console.error(error);
+                                        }
+                                    }
+                                }))();
                             }
-                        }))();
+                            return response.status(400).send({ message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)' });
+                        }
+                        yield schema_1.default.Transfers().create({
+                            user: uid,
+                            amount: amount,
+                            anumber: anumber,
+                            bank: bank,
+                            status: 'transfer',
+                            date: today
+                        });
+                        if (admin) {
+                            //notify admin
+                            let chunks = expo.chunkPushNotifications([{
+                                    "to": admin.pushToken,
+                                    "sound": "default",
+                                    "channelId": "notification-sound-channel",
+                                    "title": "Transfer Request!",
+                                    "body": `Please attend to the transfer request ASAP!.`
+                                }]);
+                            let tickets = [];
+                            (() => __awaiter(this, void 0, void 0, function* () {
+                                for (let chunk of chunks) {
+                                    try {
+                                        let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                        console.log(ticketChunk);
+                                        tickets.push(...ticketChunk);
+                                    }
+                                    catch (error) {
+                                        console.error(error);
+                                    }
+                                }
+                            }))();
+                        }
+                        return response.status(200).send({
+                            message: 'Transfer Request Funded!'
+                        });
                     }
-                    return response.status(200).send({
-                        message: 'Transfer Request Funded!'
-                    });
+                    else {
+                        console.log('User not found');
+                        return response.status(500).send({
+                            message: 'User not found'
+                        });
+                    }
                 }
-                else {
-                    console.log('User not found');
+                catch (err) {
+                    console.log(err);
                     return response.status(500).send({
-                        message: 'User not found'
+                        message: 'An error occured'
                     });
                 }
-            }
-            catch (err) {
-                console.log(err);
-                return response.status(500).send({
-                    message: 'An error occured'
-                });
-            }
+            }));
         });
     }
     //UPDATE A TRANSFER REQUEST

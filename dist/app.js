@@ -20,6 +20,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const http_1 = __importDefault(require("http"));
+const request_1 = __importDefault(require("request"));
 const node_cron_1 = __importDefault(require("node-cron"));
 const schema_1 = __importDefault(require("./schema/schema"));
 const Middleware_1 = __importDefault(require("./middleware/Middleware"));
@@ -606,15 +607,23 @@ const transfer = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 //transfer();
 const getBalance = () => __awaiter(void 0, void 0, void 0, function* () {
-    http_1.default.request({ host: 'https://api.flutterwave.com/v3/balances/NGN', method: 'GET', headers: {
+    var options = {
+        'method': 'GET',
+        'url': 'https://api.flutterwave.com/v3/balances/NGN',
+        'headers': {
             'Authorization': `Bearer ${process.env.SECRET_KEY}`,
             'Content-Type': 'application/json'
-        } }, (res) => {
-        console.log("Connected");
-        console.log(res);
+        }
+    };
+    request_1.default(options, function (error, response) {
+        if (error) {
+            console.log(error);
+        }
+        ;
+        return (response.body.split(":")[5].split(",")[0]);
     });
 });
-getBalance();
+//getBalance();
 //seedArtisan();
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
