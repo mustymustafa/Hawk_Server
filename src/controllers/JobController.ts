@@ -7,7 +7,11 @@ import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
 import { Expo } from "expo-server-sdk";
-
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio(accountSid, authToken, {
+  lazyLoading: true
+});
 
 const expo = new Expo();
 
@@ -211,8 +215,12 @@ const today = month + '/' + day + '/' + year
         //console.log("end:" + endAt)
         //console.log("now:" + now)
 
+        //create confirmation code
+        const confirmationCode = String(Date.now()).slice(9, 13);
+
       const job =  await Schema.Job().create({
             user: uid,
+            otp: confirmationCode,
           
           
             category: category,
@@ -273,6 +281,15 @@ const today = month + '/' + day + '/' + year
             status: 201
           });
 
+    //send otp to receivers
+    const message = `Delivery Token: ${confirmationCode}`;
+    client.messages
+        .create({
+          body: message,
+          from: '+17076402854',
+          to: [p1,p2,p3,p4,p5]
+        });
+    
 
 
         

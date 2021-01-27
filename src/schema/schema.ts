@@ -145,6 +145,7 @@ class Schema {
         const JobSchema = new mongoose.Schema({
             category: String,
             pTime: String,
+            otp: Number,
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
             artisan: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
             payment: String,
