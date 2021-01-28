@@ -467,6 +467,7 @@ console.log("hirer:" + hirer)
 const artisan = await Schema.Artisan().findOne({_id: uid});
 console.log(price);
     console.log("artisan name " + artisan.name)
+    console.log("artisan phone " + artisan.phone)
 
     
    
