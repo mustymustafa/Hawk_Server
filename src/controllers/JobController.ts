@@ -7,6 +7,7 @@ import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
 import { Expo } from "expo-server-sdk";
+import twilio from 'twilio';
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken, {
@@ -287,8 +288,44 @@ const today = month + '/' + day + '/' + year
         .create({
           body: message,
           from: '+17076402854',
-          to: [p1,p2,p3,p4,p5]
+          to: p1
         });
+
+        if(p2.length > 0){
+          client.messages
+          .create({
+            body: message,
+            from: '+17076402854',
+            to: p2
+          });
+        }
+
+        if(p3.length > 0){
+          client.messages
+          .create({
+            body: message,
+            from: '+17076402854',
+            to: p3
+          });
+        }
+
+        if(p4.length > 0){
+          client.messages
+          .create({
+            body: message,
+            from: '+17076402854',
+            to: p4
+          });
+        }
+
+        if(p5.length > 0){
+          client.messages
+          .create({
+            body: message,
+            from: '+17076402854',
+            to: p5
+          });
+        }
     
 
 
