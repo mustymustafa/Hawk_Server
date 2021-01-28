@@ -12,6 +12,7 @@ class Schema {
             password: String,
             pushToken: String,
             confirmationCode: String,
+            otp: String,
             isConfirmed: Boolean,
             promo: {type: Boolean, default: false},
             next_promo: String,
@@ -84,6 +85,7 @@ class Schema {
             country: String,
             city: String,
             city2: String,
+            otp: String,
         
             email: String,
             phone: String,

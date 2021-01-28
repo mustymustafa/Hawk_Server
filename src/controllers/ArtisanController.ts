@@ -1718,9 +1718,39 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
   //PLATABOX WALLET
 
+
+  //create withdraw TOKEN
+static async withdrawToken(request: Request, response: Response){
+  const {uid} = request.body
+  const user = await Schema.Artisan().findOne({_id: uid});
+      console.log(user)
+      if(user){
+        const otp = String(Date.now()).slice(9, 13);
+        await Schema.Artisan()
+        .updateOne({
+      _id: uid,
+      }, {
+      $set: {
+      otp: otp,
+      }
+         });
+
+         const message = `Withdrawal Token: ${otp}`;
+    client.messages
+        .create({
+          body: message,
+          from: '+17076402854',
+          to: user.phone
+        });
+        response.send('Token sent')
+      } else {
+        response.status(400).send({error: "user not found"})
+      }
+}
+
 //WITHDRAW FUNDS
 static async withdrawFund(req: Request, response: Response){
-  const {uid, bcode, amount, anumber} =  req.body;
+  const {uid, bcode, amount, anumber, otp} =  req.body;
 
   //check balance in platabox account
 
@@ -1798,7 +1828,11 @@ static async withdrawFund(req: Request, response: Response){
 
     else {
 
-    
+       //verify token
+       if(user.otp != otp){
+        response.status(400).send({error: 'The OTP you entered is incorrect. Please try again'})
+      }
+
     const payload = {
       "account_bank": bcode,
       "account_number": anumber,

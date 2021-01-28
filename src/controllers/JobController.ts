@@ -190,7 +190,8 @@ const today = month + '/' + day + '/' + year
   static async logRequest (request:Request, response:Response){
     const {city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime, p1,p2,p3,p4,p5} = request.body;
   //console.log(category)
-   
+   console.log(p1.length)
+   console.log(p2.length)
   console.log(city)
 
     let savedTokens;
@@ -486,6 +487,7 @@ console.log(price);
             $set: {
                 artisan: uid,
                 artisan_name: artisan.name,
+                artisan_phone: artisan.phone,
                 status: 'accepted',
                 price: price
             }
