@@ -815,12 +815,13 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
        const artisan = await Schema.Artisan().findOne({_id: job.artisan});
        console.log("artisan:" + artisan)
       
+/** 
         if(artisan.earnings > 0){
           total_price = Math.round((artisan.earnings) - job.price)
         } else {
           total_price = artisan.earnings
         }
-       
+       */
        /** 
         *     const earning = artisan.earnings
     const earnings = earning.splice( earning.indexOf(job.price), 1 );
@@ -873,18 +874,6 @@ let tickets = [];
           
           );
 
-          await Schema.Artisan().updateOne({
-            _id: job.artisan
-        },
-        {
-            $set: {
-              earnings: total_price
-            }
-        }
-  
-  
-  
-        );
     
   
         console.log("cancelled");
