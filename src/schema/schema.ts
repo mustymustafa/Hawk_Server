@@ -86,6 +86,8 @@ class Schema {
             city: String,
             city2: String,
             otp: String,
+            sub: String,
+            owner:  {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
         
             email: String,
             phone: String,

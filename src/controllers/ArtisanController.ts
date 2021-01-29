@@ -1216,6 +1216,22 @@ class ArtisanController {
   }
   
 
+  static async Subs(request: Request, response: Response) {
+    const {uid} = request.body;
+
+    try {
+      const subs = await Schema.Artisan().find({owner: uid}).sort({'_id': -1})  
+      console.log(subs)
+      return response.status(200).send({value: subs})
+    } catch(error) {
+        console.log(error.toString());
+    return  response.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+  }
+  
+
 
 
 //get registratins 
