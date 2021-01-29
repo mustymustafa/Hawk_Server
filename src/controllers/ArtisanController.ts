@@ -124,13 +124,12 @@ class ArtisanController {
     console.log("owner id " + owner)
 
     try {
-      const foundEmail = await Schema.Artisan().find({ phone: phone.trim() });
+      const foundEmail = await Schema.Artisan().find({ phone: phone});
       if (foundEmail && foundEmail.length > 0) {
 
         console.log(foundEmail[0])
         return response.status(409).send({
-          message: 'This number already exists',
-          isConfirmed: foundEmail[0].isConfirmed
+          message: 'This number already exists'
         });
       }
 
@@ -148,6 +147,7 @@ class ArtisanController {
       await Schema.Artisan().create({
         owner: owner,
         pic: findOwner.pic,
+        category: findOwner.category,
         cac: findOwner.cac,
         country: findOwner.country,
         name: name.trim(),
@@ -1218,6 +1218,7 @@ class ArtisanController {
 
   static async Subs(request: Request, response: Response) {
     const {uid} = request.body;
+    console.log(uid)
 
     try {
       const subs = await Schema.Artisan().find({owner: uid}).sort({'_id': -1})  
