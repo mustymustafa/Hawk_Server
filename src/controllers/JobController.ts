@@ -289,6 +289,13 @@ const today = month + '/' + day + '/' + year
         .create({
           body: message,
           from: '+17076402854',
+          to: user.phone
+        });
+
+    client.messages
+        .create({
+          body: message,
+          from: '+17076402854',
           to: p1
         });
 
@@ -451,6 +458,7 @@ console.log("hirer:" + hirer)
 
 }
 
+/** 
   static async acceptJob(request:Request, response:Response){
 
     const {uid, job_id, price} = request.body
@@ -542,7 +550,7 @@ let tickets = [];
 
 
   }
-
+*/
 
   static async acceptTaxi(request:Request, response:Response){
 
@@ -673,6 +681,7 @@ console.log("artisan " + artisan.name)
                 artisan: uid,
                 status: 'accepted',
                 artisan_name: artisan.name,
+                artisan_phone: artisan.phone,
                 price: price
             }
         }
@@ -681,18 +690,7 @@ console.log("artisan " + artisan.name)
 
         );
 
-        await Schema.Artisan().updateOne({
-          _id: uid
-      },
-      {
-          $set: {
-            earnings: total_price
-          }
-      }
-
-
-
-      );
+      
 
   
 
