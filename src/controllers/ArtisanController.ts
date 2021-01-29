@@ -1231,6 +1231,59 @@ class ArtisanController {
     }
   }
   
+  //delete sub account
+  static async deleteSub(request:Request, response:Response){
+
+    const {uid} = request.body
+  
+    
+
+
+    const sub = await Schema.Artisan().findOne({_id: uid})
+    console.log("sub found:" + sub);
+
+       
+       
+
+
+    
+    if (!sub) {
+        return response.status(404).send({
+          message: 'sub does not exist'
+        });
+      }
+   
+    try {
+
+        await Schema.Artisan().deleteOne({_id: uid});
+
+        console.log("deleted");
+        response.status(201).send({
+            message: 'Sub Deleted successfully',
+            status: 201
+          });
+       
+
+
+
+
+
+
+
+
+          
+
+
+
+    } catch(error) {
+        console.log(error)
+        return response.status(404).send("an error occured")
+    }
+  
+
+
+
+  }
 
 
 
