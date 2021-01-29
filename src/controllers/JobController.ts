@@ -458,7 +458,7 @@ console.log("hirer:" + hirer)
 
 }
 
-/** 
+
   static async acceptJob(request:Request, response:Response){
 
     const {uid, job_id, price} = request.body
@@ -550,7 +550,7 @@ let tickets = [];
 
 
   }
-*/
+
 
   static async acceptTaxi(request:Request, response:Response){
 
