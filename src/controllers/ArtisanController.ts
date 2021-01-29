@@ -114,6 +114,63 @@ class ArtisanController {
     }
   }
 
+  //create subaccount
+  static async Subsignup(request: Request, response: Response) {
+    const {
+      name, sub, password, phone, owner
+    } = request.body;
+
+    console.log(sub);
+    console.log("owner id " + owner)
+
+    try {
+      const foundEmail = await Schema.Artisan().find({ phone: phone.trim() });
+      if (foundEmail && foundEmail.length > 0) {
+
+        console.log(foundEmail[0])
+        return response.status(409).send({
+          message: 'This number already exists',
+          isConfirmed: foundEmail[0].isConfirmed
+        });
+      }
+
+    
+      if (!phone) {
+
+        return response.status(409).send({
+          message: 'Please enter a valid  number',
+        });
+      }
+
+    
+      const findOwner = await Schema.Artisan().findOne({ _id: owner });
+      console.log("owner: " + findOwner)
+      await Schema.Artisan().create({
+        owner: owner,
+        pic: findOwner.pic,
+        cac: findOwner.cac,
+        country: findOwner.country,
+        name: name.trim(),
+        sub: sub,
+        password: bcrypt.hashSync(password.trim(), ArtisanController.generateSalt()),
+        phone,
+        isConfirmed: true
+      });
+
+
+      response.status(201).send({
+        message: 'User created successfully',
+        status: 201
+      });
+    } catch (error) {
+      console.log(error.toString());
+      response.status(500).send({
+        message: "Somenthing went wrong"
+      })
+    }
+  }
+
+
 
 
   //continue signup

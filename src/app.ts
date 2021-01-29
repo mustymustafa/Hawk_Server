@@ -58,6 +58,8 @@ app.post('/api/v1/signup', Middleware.userSignupMiddleware, UserController.signu
 app.post('/api/v1/signin', Middleware.signinPhoneMiddleware, UserController.signin);
 app.post('/api/v1/adminsignin', Middleware.signinMiddleware, ArtisanController.adminSignin);
 
+//subaccount
+app.post('/api/v1/subaccount', ArtisanController.Subsignup);
 
 
 app.post('/api/v1/confirmation', UserController.confirm);
