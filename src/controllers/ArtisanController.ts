@@ -1189,7 +1189,7 @@ class ArtisanController {
 
 
     try {
-      const drivers = await Schema.Artisan().find({'category': 'driver'}).where({'active': true}).sort({'_id': -1})  
+      const drivers = await Schema.Artisan().find({'category': 'driver'}).where({'active': true}).where({'lat': !undefined}).where({'long': !undefined})
       console.log(drivers)
       return response.status(200).send({value: drivers})
     } catch(error) {
@@ -1204,7 +1204,7 @@ class ArtisanController {
 
 
     try {
-      const logs = await Schema.Artisan().find({'category': 'log'}).where({'active': true}).sort({'_id': -1})  
+      const logs = await Schema.Artisan().find({'category': 'log'}).where({'active': true}).where({'lat': !undefined}).where({'long': !undefined})
       console.log(logs)
       return response.status(200).send({value: logs})
     } catch(error) {
