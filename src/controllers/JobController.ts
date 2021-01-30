@@ -230,11 +230,11 @@ const today = month + '/' + day + '/' + year
             city: city,
             city2: city2,
 
-            p1: p1,
-            p2: p2,
-            p3: p3,
-            p4: p4,
-            p5: p5,
+            n1: p1,
+            n2: p2,
+            n3: p3,
+            n4: p4,
+            n5: p5,
           
 
             status: 'active',
@@ -248,7 +248,7 @@ const today = month + '/' + day + '/' + year
             to5: to5,
 
             from: from,
-            pTime: pTime,
+       
             lat: lat,
             long: long,
 
