@@ -15,6 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const schema_1 = __importDefault(require("../schema/schema"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const expo_server_sdk_1 = require("expo-server-sdk");
+const twilio_1 = __importDefault(require("twilio"));
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio_1.default(accountSid, authToken, {
+    lazyLoading: true
+});
 const expo = new expo_server_sdk_1.Expo();
 var transporter = nodemailer_1.default.createTransport({
     service: 'gmail',
@@ -129,8 +135,10 @@ class JobController {
     }
     static logRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime } = request.body;
+            const { city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime, p1, p2, p3, p4, p5 } = request.body;
             //console.log(category)
+            console.log(p1.length);
+            console.log(p2.length);
             console.log(city);
             let savedTokens;
             const user = yield schema_1.default.User().findOne({ _id: uid });
@@ -149,12 +157,20 @@ class JobController {
                 // console.log(pTime)
                 //console.log("end:" + endAt)
                 //console.log("now:" + now)
+                //create confirmation code
+                const confirmationCode = String(Date.now()).slice(9, 13);
                 const job = yield schema_1.default.Job().create({
                     user: uid,
+                    otp: confirmationCode,
                     category: category,
                     location: location,
                     city: city,
                     city2: city2,
+                    p1: p1,
+                    p2: p2,
+                    p3: p3,
+                    p4: p4,
+                    p5: p5,
                     status: 'active',
                     payment: payment,
                     rated: false,
@@ -191,6 +207,52 @@ class JobController {
                     message: 'Job created successfully',
                     status: 201
                 });
+                //send otp to receivers
+                const message = `Delivery Token: ${confirmationCode}`;
+                client.messages
+                    .create({
+                    body: message,
+                    from: '+17076402854',
+                    to: user.phone
+                });
+                client.messages
+                    .create({
+                    body: message,
+                    from: '+17076402854',
+                    to: p1
+                });
+                if (p2.length > 0) {
+                    client.messages
+                        .create({
+                        body: message,
+                        from: '+17076402854',
+                        to: p2
+                    });
+                }
+                if (p3.length > 0) {
+                    client.messages
+                        .create({
+                        body: message,
+                        from: '+17076402854',
+                        to: p3
+                    });
+                }
+                if (p4.length > 0) {
+                    client.messages
+                        .create({
+                        body: message,
+                        from: '+17076402854',
+                        to: p4
+                    });
+                }
+                if (p5.length > 0) {
+                    client.messages
+                        .create({
+                        body: message,
+                        from: '+17076402854',
+                        to: p5
+                    });
+                }
                 const artisan = yield schema_1.default.Artisan().find({ category: 'log', pushToken: { $exists: true }, $or: [
                         { city: city },
                         { city2: city2 }
@@ -285,6 +347,7 @@ class JobController {
             const artisan = yield schema_1.default.Artisan().findOne({ _id: uid });
             console.log(price);
             console.log("artisan name " + artisan.name);
+            console.log("artisan phone " + artisan.phone);
             if (!job && !hirer) {
                 return response.status(404).send({
                     message: 'Job does not exist'
@@ -297,6 +360,7 @@ class JobController {
                     $set: {
                         artisan: uid,
                         artisan_name: artisan.name,
+                        artisan_phone: artisan.phone,
                         status: 'accepted',
                         price: price
                     }
@@ -420,14 +484,8 @@ class JobController {
                         artisan: uid,
                         status: 'accepted',
                         artisan_name: artisan.name,
+                        artisan_phone: artisan.phone,
                         price: price
-                    }
-                });
-                yield schema_1.default.Artisan().updateOne({
-                    _id: uid
-                }, {
-                    $set: {
-                        earnings: total_price
                     }
                 });
                 response.status(200).send({ hirer: hirer.name, number: hirer.phone, job: job });
@@ -499,12 +557,13 @@ class JobController {
             console.log("hirer:" + hirer);
             const artisan = yield schema_1.default.Artisan().findOne({ _id: job.artisan });
             console.log("artisan:" + artisan);
-            if (artisan.earnings > 0) {
-                total_price = Math.round((artisan.earnings) - job.price);
-            }
-            else {
-                total_price = artisan.earnings;
-            }
+            /**
+                    if(artisan.earnings > 0){
+                      total_price = Math.round((artisan.earnings) - job.price)
+                    } else {
+                      total_price = artisan.earnings
+                    }
+                   */
             /**
              *     const earning = artisan.earnings
          const earnings = earning.splice( earning.indexOf(job.price), 1 );
@@ -541,13 +600,6 @@ class JobController {
                 }, {
                     $set: {
                         status: 'cancelled'
-                    }
-                });
-                yield schema_1.default.Artisan().updateOne({
-                    _id: job.artisan
-                }, {
-                    $set: {
-                        earnings: total_price
                     }
                 });
                 console.log("cancelled");

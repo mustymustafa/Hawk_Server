@@ -486,10 +486,40 @@ class UserController {
             }
         });
     }
+    //create withdraw TOKEN
+    static withdrawToken(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.body;
+            const user = yield schema_1.default.User().findOne({ _id: uid });
+            console.log(user);
+            if (user) {
+                const otp = String(Date.now()).slice(9, 13);
+                yield schema_1.default.User()
+                    .updateOne({
+                    _id: uid,
+                }, {
+                    $set: {
+                        otp: otp,
+                    }
+                });
+                const message = `Withdrawal Token: ${otp}`;
+                client.messages
+                    .create({
+                    body: message,
+                    from: '+17076402854',
+                    to: user.phone
+                });
+                response.send('Token sent');
+            }
+            else {
+                response.status(400).send({ error: "user not found" });
+            }
+        });
+    }
     //WITHDRAW FUNDS
     static withdrawFund(req, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { uid, bcode, amount, anumber } = req.body;
+            const { uid, bcode, amount, anumber, otp, } = req.body;
             //check balance in platabox account
             var options = {
                 'method': 'GET',
@@ -548,6 +578,10 @@ class UserController {
                             return response.status(400).send({ message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)' });
                         }
                         else {
+                            //verify token
+                            if (user.otp != otp) {
+                                response.status(400).send({ error: 'The OTP you entered is incorrect. Please try again' });
+                            }
                             const payload = {
                                 "account_bank": bcode,
                                 "account_number": anumber,

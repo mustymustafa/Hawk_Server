@@ -45,6 +45,10 @@ app.use(cookie_parser_1.default());
 app.post('/api/v1/signup', Middleware_1.default.userSignupMiddleware, UserController_1.default.signup);
 app.post('/api/v1/signin', Middleware_1.default.signinPhoneMiddleware, UserController_1.default.signin);
 app.post('/api/v1/adminsignin', Middleware_1.default.signinMiddleware, ArtisanController_1.default.adminSignin);
+//subaccount
+app.post('/api/v1/subaccount', ArtisanController_1.default.Subsignup);
+app.post('/api/v1/:uid/getSubs', ArtisanController_1.default.Subs);
+app.post('/api/v1/:uid/deleteSub', ArtisanController_1.default.deleteSub);
 app.post('/api/v1/confirmation', UserController_1.default.confirm);
 app.post('/api/v1/resend-otp', UserController_1.default.resendOtp);
 app.post('/api/v1/forgot-password', UserController_1.default.forgotPassword);
@@ -80,8 +84,9 @@ app.post('/api/v1/idexpiry', ArtisanController_1.default.idExpiry);
 //set vehicle details
 app.post('/api/v1/vehicledetails', ArtisanController_1.default.vehicleDetails);
 app.get('/api/v1/user/:uid', UserController_1.default.userDetails);
-//get drivers
+//get drivers and logs
 app.get('/api/v1/drivers', ArtisanController_1.default.getDrivers);
+app.get('/api/v1/logs', ArtisanController_1.default.getLog);
 //push notification
 app.post('/api/v1/token/:uid', UserController_1.default.savePushToken);
 //app.post('/api/v1/jobrequest', JobController.createJob);

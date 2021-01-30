@@ -96,6 +96,52 @@ class ArtisanController {
             }
         });
     }
+    //create subaccount
+    static Subsignup(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { name, sub, password, phone, owner } = request.body;
+            console.log(sub);
+            console.log("owner id " + owner);
+            try {
+                const foundEmail = yield schema_1.default.Artisan().find({ phone: phone });
+                if (foundEmail && foundEmail.length > 0) {
+                    console.log(foundEmail[0]);
+                    return response.status(409).send({
+                        message: 'This number already exists'
+                    });
+                }
+                if (!phone) {
+                    return response.status(409).send({
+                        message: 'Please enter a valid  number',
+                    });
+                }
+                const findOwner = yield schema_1.default.Artisan().findOne({ _id: owner });
+                console.log("owner: " + findOwner);
+                yield schema_1.default.Artisan().create({
+                    owner: owner,
+                    pic: findOwner.pic,
+                    category: findOwner.category,
+                    cac: findOwner.cac,
+                    country: findOwner.country,
+                    name: name.trim(),
+                    sub: sub,
+                    password: bcrypt_1.default.hashSync(password.trim(), ArtisanController.generateSalt()),
+                    phone,
+                    isConfirmed: true
+                });
+                response.status(201).send({
+                    message: 'User created successfully',
+                    status: 201
+                });
+            }
+            catch (error) {
+                console.log(error.toString());
+                response.status(500).send({
+                    message: "Somenthing went wrong"
+                });
+            }
+        });
+    }
     //continue signup
     static continueSignup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -886,6 +932,48 @@ class ArtisanController {
             }
         });
     }
+    static Subs(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.body;
+            console.log(uid);
+            try {
+                const subs = yield schema_1.default.Artisan().find({ owner: uid }).sort({ '_id': -1 });
+                console.log(subs);
+                return response.status(200).send({ value: subs });
+            }
+            catch (error) {
+                console.log(error.toString());
+                return response.status(500).send({
+                    message: 'something went wrong'
+                });
+            }
+        });
+    }
+    //delete sub account
+    static deleteSub(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.body;
+            const sub = yield schema_1.default.Artisan().findOne({ _id: uid });
+            console.log("sub found:" + sub);
+            if (!sub) {
+                return response.status(404).send({
+                    message: 'sub does not exist'
+                });
+            }
+            try {
+                yield schema_1.default.Artisan().deleteOne({ _id: uid });
+                console.log("deleted");
+                response.status(201).send({
+                    message: 'Sub Deleted successfully',
+                    status: 201
+                });
+            }
+            catch (error) {
+                console.log(error);
+                return response.status(404).send("an error occured");
+            }
+        });
+    }
     //get registratins 
     static getLogRegistartion(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -1332,10 +1420,40 @@ class ArtisanController {
         });
     }
     //PLATABOX WALLET
+    //create withdraw TOKEN
+    static withdrawToken(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.body;
+            const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+            console.log(user);
+            if (user) {
+                const otp = String(Date.now()).slice(9, 13);
+                yield schema_1.default.Artisan()
+                    .updateOne({
+                    _id: uid,
+                }, {
+                    $set: {
+                        otp: otp,
+                    }
+                });
+                const message = `Withdrawal Token: ${otp}`;
+                client.messages
+                    .create({
+                    body: message,
+                    from: '+17076402854',
+                    to: user.phone
+                });
+                response.send('Token sent');
+            }
+            else {
+                response.status(400).send({ error: "user not found" });
+            }
+        });
+    }
     //WITHDRAW FUNDS
     static withdrawFund(req, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { uid, bcode, amount, anumber } = req.body;
+            const { uid, bcode, amount, anumber, otp } = req.body;
             //check balance in platabox account
             var options = {
                 'method': 'GET',
@@ -1396,6 +1514,10 @@ class ArtisanController {
                             return response.status(400).send({ message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)' });
                         }
                         else {
+                            //verify token
+                            if (user.otp != otp) {
+                                response.status(400).send({ error: 'The OTP you entered is incorrect. Please try again' });
+                            }
                             const payload = {
                                 "account_bank": bcode,
                                 "account_number": anumber,
