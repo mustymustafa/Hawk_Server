@@ -413,7 +413,7 @@ const today = month + '/' + day + '/' + year
       console.log("area2:" + area2);
       
       
-    const job = await Schema.Job().find({category: category}).where({area1: area1,$or:[{area2: area2}], $and: [{status: 'active'}]}).sort({'_id': -1})  
+    const job = await Schema.Job().find({category: category}).where({area1: area1, $or:[{area1: area2}]}).or([{area2: area1}]).or([{area2: area2}]).and([{status: 'active'}]).sort({'_id': -1})
  
     console.log(job)
 
