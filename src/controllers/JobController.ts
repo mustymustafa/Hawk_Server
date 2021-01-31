@@ -198,7 +198,8 @@ const today = month + '/' + day + '/' + year
 
     
     const user = await Schema.User().findOne({_id: uid});
-
+    console.log(price)
+    console.log(user.balance)
     try {
 
       //check if it's a wallet payment
