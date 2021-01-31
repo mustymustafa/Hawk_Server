@@ -1356,6 +1356,81 @@ let tickets = [];
 
 }
 
+static async trackReq(request:Request, response:Response) {
+  var total = 0;
+
+
+  const {uid, name, job_id} = request.body; 
+
+  let savedTokens;
+
+  console.log("category" + name);
+  console.log("user:" + uid);
+
+  const user = await Schema.User().findOne({_id: uid});
+  console.log(user)
+  
+  // find artisan
+const job = await Schema.Job().findOne({_id: job_id,  $and: [{category: name}]}).where('status').equals('accepted')
+
+console.log('Job A' + job)
+
+  if(job){
+    const findArtisan = await Schema.Artisan().findOne({_id: job.artisan})
+    console.log(findArtisan)
+  
+
+
+
+
+
+try {
+
+
+
+
+  const getRating = findArtisan.rating
+  console.log(getRating.length);
+
+  for(var i = 0; i < getRating.length; i++){
+      total += getRating[i]
+  }
+  var rate = Math.round(total / getRating.length);
+  console.log("rating:" + rate)
+
+
+       response.status(200).send({artisan: findArtisan, job: job, rating: rate})
+    
+
+   
+// send notification
+
+
+savedTokens = user.pushToken;
+
+console.log(savedTokens)
+
+
+
+
+
+
+} catch(error) {
+
+  console.log(error);
+  response.status(404).send("something went wrong")
+
+}
+
+} else {
+  console.log("No Driver Available")
+  return response.status(404).send("no driver yet")
+}
+
+
+
+}
+
 
 // Job Rating
 

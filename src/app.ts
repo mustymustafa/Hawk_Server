@@ -187,6 +187,7 @@ app.post('/api/v1/job/:job_id/complete', JobController.completeJob);
 
 app.post('/api/v1/:uid/jobs', JobController.artisanJobs);
 app.post('/api/v1/:uid/job/artisan', JobController.getArtisan);
+app.post('/api/v1/:uid/job/track', JobController.trackReq);
 app.post('/api/v1/:uid/job/artisan/start', JobController.startedJob);
 app.post('/api/v1/job/:uid/lastjob', JobController.checkRating);
 app.post('/api/v1/job/:uid/rate', JobController.rateArtisan);
