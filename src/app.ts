@@ -86,7 +86,6 @@ app.post('/api/v1/setcert', ArtisanController.setCert);
 app.post('/api/v1/setschool', ArtisanController.setSchool);
 app.post('/api/v1/setcac', ArtisanController.setCac);
 
-
 //vehicle papers start
 
 app.post('/api/v1/vl', upload.single('image'), ArtisanController.uploadVl);
@@ -221,6 +220,10 @@ app.post('/api/v1/:uid/driverwithdraw', ArtisanController.withdrawFund);
 app.post('/api/v1/:uid/drivertransferRequest', ArtisanController.transferRequests);
 app.post('/api/v1/:uid/driverupdateTransfer', ArtisanController.updateTransfer);
 app.post('/api/v1/:uid/drivergetTrans', ArtisanController.allTrans);
+
+
+///emergency 
+app.post('/api/v1/:uid/emergency', UserController.Emergency);
 
 
 

@@ -968,6 +968,15 @@ static async getTrans(request: Request, response: Response){
 }
 
 
+//emergency
+ static async Emergency(request: Request, response: Response){
+const {uid, dic, location} = request.body
+
+
+
+response.status(200).send({message: 'emergency reported'})
+ 
+ }
 
 
 
