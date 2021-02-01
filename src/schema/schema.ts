@@ -115,8 +115,8 @@ class Schema {
             sname: String,
             sphone: String,
 
-            lat:  {type: Number, default: 0},
-            long:  {type: Number, default: 0},
+            lat: String,
+            long: String,
             location: String,
             start: {type: Boolean, default: false},
             arrived: {type: Boolean, default: false},
@@ -171,20 +171,20 @@ class Schema {
             code: Number,
             
             from: String,
-            lat:  {type: Number, default: 0},
-            long:  {type: Number, default: 0},
+            lat: String,
+            long: String,
 
-            destLat:  {type: Number, default: 0},
-            destLat2:  {type: Number, default: 0},
-            destLat3:  {type: Number, default: 0},
-            destLat4:  {type: Number, default: 0},
-            destLat5:  {type: Number, default: 0},
+            destLat: String,
+            destLat2: String,
+            destLat3: String,
+            destLat4: String,
+            destLat5: String,
 
-            destLong:  {type: Number, default: 0},
-            destLong2:  {type: Number, default: 0},
-            destLong3:  {type: Number, default: 0},
-            destLong4:  {type: Number, default: 0},
-            destLong5:  {type: Number, default: 0},
+            destLong: String,
+            destLong2: String,
+            destLong3: String,
+            destLong4: String,
+            destLong5: String,
 
             distance:  String,
             time: String,
@@ -225,8 +225,8 @@ class Schema {
            
             location:  String,
         
-            lat:  {type: Number, default: 0},
-            long:  {type: Number, default: 0}, 
+            lat: String,
+            long: String, 
 
             area1: String,
             area2: String,
