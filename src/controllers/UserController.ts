@@ -605,7 +605,8 @@ static async withdrawFund(req: Request, response: Response){
       console.log(error)
     };
   
-    console.log(  parseInt(resp.body.split(":")[5].split(",")[0]))
+    console.log(resp.body)
+    console.log(parseInt(resp.body.split(":")[5].split(",")[0]))
     var balance =  parseInt(resp.body.split(":")[5].split(",")[0])
    
   try {
