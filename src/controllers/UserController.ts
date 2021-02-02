@@ -969,6 +969,45 @@ static async getTrans(request: Request, response: Response){
 
 
 //emergency
+static async emergencyContact(request: Request, response: Response){
+  const {uid, phone, email, name} = request.body
+
+  try {
+    const user = await Schema.User().findOne({_id: uid});
+    console.log(user);
+    if(user){
+      await Schema.User()
+      .updateOne({
+        _id: uid,
+      }, {
+      $set: {
+        ename: name,
+        ephone: phone,
+        eemail: email,
+
+      }
+    });
+    
+    response.status(200).send({message: 'Emergency contact added!'})
+
+    } else {
+      response.status(404).send({message: 'User not found'})
+    }
+  } catch(err){
+    console.log(err)
+    return  response.status(500).send({
+      message: 'An error occured'
+    });
+  }
+  
+  
+  
+  
+   
+   }
+  
+
+
  static async Emergency(request: Request, response: Response){
 const {uid, dic, location} = request.body
 

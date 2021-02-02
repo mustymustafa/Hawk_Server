@@ -223,6 +223,9 @@ app.post('/api/v1/:uid/drivergetTrans', ArtisanController.allTrans);
 
 
 ///emergency 
+
+app.post('/api/v1/:uid/emergency/contact', UserController.emergencyContact);
+
 app.post('/api/v1/:uid/emergency', UserController.Emergency);
 
 
