@@ -289,8 +289,7 @@ const deleteU = cron.schedule("00 23 * * *", async () => {
   const delete_account = await Schema.Artisan().deleteMany({isConfirmed: false})
   console.log("deleted:" + delete_account)
 
-  const delete_user = await Schema.User().deleteMany({isConfirmed: false})
-  console.log("deleted:" + delete_user)
+ 
   
 },
 
