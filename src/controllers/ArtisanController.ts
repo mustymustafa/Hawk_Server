@@ -132,9 +132,19 @@ class ArtisanController {
     } = request.body;
 
     console.log(sub);
-    console.log("owner id " + owner)
+
 
     try {
+          
+    console.log("owner id " + owner)
+    const findOwner = await Schema.Artisan().findOne({ _id: owner });
+    console.log("owner: " + findOwner)
+    if(findOwner.sub === sub){
+      return response.status(409).send({
+        message: 'you are not authorized to create a subaccount',
+      });
+    }
+
       const foundEmail = await Schema.Artisan().find({ phone: phone});
       if (foundEmail && foundEmail.length > 0) {
 
@@ -153,13 +163,7 @@ class ArtisanController {
       }
 
     
-      const findOwner = await Schema.Artisan().findOne({ _id: owner });
-      console.log("owner: " + findOwner)
-      if(owner.sub === 'yes'){
-        return response.status(409).send({
-          message: 'you are not authorized to create a subaccount',
-        });
-      }
+  
       await Schema.Artisan().create({
         owner: owner,
         pic: findOwner.pic,
