@@ -813,7 +813,7 @@ class ArtisanController {
     console.log(request.body)
     try {
       const email = request.body.email
-      const image = request.body.image,
+      const image = request.body.image
       console.log(email)
       console.log(image)
 
