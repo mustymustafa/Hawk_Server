@@ -67,13 +67,24 @@ class ArtisanController {
     console.log(phone);
 
     try {
-      const foundEmail = await Schema.Artisan().find({ phone: phone.trim() });
+      const foundPhone = await Schema.Artisan().find({ phone: phone.trim() });
+      const foundEmail = await Schema.Artisan().find({ email: email.trim() });
+
       if (foundEmail && foundEmail.length > 0) {
 
         console.log(foundEmail[0])
         return response.status(409).send({
-          message: 'This number already exists',
+          message: 'This email already exists',
           isConfirmed: foundEmail[0].isConfirmed
+        });
+      }
+
+      if (foundPhone && foundPhone.length > 0) {
+
+        console.log(foundPhone[0])
+        return response.status(409).send({
+          message: 'This number already exists',
+          isConfirmed: foundPhone[0].isConfirmed
         });
       }
 
@@ -144,6 +155,11 @@ class ArtisanController {
     
       const findOwner = await Schema.Artisan().findOne({ _id: owner });
       console.log("owner: " + findOwner)
+      if(owner.sub === 'yes'){
+        return response.status(409).send({
+          message: 'you are not authorized to create a subaccount',
+        });
+      }
       await Schema.Artisan().create({
         owner: owner,
         pic: findOwner.pic,
@@ -154,7 +170,8 @@ class ArtisanController {
         sub: sub,
         password: bcrypt.hashSync(password.trim(), ArtisanController.generateSalt()),
         phone,
-        isConfirmed: true
+        isConfirmed: true,
+        active: true
       });
 
 
@@ -182,6 +199,8 @@ class ArtisanController {
 
     console.log(request.body);
     const foundUser: any = await Schema.Artisan().findOne({ email });
+    const admin1 = await Schema.Artisan().findOne({name: 'Platabox Test'})
+    const admin2 = await Schema.Artisan().findOne({name: 'Platabox Test2'})
 
     if (foundUser && Object.keys(foundUser).length > 0) {
       console.log(foundUser);
@@ -216,11 +235,17 @@ class ArtisanController {
           }
         });
 
-
+            //notify admin
+            ArtisanController.sendMail(admin1.email, 'New Registration.', 'Please Review and activate');
+            ArtisanController.sendMail(admin2.email, 'New Registration.', 'Please Review and activate');
+        
         return response.status(200).send({
           message: 'User created successfully',
           status: 201
         });
+
+
+
       } catch (error) {
         console.log(error.toString());
         response.status(500).send({
@@ -788,7 +813,7 @@ class ArtisanController {
     console.log(request.body)
     try {
       const email = request.body.email
-      const image = request.body.image
+      const image = request.body.image,
       console.log(email)
       console.log(image)
 
