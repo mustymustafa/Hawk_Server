@@ -438,8 +438,8 @@ console.log("hirer:" + hirer)
   static async logRequests(request:Request, response:Response) {
     const {category, city, city2} = request.body; 
     console.log(category);
-    console.log("area1:" + city);
-    console.log("area2:" + city2);
+    console.log("city:" + city);
+    console.log("city2:" + city2);
     
   
    
