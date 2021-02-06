@@ -18,6 +18,9 @@ class Schema {
             next_promo: String,
             promo_date: String,
             createdAt: String,
+            ename: String,
+            ephone: String,
+            eemail: String,
             balance: {type: Number, default: 0}
 
         })
@@ -149,7 +152,7 @@ class Schema {
         const JobSchema = new mongoose.Schema({
             category: String,
             pTime: String,
-            otp: Number,
+            otp: String,
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
             artisan: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},
             payment: String,
@@ -230,6 +233,10 @@ class Schema {
 
             area1: String,
             area2: String,
+
+            phone: String,
+            email: String,
+            name: String,
             
             createdAt: {type: Date, default: Date.now},
         
