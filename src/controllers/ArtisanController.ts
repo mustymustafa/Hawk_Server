@@ -1529,10 +1529,10 @@ static async getDriverRegistartion(request: Request, response: Response) {
             lat: lat,
             long: long,
             location: location,
-            area1: area1.trim(),
-            area2: area2.trim(),
-            city: city.trim(),
-            city2: city2.trim()
+            area1: undefined ? '' : area1.trim(),
+            area2: undefined ? '' : area2.trim(),
+            city: undefined ? '' : city.trim(),
+            city2: undefined ? '' : city2.trim(),
         
           }
         });
