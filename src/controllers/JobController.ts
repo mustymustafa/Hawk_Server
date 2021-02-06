@@ -448,7 +448,7 @@ console.log("hirer:" + hirer)
     { city: city2},
     { city2: city},
     { city2: city2},
-    { name: 'Platabox Test2'},
+    { name: 'Mustapha Ahmed'},
   ]}).and([{status: 'active'}]).sort({'_id': -1})  
 
   console.log(job)
@@ -1150,6 +1150,7 @@ console.log(hirer.pushToken)
         //debit user
         const new_balance = hirer.balance - parseInt(job.price)
         console.log(new_balance)
+        
         if(job.payment == 'wallet'){
 
           // debit user
