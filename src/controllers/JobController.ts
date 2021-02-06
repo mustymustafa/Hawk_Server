@@ -228,8 +228,8 @@ const today = month + '/' + day + '/' + year
           
             category: category,
             location: location,
-            city: city.trim(),
-            city2: city2.trim(),
+            city: city,
+            city2: city2,
 
             n1: p1,
             n2: p2,
