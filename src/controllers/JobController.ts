@@ -341,7 +341,10 @@ const today = month + '/' + day + '/' + year
         
      const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true},   $or: [
       { city: city },
-      { city2: city2 }
+      { city: city2 },
+      { city2: city },
+      { city2: city2 },
+
     ] })
      
 
