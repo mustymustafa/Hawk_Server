@@ -339,13 +339,13 @@ const today = month + '/' + day + '/' + year
 
 
         
-     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true},   $or: [
+     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}}).where({$or: [
       { city: city },
       { city: city2 },
       { city2: city },
       { city2: city2 },
 
-    ] })
+    ]})
      
 
      if (!artisan) {
@@ -438,15 +438,16 @@ console.log("hirer:" + hirer)
   static async logRequests(request:Request, response:Response) {
     const {category, city, city2} = request.body; 
     console.log(category);
-    //console.log("area1:" + area1);
-    //console.log("area2:" + area2);
+    console.log("area1:" + city);
+    console.log("area2:" + city2);
     
   
+   
   const job = await Schema.Job().find({category: category}).where({$or: [
-    { city: city },
-    { city: city2 },
-    { city2: city },
-    { city2: city2 }, 
+    { city: undefined ? '' : city.trim()},
+    { city: undefined ? '' : city2.trim()},
+    { city2: undefined ? '' : city.trim()},
+    { city2: undefined ? '' : city2.trim()}, 
   ]}).and([{status: 'active'}]).sort({'_id': -1})  
 
   console.log(job)
