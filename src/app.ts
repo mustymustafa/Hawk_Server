@@ -213,8 +213,8 @@ app.post('/api/v1/:uid/fund', UserController.fundWallet);
 app.post('/api/v1/:uid/withdraw', UserController.withdrawFund);
 app.post('/api/v1/:uid/transferRequest', UserController.transferRequests);
 app.post('/api/v1/:uid/updateTransfer', UserController.updateTransfer);
-app.post('/api/v1/:uid/getTrans', UserController.getTrans);
-app.get('/api/v1/getTransactions', UserController.allTrans);
+app.post('/api/v1/:uid/getTrans', UserController.allTrans);
+app.get('/api/v1/getTransactions', UserController.getTrans);
 //PLATABOX DRIVER WALLET
 app.post('/api/v1/:uid/driverwithdraw', ArtisanController.withdrawFund);
 app.post('/api/v1/:uid/drivertransferRequest', ArtisanController.transferRequests);
