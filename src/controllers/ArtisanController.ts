@@ -203,8 +203,7 @@ class ArtisanController {
 
     console.log(request.body);
     const foundUser: any = await Schema.Artisan().findOne({ email });
-    const admin1 = await Schema.Artisan().findOne({name: 'Platabox Test'})
-    const admin2 = await Schema.Artisan().findOne({name: 'Platabox Test2'})
+
 
     if (foundUser && Object.keys(foundUser).length > 0) {
       console.log(foundUser);
@@ -240,8 +239,8 @@ class ArtisanController {
         });
 
             //notify admin
-            ArtisanController.sendMail(admin1.email, 'New Registration.', 'Please Review and activate');
-            ArtisanController.sendMail(admin2.email, 'New Registration.', 'Please Review and activate');
+            ArtisanController.sendMail('mohammed.ahmed1@aun.edu.ng', 'New Registration.', 'Please Review and activate');
+            ArtisanController.sendMail('mustapha.mohammed1@aun.edu.ng', 'New Registration.', 'Please Review and activate');
         
         return response.status(200).send({
           message: 'User created successfully',
