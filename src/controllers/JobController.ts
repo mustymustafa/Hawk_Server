@@ -448,6 +448,7 @@ console.log("hirer:" + hirer)
     { city: city2},
     { city2: city},
     { city2: city2},
+    { name: 'Platabox Test2'},
   ]}).and([{status: 'active'}]).sort({'_id': -1})  
 
   console.log(job)
