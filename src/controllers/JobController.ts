@@ -228,8 +228,8 @@ const today = month + '/' + day + '/' + year
           
             category: category,
             location: location,
-            city: city,
-            city2: city2,
+            city: city.trim(),
+            city2: city2.trim(),
 
             n1: p1,
             n2: p2,
@@ -340,10 +340,10 @@ const today = month + '/' + day + '/' + year
 
         
      const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true},   $or: [
-      { city: city },
-      { city: city2 },
-      { city2: city },
-      { city2: city2 },
+      { city: city.trim() },
+      { city: city2.trim() },
+      { city2: city.trim() },
+      { city2: city2.trim() },
 
     ] })
      
@@ -443,10 +443,10 @@ console.log("hirer:" + hirer)
     
   
   const job = await Schema.Job().find({category: category}).where({$or: [
-    { city: city },
-    { city: city2 },
-    { city2: city },
-    { city2: city2 }, 
+    { city: city.trim() },
+    { city: city2.trim() },
+    { city2: city.trim() },
+    { city2: city2.trim() }, 
   ]}).and([{status: 'active'}]).sort({'_id': -1})  
 
   console.log(job)
@@ -962,6 +962,7 @@ let tickets = [];
   }
   
   
+  //not in use
   static async cancelArtisan(request:Request, response:Response){
 
     const {uid, job_id} = request.body
@@ -1086,6 +1087,7 @@ console.log(hirer.pushToken)
 
     const job = await Schema.Job().findOne({_id: job_id})
     console.log("job found:" + job);
+
     const hirer = await Schema.User().findOne({_id: job.user});
     console.log("hirer:" + hirer)
 
@@ -1093,6 +1095,10 @@ console.log(hirer.pushToken)
     const artisan = await Schema.Artisan().findOne({_id: job.artisan});
     console.log("artisan:" + artisan)
     const completed =  Math.round(artisan.completed + 1)
+
+    const owner = await Schema.Artisan().findOne({_id: artisan.owner});
+
+  
     
 
 
@@ -1109,8 +1115,9 @@ console.log(hirer.pushToken)
    
        
     
-    if (!job || !hirer) {
-        return response.status(404).send({
+    if (!job || !hirer ||!artisan){
+      //delete request
+        return response.status(201).send({
           message: 'Job does not exist or invalid user'
         });
       }
@@ -1125,7 +1132,7 @@ console.log(hirer.pushToken)
             }
         }
         );
-
+        //update rider job count
         await Schema.Artisan().updateOne({
             _id: artisan._id
         },
@@ -1137,9 +1144,13 @@ console.log(hirer.pushToken)
           }
         }
         );
+
+        //debit user
         const new_balance = hirer.balance - parseInt(job.price)
         console.log(new_balance)
         if(job.payment == 'wallet'){
+
+          // debit user
           await Schema.User().updateOne({
             _id: hirer._id
         },
@@ -1149,19 +1160,150 @@ console.log(hirer.pushToken)
             }
         }
         );
-        await Schema.Transaction().create({
+
+         //update user transaction
+         await Schema.Transaction().create({
           user: hirer._id,
           amount: job.price,
           status: 'withdraw',
           date: today
           })
+
+          //send debit alert
+           //notify user
+  let chunks = expo.chunkPushNotifications([{
+    "to": hirer.pushToken,
+    "sound": "default",
+    "channelId": "notification-sound-channel",
+    "title": `Successful Payment :)`,
+    "body": `₦ ${job.price} has been deducted from your wallet for your last request`
+  }]);
+  let tickets = [];
+  (async () => {
+    for (let chunk of chunks) {
+      try {
+        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        console.log(ticketChunk);
+        tickets.push(...ticketChunk);
+     
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  })();
+
+
+
+
+        //credit driver (main account)
+          //find main account
+         if(artisan.sub === 'yes'){
+  
+         if(owner){
+          //credit account
+               await Schema.Artisan().updateOne({
+                _id: artisan.owner
+            },
+            {
+                $set: {
+                  earnings: owner.earnings + parseInt(job.price)
+                }
+            }
+            );
+            //update transaction
+            await Schema.Transaction().create({
+              user: artisan.owner,
+              amount: job.price,
+              status: 'funded',
+              date: today
+              })
+            //send credit alert
+             //notify user
+  let chunks = expo.chunkPushNotifications([{
+    "to": owner.pushToken,
+    "sound": "default",
+    "channelId": "notification-sound-channel",
+    "title": `Credit Alert!`,
+    "body": `₦ ${job.price} has been paid into your wallet for the last request`
+  }]);
+  let tickets = [];
+  (async () => {
+    for (let chunk of chunks) {
+      try {
+        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        console.log(ticketChunk);
+        tickets.push(...ticketChunk);
+     
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  })();
+
+
+         } else {
+           //owner not found. set status invalid task
+           await Schema.Job().updateOne({
+            _id: job_id
+        },
+        {
+            $set: {
+                status: 'invalid. contact us'
+            }
+        }
+        );
+
+         }
+
+     } else {
+       //credit main acccout
+       await Schema.Artisan().updateOne({
+        _id: artisan._id
+    },
+    {
+        $set: {
+          earnings: artisan.earnings + parseInt(job.price)
+        }
+    }
+    );
+    //update transaction
+    await Schema.Transaction().create({
+      user: artisan._id,
+      amount: job.price,
+      status: 'funded',
+      date: today
+      })
+
+       //send credit alert
+       let chunks = expo.chunkPushNotifications([{
+        "to": artisan.pushToken,
+        "sound": "default",
+        "channelId": "notification-sound-channel",
+        "title": `Credit Alert!`,
+        "body": `₦ ${job.price} has been paid into your wallet for the last request`
+      }]);
+      let tickets = [];
+      (async () => {
+        for (let chunk of chunks) {
+          try {
+            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+            console.log(ticketChunk);
+            tickets.push(...ticketChunk);
+         
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      })();
+
+     }
         }
         response.status(201).send({
            message: "Completed",
            status: 201
        })
     
-//send notification
+//send notification to user
 
 let chunks = expo.chunkPushNotifications([{
   "to": hirer.pushToken,
@@ -1183,33 +1325,6 @@ let tickets = [];
     }
   }
 })();
-
-if(job.payment == 'wallet'){
-  let chunks = expo.chunkPushNotifications([{
-    "to": hirer.pushToken,
-    "sound": "default",
-    "channelId": "notification-sound-channel",
-    "title": `Successful Payment :)`,
-    "body": `₦ ${job.price} has been deducted from your wallet for your last request`
-  }]);
-  let tickets = [];
-  (async () => {
-    for (let chunk of chunks) {
-      try {
-        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-        console.log(ticketChunk);
-        tickets.push(...ticketChunk);
-     
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  })();
-}
-
-            
-
-
 
 
     } catch(error) {

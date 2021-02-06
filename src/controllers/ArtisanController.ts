@@ -1928,7 +1928,7 @@ static async withdrawFund(req: Request, response: Response){
 
   try {
   const user = await Schema.Artisan().findOne({_id: uid});
-  const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
+  const admin = await Schema.User().findOne({name: 'Platabox Test'})
   console.log(user);
 
   
