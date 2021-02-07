@@ -343,8 +343,7 @@ const today = month + '/' + day + '/' + year
       { city: city },
       { city: city2 },
       { city2: city },
-      { city2: city2 },
-      { name: 'Mustapha Ahmed'}
+      { city2: city2 }
 
     ]})
      

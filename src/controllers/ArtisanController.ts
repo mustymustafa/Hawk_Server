@@ -254,9 +254,7 @@ class ArtisanController {
           }
         });
 
-            //notify admin
-            ArtisanController.sendMail('mohammed.ahmed1@aun.edu.ng', 'New Registration.', 'Please Review and activate');
-            ArtisanController.sendMail('mustapha.mohammed1@aun.edu.ng', 'New Registration.', 'Please Review and activate');
+            
         
         return response.status(200).send({
           message: 'User created successfully',
@@ -1208,6 +1206,9 @@ class ArtisanController {
 
         foundUser.isConfirmed = true;
         ArtisanController.sendMail('management@platabox.com', 'New Registration Request. Please attend to it now.', 'New Registration');
+        //notify admin
+        ArtisanController.sendMail('mohammed.ahmed1@aun.edu.ng', 'New Registration.', 'Please Review and activate');
+        ArtisanController.sendMail('mustapha.mohammed1@aun.edu.ng', 'New Registration.', 'Please Review and activate');
         return response.status(200).send({
           token: ArtisanController.generateToken(foundUser)
         });
