@@ -20,10 +20,23 @@ const rave = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, fa
 
 //date initialization
 const now = new Date();
+const next = new Date();
+const tom = new Date();
+next.setDate(next.getDate() + 7)
+tom.setDate(next.getDate() + 1)
+
+
 const month = now.getMonth() + 1
 const day = now.getDate()
 const year = now.getFullYear()
 const today = month + '/' + day + '/' + year
+
+
+
+const nmonth = next.getMonth() + 1
+const nday = next.getDate()
+const nyear = next.getFullYear()
+const nextweek = nmonth + '/' + nday + '/' + nyear
 
 
 
@@ -173,9 +186,12 @@ class ArtisanController {
         name: name.trim(),
         sub: sub,
         password: bcrypt.hashSync(password.trim(), ArtisanController.generateSalt()),
-        phone,
+        phone: phone,
         isConfirmed: true,
-        active: true
+        active: true,
+        createdAt: today,
+        expireAt: nextweek
+        
       });
 
 
@@ -233,8 +249,8 @@ class ArtisanController {
             plate: plate,
             sname: sname,
             sphone: sphone,
-            createdAt: createdAt,
-            expireAt: now.toLocaleDateString()
+            createdAt: today,
+            expireAt: nextweek
           }
         });
 
