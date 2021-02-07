@@ -444,19 +444,12 @@ console.log("hirer:" + hirer)
     
   
    
-  const job1 = await Schema.Job().find({category: category, $or: [
+  const job = await Schema.Job().find({category: category, $or: [
     { city: city},
     { city: city2},
     { city2: city},
     { city2: city2},
   ]}).and([{status: 'active'}]).sort({'_id': -1})  
-
-  const job = await Schema.Job().find({category: category, status: 'active'}).and([{$or: [
-    { city: city},
-    { city: city2},
-    { city2: city},
-    { city2: city2},
-  ]}]).sort({'_id': -1})  
 
   console.log(job)
 
