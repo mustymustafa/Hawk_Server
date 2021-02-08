@@ -624,7 +624,7 @@ const get_users = await Schema.User().find({promo: true, pushToken: {$exists: tr
 //FREE DISCOUNT**
 
 
- const freeDiscount = cron.schedule("16 01 * * *", async () => {
+ const freeDiscount = cron.schedule("48 22 * * *", async () => {
   
   console.log("discount notification initialized");
 //find accountsfree 
@@ -666,7 +666,7 @@ console.log("next promo: " + next_promo)
         let chunks = expo.chunkPushNotifications([{
           "to": [usr.pushToken],
           "sound": "default",
-          "title": "Free 30% Discount!!",
+          "title": "Free 30% Discount tomorrow!!",
           "body": "you have been awarded a free 30% discount :)"
         }]);
         let tickets = [];
@@ -856,7 +856,7 @@ const genNot = async () => {
 //genNot()
 
 deleteU.start();
-//freeDiscount.start();
+freeDiscount.start();
 discountCheck.start()
 discountCheck1.start()
 //deactivate.start();

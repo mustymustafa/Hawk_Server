@@ -284,7 +284,7 @@ const today = month + '/' + day + '/' + year
             status: 201
           });
 
-    //send otp to receivers
+    //send otp to receivers if number is not undefined
     const message = `Delivery Token: ${confirmationCode}`;
     client.messages
         .create({
@@ -293,14 +293,16 @@ const today = month + '/' + day + '/' + year
           to: user.phone
         });
 
+      if(p1.length > 0 && p1 !== undefined ){
     client.messages
         .create({
           body: message,
           from: '+17076402854',
           to: p1
         });
+      }
 
-        if(p2.length > 0){
+        if(p2.length > 0 && p2 !== undefined ){
           client.messages
           .create({
             body: message,
@@ -309,7 +311,7 @@ const today = month + '/' + day + '/' + year
           });
         }
 
-        if(p3.length > 0){
+        if(p3.length > 0 && p3 !== undefined){
           client.messages
           .create({
             body: message,
@@ -318,7 +320,7 @@ const today = month + '/' + day + '/' + year
           });
         }
 
-        if(p4.length > 0){
+        if(p4.length > 0 && p4 !== undefined){
           client.messages
           .create({
             body: message,
@@ -327,7 +329,7 @@ const today = month + '/' + day + '/' + year
           });
         }
 
-        if(p5.length > 0){
+        if(p5.length > 0 && p5 !== undefined){
           client.messages
           .create({
             body: message,
