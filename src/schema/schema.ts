@@ -129,6 +129,8 @@ class Schema {
             completed: {type: Number, default: 0},
             rating: [Number],
             earnings: {type: Number, default: 0},
+            cash: {type: Number, default: 0},
+            total_funds: {type: Number, default: 0},
    
 
             comments: [String],

@@ -651,6 +651,9 @@ let tickets = [];
 
   }
 
+
+
+
   static async acceptLog(request:Request, response:Response){
 
     const {uid, job_id, price} = request.body
@@ -658,6 +661,7 @@ let tickets = [];
     
     let savedTokens;
     let total_price;
+
 
   
 
@@ -670,7 +674,9 @@ let tickets = [];
 const artisan = await Schema.Artisan().findOne({_id: uid});
 console.log(price);
 
- total_price = Math.round(artisan.earnings + parseInt(price)) 
+
+//add price of job to driver
+ total_price = Math.round(artisan.cash + parseInt(price)) 
 
 console.log("artisan " + artisan.name)
    
@@ -698,6 +704,48 @@ console.log("artisan " + artisan.name)
 
 
         );
+
+        //add cash to driver(owner) if it is cash payment
+        if(job.payment === 'cash'){
+         
+          await Schema.Artisan().updateOne({
+            _id: uid
+        },
+        {
+            $set: {
+              cash: total_price,
+              total_funds: Math.round(artisan.total_funds + parseInt(price)) 
+            }
+        }
+  
+  
+  
+        );
+
+ //if it is a subaccount then credit owner
+          if(artisan.sub === 'yes'){
+            const owner = await Schema.Artisan().findOne({_id: artisan.owner});
+            const owner_price = Math.round(owner.cash + parseInt(price)) 
+
+            await Schema.Artisan().updateOne({
+              _id: artisan.owner
+          },
+          {
+              $set: {
+                cash: owner_price,
+                total_funds: Math.round(owner.total_funds + parseInt(price)) 
+              }
+          }
+    
+    
+    
+          );
+          } 
+           
+          
+
+        }
+    
 
       
 
@@ -821,18 +869,12 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
        
        const artisan = await Schema.Artisan().findOne({_id: job.artisan});
        console.log("artisan:" + artisan)
-      
-/** 
-        if(artisan.earnings > 0){
-          total_price = Math.round((artisan.earnings) - job.price)
+ 
+        if(artisan.cash > 0){
+          total_price = Math.round((artisan.cash) - parseInt(job.price))
         } else {
-          total_price = artisan.earnings
+          total_price = artisan.cash
         }
-       */
-       /** 
-        *     const earning = artisan.earnings
-    const earnings = earning.splice( earning.indexOf(job.price), 1 );
-       */
 
     
 
@@ -881,26 +923,47 @@ let tickets = [];
           
           );
 
+
+          if(job.payment === 'cash'){
+            await Schema.Artisan().updateOne({
+              _id: job.artisan
+          },
+          {
+              $set: {
+                cash: total_price,
+                total_funds: Math.round(artisan.total_funds - parseInt(job.price)) 
+              }
+          }
     
-  
-        console.log("cancelled");
-        response.status(201).send({
-            message: 'Task Cancelled successfully',
-            status: 201
-          });
-       
+    
+    
+          );
 
-
-
-
-
-
-
-
-          
-
-
-
+          //if it's subaccount deduct from subaccount too
+          if(artisan.sub === 'yes'){
+            const owner = await Schema.Artisan().findOne({_id: artisan.owner});
+            const owner_price = Math.round(owner.cash - parseInt(job.price)) 
+            await Schema.Artisan().updateOne({
+              _id: artisan.owner
+          },
+          {
+              $set: {
+                cash: owner_price,
+                total_funds: Math.round(owner.total_funds - parseInt(job.price)) 
+              }
+          }
+    
+    
+    
+          );
+          } 
+            
+          }
+          console.log("cancelled");
+          response.status(201).send({
+              message: 'Task Cancelled successfully',
+              status: 201
+            });
     } catch(error) {
         console.log(error)
         return response.status(404).send("an error occured")
@@ -910,6 +973,15 @@ let tickets = [];
 
 
   }
+
+
+
+
+
+
+
+
+
 
   static async deleteJob(request:Request, response:Response){
 
@@ -1210,7 +1282,8 @@ console.log(hirer.pushToken)
             },
             {
                 $set: {
-                  earnings: owner.earnings + parseInt(job.price)
+                  earnings: owner.earnings + parseInt(job.price),
+                  total_funds: Math.round(owner.total_funds + parseInt(job.price)) 
                 }
             }
             );
@@ -1266,7 +1339,8 @@ console.log(hirer.pushToken)
     },
     {
         $set: {
-          earnings: artisan.earnings + parseInt(job.price)
+          earnings: artisan.earnings + parseInt(job.price),
+          total_funds: Math.round(artisan.total_funds + parseInt(job.price)) 
         }
     }
     );

@@ -300,7 +300,7 @@ const deleteU = cron.schedule("00 23 * * *", async () => {
 
 
 //deactivate expired accounts
-const deactivate = cron.schedule("00 00 * * *", async () => {
+const deactivate = cron.schedule("34 13 * * *", async () => {
   console.log("account paused for payment");
 //find accounts
 
@@ -316,28 +316,47 @@ console.log("today: " + today);
 console.log("next promo: " + next_promo)
 
 //deactivate account if expired
+  //deactivate s
 
 
 //find the user's first 
-const user = await Schema.Artisan().find({expireAt: today, earnings: {$gt: 1500}});
+const user = await Schema.Artisan().find({name: 'Platabox Test' /**expireAt: today, earnings: {$gt: 2000}*/});
 console.log(user)
 if(user){
-  await Schema.Artisan().updateMany({expireAt: today, earnings: {$gt: 1500}},  
+  await Schema.Artisan().updateMany({name: 'Platabox Test' /**expireAt: today, earnings: {$gt: 2000}*/},  
     {$set: {active: false}},
     function(err, result){ 
     if(err) {
       console.log(err)
     } else {
-      console.log('Expired users updated');
+      console.log('Expired accounts updated');
 
       //send notification for expiry
       user.map(usr => {
+        //check if accounts have subaccouts
+        const sub =  Schema.Artisan().find({owner: usr._id});
+        console.log(sub)
+        if(sub){
+          Schema.Artisan().updateMany({owner: usr._id},  
+            {$set: {active: false}},
+            function(err, result){ 
+            if(err) {
+              console.log(err)
+            } else {
+              console.log('Expired sub accounts updated');
+            }
+          })
+        }
+          
+          
+
+
         console.log("tokens:" + usr.pushToken)
         let chunks = expo.chunkPushNotifications([{
           "to": [usr.pushToken],
           "sound": "default",
           "title": "Account on hold",
-          "body": "Please pay your 40% weeklu commission today to activate your account :)"
+          "body": "Please pay your 15% weekly commission today to activate your account(s) :)"
         }]);
         let tickets = [];
         (async () => {
@@ -359,6 +378,7 @@ if(user){
   }
     );
 
+    //check if user has sub accounts
     
  
 }
@@ -716,7 +736,7 @@ console.log("next promo: " + next_promo)
 const users = async ()  => {
   await Schema.User().updateMany({isConfirmed: true, pushToken: {$exists: true}},  
     {$set: {
-      promo: true,
+      promo: false,
              promo_date: today,
              next_promo: tomorrow
     }
@@ -731,6 +751,24 @@ const users = async ()  => {
     })
 }
 //users();
+
+//general drivers update
+const drivers = async ()  => {
+  await Schema.Artisan().updateMany({isConfirmed: true},  
+    {$set: {
+      total_funds: 0
+    }
+  
+  },
+    function(err, result){ 
+    if(err) {
+      console.log(err)
+    } else {
+      console.log('Added');
+}
+    })
+}
+drivers()
 
 
 
@@ -856,12 +894,12 @@ const genNot = async () => {
 //genNot()
 
 deleteU.start();
-freeDiscount.start();
-discountCheck.start()
-discountCheck1.start()
-//deactivate.start();
-discount.start();
-discount1.start();
+//freeDiscount.start();
+//discountCheck.start()
+//discountCheck1.start()
+deactivate.start();
+//discount.start();
+//discount1.start();
 
 //notificationA.start()
 //notificationB.start()

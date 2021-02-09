@@ -190,7 +190,6 @@ class ArtisanController {
         isConfirmed: true,
         active: true,
         createdAt: today,
-        expireAt: nextweek
         
       });
 
@@ -1413,6 +1412,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
   static async userDetails(request: Request, response: Response) {
 
     var total = 0;
+    var expire = false;
 
     const { uid } = request.params;
     console.log(uid)
@@ -1440,29 +1440,36 @@ static async getDriverRegistartion(request: Request, response: Response) {
         //get total amount
       
         console.log('total earnings:' + user.earnings)
+        console.log('total earnings:' + user.cash)
         //amount to pay
-        var pay = Math.round(user.earnings * 0.20);
+        var pay = Math.round(user.earnings * 0.15);
         const available = parseInt(user.earnings) - pay
+
+        var pay_cash = Math.round(user.cash * 0.15);
+
         console.log('pay' + pay)
         console.log('available' + available)
+        console.log('cash to pay' + pay_cash)
 
 
 
 
         console.log("TODAY:" + today)
 
-        /**if(user.expireAt === today){
+       if(user.expireAt === today){
           expire = true
-        }*/
+        }
 
-        //console.log("EXPIRIED?" + expire)
+        console.log("EXPIRIED?" + expire)
         response.status(200).send({
           user,
           rating: rate,
           earning: user.earnings,
+          cash: user.cash,
           pay: pay,
+          pay_cash: pay_cash,
           available: available,
-          expired:false
+          expired:expire
 
         });
         // console.log(user)
@@ -1479,6 +1486,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
     }
   }
 
+
   //update status on payment
   static async activateAccount(request: Request, response: Response) {
     const { uid } = request.params
@@ -1493,14 +1501,16 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
     try {
       const user = await Schema.Artisan().findOne({ _id: uid })
+      //find subaccounts
+      const sub = await Schema.Artisan().find({owner: uid })
       if (user) {
 
         await Schema.Artisan().updateOne({ _id: uid },
           {
             $set: {
               active: true,
-              //expireAt: now.toLocaleDateString(),
-              //earnings: 0
+              expireAt: nextweek,
+              cash: 0
             }
           }
 
@@ -1518,11 +1528,68 @@ static async getDriverRegistartion(request: Request, response: Response) {
         });
       }
 
+      //if it has subaccounts activate them
+      if (sub) {
+        await Schema.Artisan().updateMany({owner:uid},  
+           {$set: {
+            active: true,
+            expireAt: nextweek,
+            cash: 0
+          }
+        },
+          function(err, result){ 
+          if(err) {
+            console.log(err)
+          } else {
+            console.log('Added free discounts');
+      
+            //send notification for expiry
+            sub.map(usr => {
+              console.log("tokens:" + usr.pushToken)
+              let chunks = expo.chunkPushNotifications([{
+                "to": [usr.pushToken],
+                "sound": "default",
+                "title": "Account activated!",
+                "body": "your weekly payment has been made and your account is now active! :)"
+              }]);
+              let tickets = [];
+              (async () => {
+                for (let chunk of chunks) {
+                  try {
+                    let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+                    console.log(ticketChunk);
+                    tickets.push(...ticketChunk);
+                 
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }
+              })();
+          
+            })
+          }
+        })
+       
+
+        response.status(200).send({
+          message: 'Account Activated!'
+        })
+
+      } else {
+        response.status(404).send({
+          message: 'Cannot find subaccounts for this user'
+        });
+      }
+
+
     } catch (error) {
       response.status(404).send({ error: 'could not complete your request at the moment' })
     }
 
   }
+
+
+
 
   //location
   static async storeLocation(request: Request, response: Response) {
@@ -1949,7 +2016,7 @@ static async withdrawFund(req: Request, response: Response){
 
   
 
-  const pay = Math.round(user.earnings * 0.20);
+  const pay = Math.round(user.earnings * 0.15);
   const available = parseInt(user.earnings) - pay
   const new_amount = parseInt(user.earnings) - parseInt(amount)
 
