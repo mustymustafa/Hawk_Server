@@ -300,7 +300,7 @@ const deleteU = cron.schedule("00 23 * * *", async () => {
 
 
 //deactivate expired accounts
-const deactivate = cron.schedule("34 13 * * *", async () => {
+const deactivate = cron.schedule("00 00 * * *", async () => {
   console.log("account paused for payment");
 //find accounts
 
