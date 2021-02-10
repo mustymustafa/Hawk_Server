@@ -341,12 +341,11 @@ const today = month + '/' + day + '/' + year
 
 
         
-     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}, $or:[
+     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}}).where({$or:[
       { city: city },
       { city: city2 },
       { city2: city },
       { city2: city2 }
-
     ]})
      
 
@@ -445,7 +444,7 @@ console.log("hirer:" + hirer)
     
   
    
-  const job = await Schema.Job().find({category: category, $or: [
+  const job = await Schema.Job().find({category: category}).where({$or: [
     { city: city},
     { city: city2},
     { city2: city},
