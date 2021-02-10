@@ -2011,7 +2011,7 @@ static async withdrawFund(req: Request, response: Response){
 
   try {
   const user = await Schema.Artisan().findOne({_id: uid});
-  const admin = await Schema.User().findOne({name: 'Platabox Test'})
+   const admin = await Schema.User().findOne({phone: '+2349038826995'})
   console.log(user);
 
   
@@ -2170,7 +2170,7 @@ static async transferRequests(req: Request, response: Response){
 
     try {
       const user = await Schema.Artisan().findOne({_id: uid});
-      const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
+       const admin = await Schema.User().findOne({phone: '+2349038826995'})
       //console.log(user);
       //console.log(admin)
       const limit = parseInt(user.earnings) - 50

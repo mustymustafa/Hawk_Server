@@ -828,8 +828,8 @@ const genNot = async () => {
     let chunks = expo.chunkPushNotifications([{
       "to": [users.pushToken],
       "sound": "default",
-      "title": "Christmas Break",
-      "body": "Dear lovely customers, we want to inform you that we will be closed from the 25th of December till the 3rd of January. Have a wonderful Christmas and a Happy New Year! :)"
+      "title": "Platabox v2 Update",
+      "body": "Don't forget to update your platabox app from your Apple Playstore or Google App Store! :)"
     }]);
     let tickets = [];
     (async () => {
@@ -847,7 +847,7 @@ const genNot = async () => {
     })
   
   }
-
+//genNot()
 
 
 
@@ -891,7 +891,7 @@ const genNot = async () => {
 
 
 
-//genNot()
+
 
 deleteU.start();
 //freeDiscount.start();

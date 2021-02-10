@@ -611,7 +611,7 @@ static async withdrawFund(req: Request, response: Response){
    
   try {
   const user = await Schema.User().findOne({_id: uid});
-  const admin = await Schema.User().findOne({name: 'Platabox Test'})
+  const admin = await Schema.User().findOne({phone: '+2349038826995'})
   console.log(user);
   const new_amount = parseInt(user.balance) - parseInt(amount)
   const limit = parseInt(user.balance) - 50
@@ -765,7 +765,7 @@ static async transferRequests(req: Request, response: Response){
 
     try {
       const user = await Schema.User().findOne({_id: uid});
-      const admin = await Schema.User().findOne({name: 'mustafa mohammed'})
+      const admin = await Schema.User().findOne({phone: '+2349038826995'})
       console.log(user);
       console.log(admin)
       const limit = parseInt(user.balance) - 50
@@ -930,9 +930,9 @@ static async allTrans(request: Request, response: Response){
     
     const user = await Schema.User().findOne({_id: uid})
     console.log(user)
-    const trans = await Schema.Transaction().find({user:uid}).sort({'_id': -1})  
+    const trans = await Schema.Transaction().findOne({user:uid}).sort({'_id': -1})  
     console.log(trans)
-    if(user && trans){
+    if(user){
       response.status(200).send({trans: trans})
     } else {
       response.status(500).send({error: 'Could not find Transactions for this user'})
