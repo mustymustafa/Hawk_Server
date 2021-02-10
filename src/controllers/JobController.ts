@@ -341,7 +341,7 @@ const today = month + '/' + day + '/' + year
 
 
         
-     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}, $or:[{city: city},{ city: city2 }, { city2: city }, { city2: city2 } ] })
+        const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}, $or:[{city: city.trim()},{ city: city2.trim() }, { city2: city.trim() }, { city2: city2.trim() } ] })
      
 
      if (!artisan) {
@@ -439,7 +439,7 @@ console.log("hirer:" + hirer)
     
   
    
-  const job = await Schema.Job().find({category: category, $or:[{city: city},{ city: city2 }, { city2: city }, { city2: city2 } ]}).where([{status: 'active'}]).sort({'_id': -1})  
+  const job = await Schema.Job().find({category: category,$or:[{city: city.trim()},{ city: city2.trim() }, { city2: city.trim() }, { city2: city2.trim() } ]}).where([{status: 'active'}]).sort({'_id': -1})  
 
   console.log(job)
 
