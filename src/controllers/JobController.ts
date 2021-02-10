@@ -341,7 +341,7 @@ const today = month + '/' + day + '/' + year
 
 
         
-     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}}).where({city: city, $or:[{ city: city2 }, { city2: city }, { city2: city2 } ] })
+     const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}, $or:[{city: city},{ city: city2 }, { city2: city }, { city2: city2 } ] })
      
 
      if (!artisan) {
@@ -349,7 +349,7 @@ const today = month + '/' + day + '/' + year
         message: 'No riders found'
       });
     }
-     console.log(artisan)
+     console.log("send notificatio:" + artisan)
 
      artisan.map((artis:any) => {
 
@@ -439,7 +439,7 @@ console.log("hirer:" + hirer)
     
   
    
-  const job = await Schema.Job().find({category: category}).where({city: city, $or:[{ city: city2 }, { city2: city }, { city2: city2 } ] }).and([{status: 'active'}]).sort({'_id': -1})  
+  const job = await Schema.Job().find({category: category, $or:[{city: city},{ city: city2 }, { city2: city }, { city2: city2 } ]}).where([{status: 'active'}]).sort({'_id': -1})  
 
   console.log(job)
 
