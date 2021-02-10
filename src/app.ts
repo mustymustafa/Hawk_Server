@@ -602,13 +602,16 @@ const getBalance = async () => {
 
 //test requests
 const req = async () => {
-  const city = ' Abuja'
-  const city2 = 'Nigeria'
-  const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}, $or:[{city: city.trim()},{ city: city2.trim() }, { city2: city.trim() }, { city2: city2.trim() } ] })
-  console.log('Drivers' + artisan)
+  const category = 'log'
+  const city = 'Abuja'
+  const city2 = 'Abuja Municipal Area Council'
+  const cit =  undefined ? '' : city.trim()
+  const cit2 = undefined ? '' : city2.trim()
+  const job = await Schema.Job().find({category: category.trim(), $or:[{city: cit},{ city: cit2 }, { city2: cit }, { city2: cit2 } ] }).and([{status: 'active'}]).sort({'_id': -1})  
+  console.log('Drivers' + job)
   
 }
-req()
+//req()
 
 
 //seedArtisan();
