@@ -194,7 +194,9 @@ const today = month + '/' + day + '/' + year
     const cit2 = undefined ? '' : city2.trim()
    console.log(p1)
    console.log(p2)
-  console.log(city)
+  console.log(cit)
+  console.log(cit2)
+  
 
     let savedTokens;
 
@@ -438,12 +440,12 @@ console.log("hirer:" + hirer)
     const cit =  undefined ? '' : city.trim()
     const cit2 = undefined ? '' : city2.trim()
     console.log(category);
-    console.log("city:" + city);
-    console.log("city2:" + city2);
+    console.log("city:" + cit);
+    console.log("city2:" + cit2);
     
   
    
-  const job = await Schema.Job().find({category: category, $or:[{city: cit},{ city: cit2 }, { city2: cit }, { city2: cit2 } ]}).where([{status: 'active'}]).sort({'_id': -1})  
+  const job = await Schema.Job().find({category: category, $or:[{city: cit},{ city: cit2 }, { city2: cit }, { city2: cit2 } ] }).where([{status: 'active'}]).sort({'_id': -1})  
 
   console.log(job)
 
