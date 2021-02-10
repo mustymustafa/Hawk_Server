@@ -190,6 +190,8 @@ const today = month + '/' + day + '/' + year
   static async logRequest (request:Request, response:Response){
     const {city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime, p1,p2,p3,p4,p5} = request.body;
   //console.log(category)
+  const cit =  undefined ? '' : city.trim()
+    const cit2 = undefined ? '' : city2.trim()
    console.log(p1)
    console.log(p2)
   console.log(city)
@@ -341,7 +343,7 @@ const today = month + '/' + day + '/' + year
 
 
         
-        const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}, $or:[{city: city.trim()},{ city: city2.trim() }, { city2: city.trim() }, { city2: city2.trim() } ] })
+        const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true}, $or:[{city: cit},{ city: cit2 }, { city2: cit }, { city2: cit2 } ] })
      
 
      if (!artisan) {
@@ -433,13 +435,15 @@ console.log("hirer:" + hirer)
   //display logistics requests
   static async logRequests(request:Request, response:Response) {
     const {category, city, city2} = request.body; 
+    const cit =  undefined ? '' : city.trim()
+    const cit2 = undefined ? '' : city2.trim()
     console.log(category);
     console.log("city:" + city);
     console.log("city2:" + city2);
     
   
    
-  const job = await Schema.Job().find({category: category,$or:[{city: city.trim()},{ city: city2.trim() }, { city2: city.trim() }, { city2: city2.trim() } ]}).where([{status: 'active'}]).sort({'_id': -1})  
+  const job = await Schema.Job().find({category: category, $or:[{city: cit},{ city: cit2 }, { city2: cit }, { city2: cit2 } ]}).where([{status: 'active'}]).sort({'_id': -1})  
 
   console.log(job)
 
