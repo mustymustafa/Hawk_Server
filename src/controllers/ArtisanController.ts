@@ -78,10 +78,16 @@ class ArtisanController {
     } = request.body;
 
     console.log(phone);
-
     try {
       const foundPhone = await Schema.Artisan().find({ phone: phone.trim() });
       const foundEmail = await Schema.Artisan().find({ email: email.trim() });
+
+      if (!phone || phone.length != 14) {
+
+        return response.status(409).send({
+          message: 'Please enter a valid  number',
+        });
+      }
 
       if (foundEmail && foundEmail.length > 0) {
 
@@ -107,12 +113,7 @@ class ArtisanController {
           message: 'The Password do not match'
         });
       }
-      if (!phone) {
-
-        return response.status(409).send({
-          message: 'Please enter a valid  number',
-        });
-      }
+   
 
 
 

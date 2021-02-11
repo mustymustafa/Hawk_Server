@@ -59,7 +59,12 @@ class UserController {
 
 
     try {
-    
+      if (!phone || phone.length != 14) {
+
+        return response.status(409).send({
+          message: 'Please enter a valid  number',
+        });
+      }
   
       const foundEmail = await Schema.User().find({phone: phone.trim()});
       if (foundEmail && foundEmail.length > 0) {
@@ -77,12 +82,7 @@ class UserController {
           message: 'The Password do not match'
         });
       }
-      if (!phone) {
-       
-        return response.status(409).send({
-          message: 'Please enter a valid  number',
-        });
-      }
+   
   
       const confirmationCode = String(Date.now()).slice(9, 13);
       const message = `Verification code: ${confirmationCode}`
@@ -355,9 +355,6 @@ class UserController {
         }, {
           $set: {
             isConfirmed: true,
-            promo_date: createdAt,
-            next_promo: now.toLocaleDateString(),
-            promo: true,
             createdAt: createdAt
           }
         });
