@@ -288,33 +288,7 @@ class ArtisanController {
 
     if (foundUser && Object.keys(foundUser).length > 0) {
       console.log(foundUser);
-      if (!bio) {
-
-        return response.status(409).send({
-          message: 'Please enter a bio',
-        });
-      }
-
-      if (!((/^[a-z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())))) {
-
-        return response.status(409).send({
-          message: 'Please enter a valid name',
-        });
-      }
-
-      if (!wage) {
-
-        return response.status(409).send({
-          message: 'Please enter a wage',
-        });
-      }
-
-      if (!phone || phone.length < 11 || phone.length > 11) {
-
-        return response.status(409).send({
-          message: 'Please enter a valid phone',
-        });
-      }
+     
       try {
         await Schema.Artisan().updateOne({
           _id: uid
