@@ -1188,6 +1188,12 @@ console.log(hirer.pushToken)
           message: 'Job does not exist or invalid user'
         });
       }
+
+      if(job.status === 'cancelled' || job.status === 'completed'){
+        return response.status(201).send({
+          message: 'Request was cancelled'
+        });
+      }
    
     try {
         await Schema.Job().updateOne({
