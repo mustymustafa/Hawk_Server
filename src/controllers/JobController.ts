@@ -664,9 +664,15 @@ let tickets = [];
        const hirer = await Schema.User().findOne({_id: job.user});
        console.log("hirer:" + hirer)
 
-const artisan = await Schema.Artisan().findOne({_id: uid});
-console.log(artisan);
-console.log("artisan " + artisan.name)
+    const artisan = await Schema.Artisan().findOne({_id: uid});
+    if(!artisan){
+      return response.status(404).send({
+        message: 'Account does not exist'
+      });
+
+    }
+    console.log(artisan);
+    console.log("artisan " + artisan.name)
 
 
 //add price of job to driver
