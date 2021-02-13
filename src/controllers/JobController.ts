@@ -665,13 +665,14 @@ let tickets = [];
        console.log("hirer:" + hirer)
 
 const artisan = await Schema.Artisan().findOne({_id: uid});
-console.log(price);
+console.log(artisan);
+console.log("artisan " + artisan.name)
 
 
 //add price of job to driver
  total_price = Math.round(artisan.cash + parseInt(price)) 
 
-console.log("artisan " + artisan.name)
+
    
     if (!job && !hirer) {
         return response.status(404).send({
