@@ -610,7 +610,7 @@ const req = async () => {
   console.log('Drivers' + job)
   
 }
-req()
+//req()
 
 
 //seedArtisan();
