@@ -665,6 +665,8 @@ let tickets = [];
        console.log("hirer:" + hirer)
 
     const artisan = await Schema.Artisan().findOne({_id: uid});
+
+    //check if artisan exists first
     if(!artisan){
       return response.status(404).send({
         message: 'Account does not exist'
@@ -1199,7 +1201,7 @@ console.log(hirer.pushToken)
 
       if(job.status === 'cancelled' || job.status === 'completed'){
         
-        return response.status(201).send({
+        return response.status(400).send({
           message: 'Request was cancelled'
         });
       }
