@@ -984,7 +984,7 @@ class ArtisanController {
       phone
     } = request.body;
 
-    const user = await Schema.Artisan().findOne({ phone: phone.trim() });
+    const user = await Schema.Artisan().findOne({phone: phone.trim() });
     if (!user) {
       return response.status(404).send({
         message: 'User does not exist'
@@ -1587,10 +1587,10 @@ static async getDriverRegistartion(request: Request, response: Response) {
             lat: lat,
             long: long,
             location: location,
-            area1: undefined ? '' : area1.trim(),
-            area2: undefined ? '' : area2.trim(),
-            city: undefined ? '' : city.trim(),
-            city2: undefined ? '' : city2.trim(),
+            area1: area1 === undefined ? '' : area1.trim(),
+            area2: area2 === undefined ? '' : area2.trim(),
+            city: city === undefined ? '' : city.trim(),
+            city2: city2 === undefined ? '' : city2.trim(),
         
           }
         });
