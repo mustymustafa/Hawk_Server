@@ -188,12 +188,22 @@ const today = month + '/' + day + '/' + year
   }
 
   static async logRequest (request:Request, response:Response){
+    var cit;
+    var cit2;
     const {city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime, p1,p2,p3,p4,p5} = request.body;
   //console.log(category)
-  const cit =  undefined ? '' : city.trim()
-    const cit2 = undefined ? '' : city2.trim()
-   console.log(p1)
-   console.log(p2)
+  if(city != undefined){
+    cit = city.trim()
+  }
+  cit = ''
+  if(city2 != undefined){
+    cit2 = city2.trim()
+  }
+  cit2 = ''
+
+
+  console.log(p1)
+  console.log(p2)
   console.log(cit)
   console.log(cit2)
   
@@ -232,8 +242,8 @@ const today = month + '/' + day + '/' + year
           
             category: category,
             location: location,
-            city: undefined ? '' : city.trim(),
-            city2: undefined ? '' : city2.trim(),
+            city: cit,
+            city2: cit2,
 
             n1: p1,
             n2: p2,
@@ -436,9 +446,17 @@ console.log("hirer:" + hirer)
 
   //display logistics requests
   static async logRequests(request:Request, response:Response) {
+    var cit;
+    var cit2;
     const {category, city, city2} = request.body; 
-    const cit =  undefined ? '' : city.trim()
-    const cit2 = undefined ? '' : city2.trim()
+    if(city != undefined){
+      cit = city.trim()
+    }
+    cit = ''
+    if(city2 != undefined){
+      cit2 = city2.trim()
+    }
+    cit2 = ''
     console.log(category);
     console.log("city:" + cit);
     console.log("city2:" + cit2);
@@ -1190,6 +1208,7 @@ console.log(hirer.pushToken)
       }
 
       if(job.status === 'cancelled' || job.status === 'completed'){
+        
         return response.status(201).send({
           message: 'Request was cancelled'
         });
