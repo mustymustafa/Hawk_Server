@@ -927,7 +927,7 @@ static async allTrans(request: Request, response: Response){
     
     const user = await Schema.User().findOne({_id: uid})
     console.log(user)
-    const trans = await Schema.Transaction().findOne({user:uid}).sort({'_id': -1})  
+    const trans = await Schema.Transaction().find({user:uid}).sort({'_id': -1})  
     console.log(trans)
     if(user){
       response.status(200).send({trans: trans})

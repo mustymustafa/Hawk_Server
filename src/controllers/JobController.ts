@@ -194,18 +194,16 @@ const today = month + '/' + day + '/' + year
 
 
 
-  console.log(p1)
-  console.log(p2)
-  console.log(city)
-  console.log(city2)
-  
-
-    let savedTokens;
+   
 
     
     const user = await Schema.User().findOne({_id: uid});
     console.log(price)
     console.log(user.balance)
+    if(!user){
+      return response.status(400).send({error: "User not found"})
+    }
+
     try {
 
       //check if it's a wallet payment
