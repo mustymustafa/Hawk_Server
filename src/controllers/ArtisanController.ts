@@ -214,32 +214,24 @@ class ArtisanController {
   static async continueSignup(request: Request, response: Response) {
 
     const {
-      email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone, vyear
+      email, bio, phone, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone, vyear
     } = request.body;
 
     console.log(request.body);
-    const foundUser: any = await Schema.Artisan().findOne({ email });
+    const foundUser: any = await Schema.Artisan().findOne({ phone: phone });
 
 
-    if (foundUser && Object.keys(foundUser).length > 0) {
+      if(!foundUser){
+        response.status(400).send({message: `The number ${phone} does not exist`})
+      }
+
       console.log(foundUser);
       try {
-        const dt = new Date();
-        const createdAt = dt.toLocaleDateString();
-        console.log(createdAt)
-        var now = new Date();
-
-        //after 7 days
-        const expire = now.setDate(now.getDate() + 7);
-        console.log(now.toLocaleDateString())
-
-
         await Schema.Artisan().updateOne({
           _id: foundUser._id
         }, {
           $set: {
             bio: bio,
-            //  wage: wage,
             category: category,
             id_expiry: id_expiry,
             vl_expiry: vl_expiry,
@@ -269,7 +261,7 @@ class ArtisanController {
           message: 'something went wrong'
         });
       }
-    }
+
 
 
   }
