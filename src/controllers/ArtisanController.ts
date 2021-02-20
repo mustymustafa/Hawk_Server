@@ -218,13 +218,12 @@ class ArtisanController {
     } = request.body;
 
     console.log(request.body);
-    const foundUser: any = await Schema.Artisan().findOne({ phone: phone });
+    const foundUser: any = await Schema.Artisan().findOne({ email: email });
 
 
       if(!foundUser){
-        response.status(400).send({message: `The number ${phone} does not exist`})
+        response.status(400).send({message: `The email ${email} does not exist. Make sure you use the email you started signing up with :)`})
       }
-
       console.log(foundUser);
       try {
         await Schema.Artisan().updateOne({
