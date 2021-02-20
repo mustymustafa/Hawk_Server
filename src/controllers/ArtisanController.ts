@@ -221,9 +221,7 @@ class ArtisanController {
     const foundUser: any = await Schema.Artisan().findOne({ email: email });
 
 
-      if(!foundUser){
-        response.status(400).send({message: `The email ${email} does not exist. Make sure you use the email you started signing up with :)`})
-      }
+      if(foundUser){
       console.log(foundUser);
       try {
         await Schema.Artisan().updateOne({
@@ -260,6 +258,9 @@ class ArtisanController {
           message: 'something went wrong'
         });
       }
+    } else {
+      response.status(400).send({message: `The email ${email} does not exist. Make sure you use the email you started signing up with :)`})
+    }
 
 
 
