@@ -20,6 +20,7 @@ import {upload} from './util'
 import JobController from './controllers/JobController';
 
 import { Expo } from "expo-server-sdk";
+import PaymentController from './controllers/PaymentController';
 
 const expo = new Expo();
 const Flutterwave = require('flutterwave-node-v3');
@@ -220,6 +221,9 @@ app.post('/api/v1/:uid/driverwithdraw', ArtisanController.withdrawFund);
 app.post('/api/v1/:uid/drivertransferRequest', ArtisanController.transferRequests);
 app.post('/api/v1/:uid/driverupdateTransfer', ArtisanController.updateTransfer);
 app.post('/api/v1/:uid/drivergetTrans', ArtisanController.allTrans);
+//PLATABOX WALLET VERIFICATION
+app.post('/api/v1/verifyAccount', PaymentController.verifyAccount);
+
 
 
 ///emergency 
@@ -536,7 +540,7 @@ const verifyA = async () => {
   })
 
 }
-verifyA();
+//verifyA();
 
 
 const getBanks = async () => {
