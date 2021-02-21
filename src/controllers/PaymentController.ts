@@ -22,6 +22,7 @@ class PaymentController{
 
   static async verifyAccount (req: Request, response: Response) {
     const {anumber, bcode} = req.body;
+    console.log(anumber)
     var options = {
       'method': 'POST',
       'url': 'https://api.flutterwave.com/v3/accounts/resolve',
