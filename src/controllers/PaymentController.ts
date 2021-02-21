@@ -17,10 +17,10 @@ const Flutterwave = require('flutterwave-node-v3');
 const rave = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 
 
-class PaymentController{
-
+class PaymentController {
 
   static async verifyAccount (req: Request, response: Response) {
+    console.log('verify payment======')
     const {anumber, bcode} = req.body;
     console.log(anumber)
     var options = {
@@ -36,6 +36,9 @@ class PaymentController{
       })
     };
   
+    if(anumber !== undefined || bcode !== undefined){
+
+    
     request(options, async (error, resp) => { 
       if(error){
         console.log(error)
@@ -46,6 +49,7 @@ class PaymentController{
       response.status(200).send({message: name})
 
     })
+  }
 
   }
 

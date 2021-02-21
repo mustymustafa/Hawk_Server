@@ -967,6 +967,7 @@ static async getTrans(request: Request, response: Response){
 }
 
 
+
 //emergency
 static async emergencyContact(request: Request, response: Response){
   const {uid, phone, email, name} = request.body
