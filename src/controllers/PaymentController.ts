@@ -44,9 +44,15 @@ class PaymentController {
         console.log(error)
         response.status(409).send({message: 'An error occured'})
       };
+      if(resp.body.split(":")[1].split(",")[0].trim() === '"error"'){
+        console.log("Invalid Account Details. Please check and try again")
+        response.status(400).send({message: "Invalid Account Details. Please check and try again" })
+      } else {
+        
       console.log(resp.body.split(":")[5].split(",")[0].replace('}}', ""))
       const name = resp.body.split(":")[5].split(",")[0].replace('}}', "")
       response.status(200).send({message: name})
+      }
 
     })
   }

@@ -536,7 +536,18 @@ const verifyA = async () => {
     if(error){
       console.log(error)
     };
-    console.log(resp.body.split(":")[5].split(",")[0].replace('}}', ""))
+
+    console.log(resp.body.split(":")[1].split(",")[0].trim())
+    if(resp.body.split(":")[1].split(",")[0].trim() === '"error"'){
+      console.log("Invalid Account Details. Please check and try again")
+    } else {
+      const m = resp.body.split(":")[5].split(",")[0].replace('}}', "")
+      console.log(m)
+    }
+
+
+
+ 
   })
 
 }
