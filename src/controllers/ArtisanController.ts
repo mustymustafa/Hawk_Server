@@ -2024,6 +2024,7 @@ static async withdrawFund(req: Request, response: Response){
          }
        }
      })();
+     ArtisanController.sendMail('mustapha.mohammed1@aun.edu.ng', 'Insufficient wallet Balance!', 'Check wallet balance ASAP!.');
        
          }
     return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
@@ -2035,9 +2036,9 @@ static async withdrawFund(req: Request, response: Response){
     else {
 
        //verify token
-       if(user.otp != otp){
+       /**if(user.otp != otp){
         response.status(400).send({error: 'The OTP you entered is incorrect. Please try again'})
-      }
+      }*/
 
     const payload = {
       "account_bank": bcode,

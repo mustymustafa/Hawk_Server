@@ -290,12 +290,7 @@ const today = month + '/' + day + '/' + year
 
     //send otp to receivers if number is not undefined
     const message = `Delivery Token: ${confirmationCode}`;
-    client.messages
-        .create({
-          body: message,
-          from: '+17076402854',
-          to: user.phone
-        });
+  
 
       if(p1.length > 0 && p1 !== undefined ){
     client.messages
@@ -443,7 +438,7 @@ console.log("hirer:" + hirer)
     console.log("city2:" + city2);
     const job = await Schema.Job().find({category: 'log', $or:[{city: city === undefined ? '' : city.trim()},{ city: city2 === undefined ? '' : city2.trim() }, { city2: city === undefined ? '' : city.trim() }, { city2: city2 === undefined ? '' : city2.trim() } ] }).and([{status: 'active'}]).sort({'_id': -1})   
 
-  console.log(job)
+  //console.log(job)
 
   //get hirer id
 const user = job.map(usr => {
@@ -451,7 +446,7 @@ const user = job.map(usr => {
 })
 
 const hirer = await Schema.User().findOne({_id: user});
-console.log("hirer:" + hirer)
+//console.log("hirer:" + hirer)
   return response.status(200).send({job: job, hirer:hirer})
 
 

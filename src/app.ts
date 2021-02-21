@@ -505,25 +505,38 @@ const genNot = async () => {
     }
   }
   
-  //setBalance();
+//setBalance();
 
-  
-
-
-  //get balance from FW
-
-
-
-
-
-
-deleteU.start();
+//deleteU.start();
 
 deactivate.start();
 
 
 
+//verify account
+const verifyA = async () => {
+  var options = {
+    'method': 'POST',
+    'url': 'https://api.flutterwave.com/v3/accounts/resolve',
+    'headers': {
+      'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    'body': JSON.stringify({
+      "account_number": "0695945271",
+      "account_bank": "044"
+    })
+  };
 
+  request(options, async (error, resp) => { 
+    if(error){
+      console.log(error)
+    };
+    console.log(resp.body.split(":")[5].split(",")[0].replace('}}', ""))
+  })
+
+}
+verifyA();
 
 
 const getBanks = async () => {
@@ -543,10 +556,7 @@ const getBanks = async () => {
   }
 
 }
-
-
 //getBanks();
-
 
 const transfer = async () => {
   try {

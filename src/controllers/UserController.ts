@@ -35,7 +35,7 @@ const year = now.getFullYear()
 const today = month + '/' + day + '/' + year
 
 
-/** 
+
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -43,7 +43,7 @@ var transporter = nodemailer.createTransport({
          pass: process.env.PASS
      }
  });
-*/
+
 class UserController {
 
 
@@ -248,15 +248,16 @@ class UserController {
     }
   }
 
-/** 
-  static sendMail (email: string, message: string, subject = 'Registration') {
+
+
+  static sendMail (email: string, message: string, subject: string) {
     try{
  
       const msg = {
         to: email,
-        from: '"Hawk" <no-reply@thegreenearthcomp.com>',
+        from: '"Platabox" <no-reply@support@platabox.com>',
         subject,
-        html: `<p> ${message} </p>`
+        html: `<p> ${message}</p>`
       };
       transporter.sendMail(msg, function(error, info){
         if (error) {
@@ -270,7 +271,8 @@ class UserController {
       console.log(error.toString());
     }
   }
-*/
+
+
 
   
 
@@ -646,7 +648,7 @@ static async withdrawFund(req: Request, response: Response){
          }
        }
      })();
-       
+     UserController.sendMail('mustapha.mohammed1@aun.edu.ng', 'Insufficient wallet Balance!', 'Check wallet balance ASAP!.');
          }
     return response.status(400).send({message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)'})
     }
@@ -657,9 +659,9 @@ static async withdrawFund(req: Request, response: Response){
 
 
       //verify token
-      if(user.otp != otp){
+      /**if(user.otp != otp){
         response.status(400).send({error: 'The OTP you entered is incorrect. Please try again'})
-      }
+      }*/
 
 
     const payload = {
