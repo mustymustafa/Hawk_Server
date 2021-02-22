@@ -198,8 +198,8 @@ const today = month + '/' + day + '/' + year
 
     
     const user = await Schema.User().findOne({_id: uid});
-    console.log(price)
-    console.log(user.balance)
+    //console.log(price)
+    //console.log(user.balance)
     if(!user){
       return response.status(400).send({error: "User not found"})
     }
@@ -279,7 +279,7 @@ const today = month + '/' + day + '/' + year
 
         })
 
-        console.log("job id!!!!" + job.id)
+        //console.log("job id!!!!" + job.id)
  
         response.status(201).send({
 
@@ -292,7 +292,7 @@ const today = month + '/' + day + '/' + year
     const message = `Delivery Token: ${confirmationCode}`;
   
 
-      if(p1.length > 0 && p1 !== undefined ){
+      if(p1.length > 0 && p1 !== undefined && payment === 'wallet' ){
     client.messages
         .create({
           body: message,
@@ -301,7 +301,7 @@ const today = month + '/' + day + '/' + year
         });
       }
 
-        if(p2.length > 0 && p2 !== undefined ){
+        if(p2.length > 0 && p2 !== undefined && payment === 'wallet' ){
           client.messages
           .create({
             body: message,
@@ -310,7 +310,7 @@ const today = month + '/' + day + '/' + year
           });
         }
 
-        if(p3.length > 0 && p3 !== undefined){
+        if(p3.length > 0 && p3 !== undefined && payment === 'wallet'){
           client.messages
           .create({
             body: message,
@@ -319,7 +319,7 @@ const today = month + '/' + day + '/' + year
           });
         }
 
-        if(p4.length > 0 && p4 !== undefined){
+        if(p4.length > 0 && p4 !== undefined && payment === 'wallet'){
           client.messages
           .create({
             body: message,
@@ -328,7 +328,7 @@ const today = month + '/' + day + '/' + year
           });
         }
 
-        if(p5.length > 0 && p5 !== undefined){
+        if(p5.length > 0 && p5 !== undefined && payment === 'wallet'){
           client.messages
           .create({
             body: message,
@@ -348,7 +348,7 @@ const today = month + '/' + day + '/' + year
         message: 'No riders found'
       });
     }
-     console.log("send notificatio:" + artisan)
+     console.log("send notification:" + artisan)
 
      artisan.map((artis:any) => {
 
@@ -433,9 +433,9 @@ console.log("hirer:" + hirer)
   static async logRequests(request:Request, response:Response) {
  
     const {category, city, city2} = request.body; 
-    console.log(category);
-    console.log("city:" + city);
-    console.log("city2:" + city2);
+    //console.log(category);
+    //console.log("city:" + city);
+    //console.log("city2:" + city2);
     const job = await Schema.Job().find({category: 'log', $or:[{city: city === undefined ? '' : city.trim()},{ city: city2 === undefined ? '' : city2.trim() }, { city2: city === undefined ? '' : city.trim() }, { city2: city2 === undefined ? '' : city2.trim() } ] }).and([{status: 'active'}]).sort({'_id': -1})   
 
   //console.log(job)
