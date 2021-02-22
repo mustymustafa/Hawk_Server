@@ -456,8 +456,8 @@ const genNot = async () => {
     let chunks = expo.chunkPushNotifications([{
       "to": [users.pushToken],
       "sound": "default",
-      "title": "Platabox v2 Update",
-      "body": "Don't forget to update your platabox app from your Apple Playstore or Google App Store! :)"
+      "title": "New Update",
+      "body": "Please update your platabox app from your Apple Playstore or Google App Store! :)"
     }]);
     let tickets = [];
     (async () => {
@@ -476,6 +476,39 @@ const genNot = async () => {
   
   }
 //genNot()
+
+//driver update
+const genNotD = async () => {
+  
+  const get_users = await Schema.Artisan().find({pushToken: {$exists: true} })
+  console.log("users:" + get_users)
+
+  get_users.map(users => {
+ 
+    console.log("tokens:" + users.pushToken)
+    let chunks = expo.chunkPushNotifications([{
+      "to": [users.pushToken],
+      "sound": "default",
+      "title": "New Update",
+      "body": "Please update your platabox app from your Apple Playstore or Google App Store! :)"
+    }]);
+    let tickets = [];
+    (async () => {
+      for (let chunk of chunks) {
+        try {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+       
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    })();
+    })
+  
+  }
+genNotD()
 
 
 
