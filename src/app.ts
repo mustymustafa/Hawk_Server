@@ -508,7 +508,7 @@ const genNotD = async () => {
     })
   
   }
-genNotD()
+//genNotD()
 
 
 
