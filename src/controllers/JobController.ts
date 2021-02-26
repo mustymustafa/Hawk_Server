@@ -291,6 +291,14 @@ const today = month + '/' + day + '/' + year
     //send otp to receivers if number is not undefined
     const message = `Delivery Token: ${confirmationCode}`;
   
+    if(user.phone.length > 0 && user.phone !== undefined && payment === 'wallet' ){
+      client.messages
+          .create({
+            body: message,
+            from: '+17076402854',
+            to: user.phone
+          });
+        }
 
       if(p1.length > 0 && p1 !== undefined && payment === 'wallet' ){
     client.messages
