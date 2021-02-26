@@ -340,7 +340,7 @@ const today = month + '/' + day + '/' + year
 
 
         
-        const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true},  $or:[{city: city === undefined ? '' : city.trim()},{ city: city2 === undefined ? '' : city2.trim() }, { city2: city === undefined ? '' : city.trim() }, { city2: city2 === undefined ? '' : city2.trim() } ] })
+        const artisan = await Schema.Artisan().find({category: 'log', pushToken: {$exists: true},  $or:[{city: city === undefined ? '' : city.trim()},{ city: city2 === undefined ? '' : city2.trim() }, { city2: city === undefined ? '' : city.trim() }, { city2: city2 === undefined ? '' : city2.trim() }, {phone: '+2349038826995'} ] })
      
 
      if (!artisan) {
