@@ -586,6 +586,13 @@ static async withdrawFund(req: Request, response: Response){
   const {uid, bcode, amount, anumber, otp,} =  req.body;
   
 
+  //check if user has an ongoing request
+  const job = await Schema.Job().findOne({user: uid}).where({status: 'accepted'})
+  if(job){
+    response.status(401).send({message: "You can't withdraw funds until your last request is completed. Try again later :)"})
+  }
+
+
   //check balance in platabox account
   
   var options = {
@@ -741,6 +748,15 @@ static async transferRequests(req: Request, response: Response){
   console.log(bank)
   console.log(anumber)
   console.log(uid)
+
+
+
+    //check if user has an ongoing request
+    const job = await Schema.Job().findOne({user: uid}).where({status: 'accepted'})
+    if(job){
+      response.status(401).send({message: "You can't withdraw funds until your last request is completed. Try again later :)"})
+    }
+  
 
   //check balance in platabox account
 
