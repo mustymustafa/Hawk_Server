@@ -544,6 +544,18 @@ const genNotD = async () => {
   
 //setBalance();
 
+
+
+
+const deleteJobs = async () => {
+  const jobs = await Schema.Job().find({user: '6020683d04d67000178d683a'});
+  console.log(jobs)
+  await Schema.Job().deleteMany({
+    user: '6020683d04d67000178d683a'
+
+  })
+}
+//deleteJobs()
 //deleteU.start();
 
 deactivate.start();

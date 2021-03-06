@@ -161,6 +161,8 @@ class Schema {
             payment: String,
             artisan_name: String,
             artisan_phone: String,
+            hirer: String,
+            hirer_phone: String,
             location:  String,
             to: String, 
             to2: String, 

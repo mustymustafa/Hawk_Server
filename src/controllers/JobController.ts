@@ -105,6 +105,8 @@ const today = month + '/' + day + '/' + year
             price: price,
             distance: distance,
             createdAt: today,
+            hirer: user.name,
+            hirer_phone: user.phone,
             active: true
 
         })
@@ -268,6 +270,8 @@ const today = month + '/' + day + '/' + year
             destLong3: destLong3,
             destLong4: destLong4,
             destLong5: destLong5,
+            hirer: user.name,
+            hirer_phone: user.phone,
 
             time: time,
             price: price,
