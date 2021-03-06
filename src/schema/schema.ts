@@ -154,6 +154,7 @@ class Schema {
         const JobSchema = new mongoose.Schema({
             category: String,
             pTime: String,
+            reason: String,
             otp: String,
             user: {type: MongooseSchema.Types.ObjectId, ref: 'User'},
             artisan: {type: MongooseSchema.Types.ObjectId, ref: 'Artisan'},

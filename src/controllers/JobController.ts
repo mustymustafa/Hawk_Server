@@ -857,7 +857,7 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
 
   static async cancelJob(request:Request, response:Response){
 
-    const {uid, job_id} = request.body
+    const {uid, job_id, reason} = request.body
     console.log("job_id" + job_id)
     
     let total_price;
@@ -919,7 +919,8 @@ let tickets = [];
         },
           {
             $set: {
-              status: 'cancelled'
+              status: 'cancelled',
+              reason: reason
             }
          
           }
