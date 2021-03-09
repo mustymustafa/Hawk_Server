@@ -21,6 +21,7 @@ import JobController from './controllers/JobController';
 
 import { Expo } from "expo-server-sdk";
 import PaymentController from './controllers/PaymentController';
+import AdminController from './controllers/AdminContoller';
 
 const expo = new Expo();
 const Flutterwave = require('flutterwave-node-v3');
@@ -206,6 +207,22 @@ app.get('/api/v1/getrides', JobController.Rides);
 app.post('/api/v1/:uid/activate', ArtisanController.adminActivate);
 
 app.post('/api/v1/:uid/deactivate', ArtisanController.deactivateAccount);
+
+app.get('/api/v1/statistics', AdminController.statistics)
+
+
+
+//send notification
+app.post('/api/v1/user/notification', AdminController.userNotification)
+app.post('/api/v1/driver/notification', AdminController.driverNotification)
+
+
+
+//send text
+app.post('/api/v1/:uid/user/text', AdminController.userText)
+app.post('/api/v1/:uid/driver/text', AdminController.driverText)
+
+//****************************** */
 
 
 
