@@ -456,8 +456,8 @@ const genNot = async () => {
     let chunks = expo.chunkPushNotifications([{
       "to": [users.pushToken],
       "sound": "default",
-      "title": "Introducing Platabox Wallet",
-      "body": "Make payments with Platabox Wallet and enjoy 10% off on all requests! :)"
+      "title": "Scheduling a delivery is back!",
+      "body": "Update your Platabox app and start scheduling your delivery requests :)"
     }]);
     let tickets = [];
     (async () => {
