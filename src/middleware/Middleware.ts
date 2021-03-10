@@ -124,18 +124,8 @@ export default class MiddleWare {
       }]
     }
 
-    if(bio !== bio){
-      errors = [...errors, {
-        bio: 'Please enter a bio'
-      }]
-    }
+  
 
-
-    if(category !== category){
-      errors = [...errors, {
-        category: 'Please enter a category'
-      }]
-    }
 
 
     if(!( (/^[a-zA-Z .'-]+\s[a-zA-Z .'-]+$/.test(fullname.trim()))  )){
