@@ -572,6 +572,7 @@ let tickets = [];
     const job = await Schema.Job().findOne({_id: job_id})
     console.log("job found:" + job);
 
+    // CHECK IF JOB EXISTS
        const hirer = await Schema.User().findOne({_id: job.user});
        console.log("hirer:" + hirer)
 const artisan = await Schema.Artisan().findOne({_id: uid});
@@ -667,8 +668,15 @@ let tickets = [];
     const job = await Schema.Job().findOne({_id: job_id})
     console.log("job found:" + job);
 
-       const hirer = await Schema.User().findOne({_id: job.user});
-       console.log("hirer:" + hirer)
+    //if job exists then continue
+    if (job) {
+    const hirer = await Schema.User().findOne({_id: job.user});
+    console.log("hirer:" + hirer)
+       if (!hirer) {
+        return response.status(404).send({
+          message: 'Hirer does not exist'
+        });
+      }
 
     const artisan = await Schema.Artisan().findOne({_id: uid});
 
@@ -677,8 +685,8 @@ let tickets = [];
       return response.status(404).send({
         message: 'Account does not exist'
       });
-
     }
+
     console.log(artisan);
     console.log("artisan " + artisan.name)
 
@@ -687,12 +695,10 @@ let tickets = [];
  total_price = Math.round(artisan.cash + parseInt(price)) 
 
 
+  
+
+      
    
-    if (!job && !hirer) {
-        return response.status(404).send({
-          message: 'Job does not exist'
-        });
-      }
    
     try {
 
@@ -803,7 +809,11 @@ let tickets = [];
     }
   
 
-
+  } else {
+    return response.status(404).send({
+      message: 'Job does not exist'
+    });
+  }
 
   }
 
@@ -871,13 +881,23 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
     const job = await Schema.Job().findOne({_id: job_id})
     console.log("job found:" + job);
 
+    if(job){
        const hirer = await Schema.User().findOne({_id: job.user});
        console.log("hirer:" + hirer)
-
+       if (!hirer) {
+        return response.status(404).send({
+          message: 'Hirer does not exist'
+        });
+      }
        
        const artisan = await Schema.Artisan().findOne({_id: job.artisan});
        console.log("artisan:" + artisan)
- 
+
+       if (!artisan) {
+        return response.status(404).send({
+          message: 'driver does not exist'
+        });
+      }
         if(artisan.cash > 0){
           total_price = Math.round((artisan.cash) - parseInt(job.price))
         } else {
@@ -887,11 +907,7 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
     
 
     
-    if (!job && !hirer) {
-        return response.status(404).send({
-          message: 'Job does not exist'
-        });
-      }
+  
    
     try {
 
@@ -979,7 +995,11 @@ let tickets = [];
     }
   
 
-
+  } else {
+    return response.status(404).send({
+      message: 'Job does not exist'
+    });
+  }
 
   }
 
