@@ -31,7 +31,7 @@ const flw = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, fal
 
 //database 
  mongoose.connect(
-    `mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test?retryWrites=true&w=majority`,
+    `mongodb+srv://hawkAdmin:${process.env.DB_PASSWORD}@hawk-gqvoe.mongodb.net/test_server?retryWrites=true&w=majority`,
   { useNewUrlParser: true, useUnifiedTopology: true},
 ).then(() =>   console.log('database connected.....'))
 .catch((error) => console.log(error.toString()));
@@ -699,7 +699,7 @@ const req = async () => {
 }
 //req()
 
-//seedArtisan();
+seedArtisan();
 
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;

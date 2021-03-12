@@ -10,9 +10,9 @@ const salt = bcrypt.genSaltSync(10);
 
 const seedUser = async () => {
   await Schema.User().create({
-    name: 'user',
+    name: 'Platabox Test',
     email: 'user@hawk.com',
-    phone: '09038826995',
+    phone: '+2349038826995',
     password: bcrypt.hashSync('musty100', salt),
     isConfirmed: true,
 
@@ -23,7 +23,7 @@ export const seedArtisan = async () => {
     await Schema.Artisan().create({
       name: 'admin',
       email: 'admin@platabox.com',
-      phone: '09038826995',
+      phone: '+2349038826995',
       password: bcrypt.hashSync('musty100', salt),
       isConfirmed: true,
       isActivated: true,

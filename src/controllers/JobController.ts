@@ -670,6 +670,7 @@ let tickets = [];
 
     //if job exists then continue
     if (job) {
+
     const hirer = await Schema.User().findOne({_id: job.user});
     console.log("hirer:" + hirer)
        if (!hirer) {
@@ -679,7 +680,6 @@ let tickets = [];
       }
 
     const artisan = await Schema.Artisan().findOne({_id: uid});
-
     //check if artisan exists first
     if(!artisan){
       return response.status(404).send({
