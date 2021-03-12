@@ -1297,6 +1297,33 @@ class ArtisanController {
 
   }
 
+  //get company account
+  static async allAccounts(request: Request, response: Response) {
+    const {uid} = request.body;
+    console.log(uid)
+
+    try {
+      const user = await Schema.Artisan().findOne({_id: uid})
+      if(user){
+        //get accounts
+        const subs = await Schema.Artisan().findOne({owner: uid, $or:[{owner: user.owner}]}).sort({'_id': -1})  
+        console.log(subs)
+        return response.status(200).send({value: subs})
+      } else{
+        return  response.status(500).send({
+          message: "User not found"
+        });
+      }
+    
+    } catch(error) {
+        console.log(error.toString());
+    return  response.status(500).send({
+        message: 'something went wrong'
+      });
+    }
+  }
+  
+
 
 
 //get registratins 
