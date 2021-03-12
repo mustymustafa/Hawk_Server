@@ -473,8 +473,8 @@ const genNot = async () => {
     let chunks = expo.chunkPushNotifications([{
       "to": [users.pushToken],
       "sound": "default",
-      "title": "Scheduling a delivery is back!",
-      "body": "Update your Platabox app and start scheduling your delivery requests :)"
+      "title": "Fuel Scarcity",
+      "body": "You might experience a slight delay in pick-up time because of fuel scarcity. Please bear with us :)"
     }]);
     let tickets = [];
     (async () => {
