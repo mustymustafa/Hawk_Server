@@ -1306,9 +1306,17 @@ class ArtisanController {
       const user = await Schema.Artisan().findOne({_id: uid})
       if(user){
         //get accounts
-        const subs = await Schema.Artisan().findOne({owner: uid, $or:[{owner: user.owner}]}).sort({'_id': -1})  
-        console.log(subs)
-        return response.status(200).send({value: subs})
+
+        if(user.sub === 'yes'){
+          const subs = await Schema.Artisan().find({owner: user.owner}).sort({'_id': -1})  
+          console.log(subs)
+          return response.status(200).send({value: subs})
+
+        }
+        const subs = await Schema.Artisan().find({owner: uid}).sort({'_id': -1})  
+          console.log(subs)
+          return response.status(200).send({value: subs})
+       
       } else{
         return  response.status(500).send({
           message: "User not found"
