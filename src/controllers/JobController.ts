@@ -817,7 +817,125 @@ let tickets = [];
 
   }
 
-  
+  //deletage job
+static async delegateLog(request:Request, response:Response){
+
+  const {uid, rid, job_id} = request.body
+  console.log("uid" + uid, "job_id" + job_id)
+
+  let savedTokens;
+  let total_price;
+
+
+
+
+  const job = await Schema.Job().findOne({_id: job_id})
+  console.log("job found:" + job);
+
+  //if job exists then continue
+  if (job) {
+
+  const artisan = await Schema.Artisan().findOne({_id: uid});
+  //check if main account exists first
+  if(!artisan){
+    return response.status(404).send({
+      message: 'Account does not exist'
+    });
+  }
+
+  console.log(artisan);
+  console.log("artisan " + artisan.name)
+
+  //find rider
+  const rider = await Schema.Artisan().findOne({_id: rid});
+  //check if main account exists first
+  if(!rider){
+    return response.status(404).send({
+      message: 'Rider does not exist'
+    });
+  }
+
+  console.log(rider);
+  console.log("rider " + rider.name)
+
+
+
+
+
+
+  try {
+
+      await Schema.Job().updateOne({
+          _id: job_id
+      },
+      {
+          $set: {
+              artisan: rid,
+              artisan_name: rider.name,
+              artisan_phone: rider.phone,
+          }
+      }
+
+
+
+      );
+
+
+
+
+
+
+      response.status(200).send({message: "Job request sent"})
+
+// send notification
+
+
+savedTokens = rider.pushToken;
+
+console.log(savedTokens)
+
+
+
+
+//send notification
+
+let chunks = expo.chunkPushNotifications([{
+"to": savedTokens,
+"sound": "default",
+"channelId": "notification-sound-channel",
+"title": "New Request Received!",
+"body": `You have being assigned a request from your company.`
+}]);
+let tickets = [];
+(async () => {
+for (let chunk of chunks) {
+  try {
+    let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+    console.log(ticketChunk);
+    tickets.push(...ticketChunk);
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+})();
+
+
+
+
+  } catch(error) {
+      console.log(error)
+      return response.status(404).send("an error occured")
+  }
+
+
+} else {
+  return response.status(404).send({
+    message: 'Job does not exist'
+  });
+}
+
+}
 
   static async showJob(request:Request, response:Response){
 
