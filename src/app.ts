@@ -63,8 +63,9 @@ app.post('/api/v1/adminsignin', Middleware.signinMiddleware, ArtisanController.a
 //subaccount
 app.post('/api/v1/subaccount', ArtisanController.Subsignup);
 app.post('/api/v1/:uid/getSubs', ArtisanController.Subs);
+app.post('/api/v1/:uid/subAccounts', ArtisanController.allAccounts);
 app.post('/api/v1/:uid/deleteSub', ArtisanController.deleteSub);
-
+app.post('/api/v1/:rid/delegate', JobController.delegateLog);
 
 app.post('/api/v1/confirmation', UserController.confirm);
 app.post('/api/v1/resend-otp', UserController.resendOtp);
