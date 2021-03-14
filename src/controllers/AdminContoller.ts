@@ -23,6 +23,7 @@ class AdminController {
     //send  user notifcation
     static async userNotification (request:Request, response:Response){
         const {title, body} = request.body;
+        console.log(request.body)
 
     const get_users = await Schema.User().find({pushToken: {$exists: true} })
     console.log("users:" + get_users)
@@ -62,6 +63,7 @@ class AdminController {
     static async driverNotification (request:Request, response:Response){
         const {title, body} = request.body;
         console.log(title)
+        console.log(request.body)
 
     const get_users = await Schema.Artisan().find({pushToken: {$exists: true} })
     console.log("users:" + get_users)
