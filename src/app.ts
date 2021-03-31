@@ -700,6 +700,45 @@ const req = async () => {
 }
 //req()
 
+
+
+
+//send single notification
+const sinNot = async () => {
+  
+  const user = await Schema.User().findOne({pushToken: {$exists: true}, phone: '+2347040941857' })
+  console.log("users:" + user)
+
+ 
+    console.log("tokens:" + user)
+  
+    let chunks = expo.chunkPushNotifications([{
+      "to": user.pushToken,
+      "sound": "default",
+      "title": "Credit Alert",
+      "body": "you have been given N2000 welcome back bonus. Refer and earn more! :)"
+    }]);
+    let tickets = [];
+    (async () => {
+      for (let chunk of chunks) {
+        try {
+          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+       
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    })();
+
+
+  }
+  sinNot()
+
+
+
+
 //seedArtisan();
 
 //server

@@ -218,7 +218,7 @@ class ArtisanController {
     } = request.body;
 
     console.log(request.body);
-    const foundUser: any = await Schema.Artisan().findOne({ email: email });
+    const foundUser = await Schema.Artisan().findOne({ email: email.trim() });
 
 
       if(foundUser){
