@@ -247,9 +247,6 @@ class AdminController {
 
     if(user){
 
-    
-    console.log("users:" + user)
-  
    
       console.log("tokens:" + user)
     
@@ -272,6 +269,8 @@ class AdminController {
           }
         }
       })();
+
+      response.status(200).send('notification sent')
   
     } else {
       response.status(400).send({message: 'user not found'})
@@ -311,6 +310,7 @@ class AdminController {
           }
         }
       })();
+      response.status(200).send('notification sent')
   
     } else {
       response.status(400).send({message: 'user not found'})
