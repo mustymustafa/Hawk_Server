@@ -213,9 +213,16 @@ app.get('/api/v1/statistics', AdminController.statistics)
 
 
 
+
+
 //send notification
 app.post('/api/v1/user/notification', AdminController.userNotification)
 app.post('/api/v1/driver/notification', AdminController.driverNotification)
+
+
+//send single notification
+app.post('/api/v1/user/snotification', AdminController.singleNot)
+app.post('/api/v1/driver/snotification', AdminController.singleNotD)
 
 
 
@@ -734,9 +741,19 @@ const sinNot = async () => {
 
 
   }
-  sinNot()
+  //sinNot()
 
 
+
+
+
+
+
+
+
+
+
+  
 
 
 //seedArtisan();

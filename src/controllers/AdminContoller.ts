@@ -240,6 +240,84 @@ class AdminController {
  
 
 
+    //single user notification
+    static async singleNot (request:Request, response:Response){
+      const {num, title, body} = request.body;
+    const user = await Schema.User().findOne({pushToken: {$exists: true}, phone: num })
+
+    if(user){
+
+    
+    console.log("users:" + user)
+  
+   
+      console.log("tokens:" + user)
+    
+      let chunks = expo.chunkPushNotifications([{
+        "to": user.pushToken,
+        "sound": "default",
+        "title": `${title}`,
+        "body": `${body}`
+      }]);
+      let tickets = [];
+      (async () => {
+        for (let chunk of chunks) {
+          try {
+            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+            console.log(ticketChunk);
+            tickets.push(...ticketChunk);
+         
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      })();
+  
+    } else {
+      response.status(400).send({message: 'user not found'})
+    }
+
+  }
+
+     //single driver notification
+     static async singleNotD (request:Request, response:Response){
+      const {num, title, body} = request.body;
+    const user = await Schema.Artisan().findOne({pushToken: {$exists: true}, phone: num })
+
+    if(user){
+
+    
+    console.log("users:" + user)
+  
+   
+      console.log("tokens:" + user)
+    
+      let chunks = expo.chunkPushNotifications([{
+        "to": user.pushToken,
+        "sound": "default",
+        "title": `${title}`,
+        "body": `${body}`
+      }]);
+      let tickets = [];
+      (async () => {
+        for (let chunk of chunks) {
+          try {
+            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+            console.log(ticketChunk);
+            tickets.push(...ticketChunk);
+         
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      })();
+  
+    } else {
+      response.status(400).send({message: 'user not found'})
+    }
+
+  }
+
 
 
 }
