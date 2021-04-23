@@ -36,11 +36,6 @@ class MiddleWare {
                     cpassword: 'Passwords do not match'
                 }];
         }
-        if (bio !== bio) {
-            errors = [...errors, {
-                    bio: 'Please enter a bio'
-                }];
-        }
         if (category !== category) {
             errors = [...errors, {
                     category: 'Please enter a category'
@@ -91,20 +86,10 @@ class MiddleWare {
                     cpassword: 'Passwords do not match'
                 }];
         }
-        if (bio !== bio) {
-            errors = [...errors, {
-                    bio: 'Please enter a bio'
-                }];
-        }
-        if (category !== category) {
-            errors = [...errors, {
-                    category: 'Please enter a category'
-                }];
-        }
-        if (!((/^[a-z][a-z]+\s[a-z][a-z]+$/.test(fullname.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(fullname.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(fullname.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(fullname.trim())))) {
+        if (!((/^[a-zA-Z .'-]+\s[a-zA-Z .'-]+$/.test(fullname.trim())))) {
             errors = [
                 ...errors, {
-                    errorMessage: 'Please enter your full name',
+                    errorMessage: 'Please enter your first and last name',
                 }
             ];
         }

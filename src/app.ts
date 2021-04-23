@@ -713,7 +713,7 @@ const req = async () => {
 //send single notification
 const sinNot = async () => {
   
-  const user = await Schema.User().findOne({pushToken: {$exists: true}, phone: '+2347040941857' })
+  const user = await Schema.User().findOne({pushToken: {$exists: true}, phone: '+2348032900274' })
   console.log("users:" + user)
 
  
@@ -723,7 +723,7 @@ const sinNot = async () => {
       "to": user.pushToken,
       "sound": "default",
       "title": "Credit Alert",
-      "body": "you have been given N2000 welcome back bonus. Refer and earn more! :)"
+      "body": "you have been given N2000 in your platabox wallet. Enjoy! :)"
     }]);
     let tickets = [];
     (async () => {

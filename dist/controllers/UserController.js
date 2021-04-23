@@ -22,6 +22,7 @@ const client = twilio_1.default(accountSid, authToken, {
     lazyLoading: true
 });
 const schema_1 = __importDefault(require("../schema/schema"));
+const nodemailer_1 = __importDefault(require("nodemailer"));
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo = new expo_server_sdk_1.Expo();
 const Flutterwave = require('flutterwave-node-v3');
@@ -32,15 +33,13 @@ const month = now.getMonth() + 1;
 const day = now.getDate();
 const year = now.getFullYear();
 const today = month + '/' + day + '/' + year;
-/**
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-         user: 'musty.mohammed1998@gmail.com',
-         pass: process.env.PASS
-     }
- });
-*/
+var transporter = nodemailer_1.default.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'musty.mohammed1998@gmail.com',
+        pass: process.env.PASS
+    }
+});
 class UserController {
     // sign up
     static signup(request, response) {
@@ -48,6 +47,11 @@ class UserController {
             const { fullname, email, password, phone, cpassword, country } = request.body;
             console.log(request.body);
             try {
+                if (!phone || phone.length != 14) {
+                    return response.status(409).send({
+                        message: 'Please enter a valid  number',
+                    });
+                }
                 const foundEmail = yield schema_1.default.User().find({ phone: phone.trim() });
                 if (foundEmail && foundEmail.length > 0) {
                     console.log(foundEmail[0]);
@@ -59,11 +63,6 @@ class UserController {
                 if (cpassword.trim() !== password.trim()) {
                     return response.status(409).send({
                         message: 'The Password do not match'
-                    });
-                }
-                if (!phone) {
-                    return response.status(409).send({
-                        message: 'Please enter a valid  number',
                     });
                 }
                 const confirmationCode = String(Date.now()).slice(9, 13);
@@ -223,29 +222,27 @@ class UserController {
             }
         });
     }
-    /**
-      static sendMail (email: string, message: string, subject = 'Registration') {
-        try{
-     
-          const msg = {
-            to: email,
-            from: '"Hawk" <no-reply@thegreenearthcomp.com>',
-            subject,
-            html: `<p> ${message} </p>`
-          };
-          transporter.sendMail(msg, function(error, info){
-            if (error) {
-              console.log(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-            }
-          });
-        
-        } catch (error) {
-          console.log(error.toString());
+    static sendMail(email, message, subject) {
+        try {
+            const msg = {
+                to: email,
+                from: '"Platabox" <no-reply@support@platabox.com>',
+                subject,
+                html: `<p> ${message}</p>`
+            };
+            transporter.sendMail(msg, function (error, info) {
+                if (error) {
+                    console.log(error);
+                }
+                else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
         }
-      }
-    */
+        catch (error) {
+            console.log(error.toString());
+        }
+    }
     //sign in
     static signin(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -315,9 +312,6 @@ class UserController {
                     }, {
                         $set: {
                             isConfirmed: true,
-                            promo_date: createdAt,
-                            next_promo: now.toLocaleDateString(),
-                            promo: true,
                             createdAt: createdAt
                         }
                     });
@@ -520,6 +514,11 @@ class UserController {
     static withdrawFund(req, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid, bcode, amount, anumber, otp, } = req.body;
+            //check if user has an ongoing request
+            const job = yield schema_1.default.Job().findOne({ user: uid }).where({ status: 'accepted' });
+            if (job) {
+                response.status(401).send({ message: "You can't withdraw funds until your last request is completed. Try again later :)" });
+            }
             //check balance in platabox account
             var options = {
                 'method': 'GET',
@@ -534,11 +533,12 @@ class UserController {
                     console.log(error);
                 }
                 ;
+                console.log(resp.body);
                 console.log(parseInt(resp.body.split(":")[5].split(",")[0]));
                 var balance = parseInt(resp.body.split(":")[5].split(",")[0]);
                 try {
                     const user = yield schema_1.default.User().findOne({ _id: uid });
-                    const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
+                    const admin = yield schema_1.default.User().findOne({ phone: '+2349038826995' });
                     console.log(user);
                     const new_amount = parseInt(user.balance) - parseInt(amount);
                     const limit = parseInt(user.balance) - 50;
@@ -574,14 +574,15 @@ class UserController {
                                         }
                                     }
                                 }))();
+                                UserController.sendMail('mustapha.mohammed1@aun.edu.ng', 'Insufficient wallet Balance!', 'Check wallet balance ASAP!.');
                             }
                             return response.status(400).send({ message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)' });
                         }
                         else {
                             //verify token
-                            if (user.otp != otp) {
-                                response.status(400).send({ error: 'The OTP you entered is incorrect. Please try again' });
-                            }
+                            /**if(user.otp != otp){
+                              response.status(400).send({error: 'The OTP you entered is incorrect. Please try again'})
+                            }*/
                             const payload = {
                                 "account_bank": bcode,
                                 "account_number": anumber,
@@ -652,6 +653,11 @@ class UserController {
             console.log(bank);
             console.log(anumber);
             console.log(uid);
+            //check if user has an ongoing request
+            const job = yield schema_1.default.Job().findOne({ user: uid }).where({ status: 'accepted' });
+            if (job) {
+                response.status(401).send({ message: "You can't withdraw funds until your last request is completed. Try again later :)" });
+            }
             //check balance in platabox account
             var options = {
                 'method': 'GET',
@@ -670,7 +676,7 @@ class UserController {
                 var balance = parseInt(resp.body.split(":")[5].split(",")[0]);
                 try {
                     const user = yield schema_1.default.User().findOne({ _id: uid });
-                    const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
+                    const admin = yield schema_1.default.User().findOne({ phone: '+2349038826995' });
                     console.log(user);
                     console.log(admin);
                     const limit = parseInt(user.balance) - 50;
@@ -814,7 +820,7 @@ class UserController {
                 console.log(user);
                 const trans = yield schema_1.default.Transaction().find({ user: uid }).sort({ '_id': -1 });
                 console.log(trans);
-                if (user && trans) {
+                if (user) {
                     response.status(200).send({ trans: trans });
                 }
                 else {
@@ -845,6 +851,44 @@ class UserController {
                 console.log(error);
                 response.status(500).send('Something went wrong');
             }
+        });
+    }
+    //emergency
+    static emergencyContact(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid, phone, email, name } = request.body;
+            try {
+                const user = yield schema_1.default.User().findOne({ _id: uid });
+                console.log(user);
+                if (user) {
+                    yield schema_1.default.User()
+                        .updateOne({
+                        _id: uid,
+                    }, {
+                        $set: {
+                            ename: name,
+                            ephone: phone,
+                            eemail: email,
+                        }
+                    });
+                    response.status(200).send({ message: 'Emergency contact added!' });
+                }
+                else {
+                    response.status(404).send({ message: 'User not found' });
+                }
+            }
+            catch (err) {
+                console.log(err);
+                return response.status(500).send({
+                    message: 'An error occured'
+                });
+            }
+        });
+    }
+    static Emergency(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid, dic, location } = request.body;
+            response.status(200).send({ message: 'emergency reported' });
         });
     }
 }

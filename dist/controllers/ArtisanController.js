@@ -27,10 +27,18 @@ const Flutterwave = require('flutterwave-node-v3');
 const rave = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
 //date initialization
 const now = new Date();
+const next = new Date();
+const tom = new Date();
+next.setDate(next.getDate() + 7);
+tom.setDate(next.getDate() + 1);
 const month = now.getMonth() + 1;
 const day = now.getDate();
 const year = now.getFullYear();
 const today = month + '/' + day + '/' + year;
+const nmonth = next.getMonth() + 1;
+const nday = next.getDate();
+const nyear = next.getFullYear();
+const nextweek = nmonth + '/' + nday + '/' + nyear;
 const schema_1 = __importDefault(require("../schema/schema"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 var transporter = nodemailer_1.default.createTransport({
@@ -57,22 +65,30 @@ class ArtisanController {
             const { fullname, email, password, phone, cpassword, country } = request.body;
             console.log(phone);
             try {
-                const foundEmail = yield schema_1.default.Artisan().find({ phone: phone.trim() });
+                const foundPhone = yield schema_1.default.Artisan().find({ phone: phone.trim() });
+                const foundEmail = yield schema_1.default.Artisan().find({ email: email.trim() });
+                if (!phone || phone.length != 14) {
+                    return response.status(409).send({
+                        message: 'Please enter a valid  number',
+                    });
+                }
                 if (foundEmail && foundEmail.length > 0) {
                     console.log(foundEmail[0]);
                     return response.status(409).send({
-                        message: 'This number already exists',
+                        message: 'This email already exists',
                         isConfirmed: foundEmail[0].isConfirmed
+                    });
+                }
+                if (foundPhone && foundPhone.length > 0) {
+                    console.log(foundPhone[0]);
+                    return response.status(409).send({
+                        message: 'This number already exists',
+                        isConfirmed: foundPhone[0].isConfirmed
                     });
                 }
                 if (cpassword.trim() !== password.trim()) {
                     return response.status(409).send({
                         message: 'The Password do not match'
-                    });
-                }
-                if (!phone) {
-                    return response.status(409).send({
-                        message: 'Please enter a valid  number',
                     });
                 }
                 yield schema_1.default.Artisan().create({
@@ -101,8 +117,15 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, sub, password, phone, owner } = request.body;
             console.log(sub);
-            console.log("owner id " + owner);
             try {
+                console.log("owner id " + owner);
+                const findOwner = yield schema_1.default.Artisan().findOne({ _id: owner });
+                console.log("owner: " + findOwner);
+                if (findOwner.sub === sub) {
+                    return response.status(409).send({
+                        message: 'you are not authorized to create a subaccount',
+                    });
+                }
                 const foundEmail = yield schema_1.default.Artisan().find({ phone: phone });
                 if (foundEmail && foundEmail.length > 0) {
                     console.log(foundEmail[0]);
@@ -115,8 +138,6 @@ class ArtisanController {
                         message: 'Please enter a valid  number',
                     });
                 }
-                const findOwner = yield schema_1.default.Artisan().findOne({ _id: owner });
-                console.log("owner: " + findOwner);
                 yield schema_1.default.Artisan().create({
                     owner: owner,
                     pic: findOwner.pic,
@@ -126,8 +147,10 @@ class ArtisanController {
                     name: name.trim(),
                     sub: sub,
                     password: bcrypt_1.default.hashSync(password.trim(), ArtisanController.generateSalt()),
-                    phone,
-                    isConfirmed: true
+                    phone: phone,
+                    isConfirmed: true,
+                    active: true,
+                    createdAt: today,
                 });
                 response.status(201).send({
                     message: 'User created successfully',
@@ -145,25 +168,17 @@ class ArtisanController {
     //continue signup
     static continueSignup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, bio, wage, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone, vyear } = request.body;
+            const { email, bio, phone, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone, vyear } = request.body;
             console.log(request.body);
-            const foundUser = yield schema_1.default.Artisan().findOne({ email });
-            if (foundUser && Object.keys(foundUser).length > 0) {
+            const foundUser = yield schema_1.default.Artisan().findOne({ email: email.trim() });
+            if (foundUser) {
                 console.log(foundUser);
                 try {
-                    const dt = new Date();
-                    const createdAt = dt.toLocaleDateString();
-                    console.log(createdAt);
-                    var now = new Date();
-                    //after 7 days
-                    const expire = now.setDate(now.getDate() + 7);
-                    console.log(now.toLocaleDateString());
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
                         $set: {
                             bio: bio,
-                            //  wage: wage,
                             category: category,
                             id_expiry: id_expiry,
                             vl_expiry: vl_expiry,
@@ -173,8 +188,8 @@ class ArtisanController {
                             plate: plate,
                             sname: sname,
                             sphone: sphone,
-                            createdAt: createdAt,
-                            expireAt: now.toLocaleDateString()
+                            createdAt: today,
+                            expireAt: nextweek
                         }
                     });
                     return response.status(200).send({
@@ -189,6 +204,9 @@ class ArtisanController {
                     });
                 }
             }
+            else {
+                response.status(400).send({ message: `The email ${email} does not exist. Make sure you use the email you started signing up with :)` });
+            }
         });
     }
     //update profile
@@ -199,26 +217,6 @@ class ArtisanController {
             const foundUser = yield schema_1.default.Artisan().findOne({ _id: uid });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 console.log(foundUser);
-                if (!bio) {
-                    return response.status(409).send({
-                        message: 'Please enter a bio',
-                    });
-                }
-                if (!((/^[a-z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[a-z][a-z]+$/.test(name.trim())) || (/^[a-z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())) || (/^[A-Z][a-z]+\s[A-Z][a-z]+$/.test(name.trim())))) {
-                    return response.status(409).send({
-                        message: 'Please enter a valid name',
-                    });
-                }
-                if (!wage) {
-                    return response.status(409).send({
-                        message: 'Please enter a wage',
-                    });
-                }
-                if (!phone || phone.length < 11 || phone.length > 11) {
-                    return response.status(409).send({
-                        message: 'Please enter a valid phone',
-                    });
-                }
                 try {
                     yield schema_1.default.Artisan().updateOne({
                         _id: uid
@@ -883,6 +881,9 @@ class ArtisanController {
                     });
                     foundUser.isConfirmed = true;
                     ArtisanController.sendMail('management@platabox.com', 'New Registration Request. Please attend to it now.', 'New Registration');
+                    //notify admin
+                    ArtisanController.sendMail('mohammed.ahmed1@aun.edu.ng', 'New Registration.', 'Please Review and activate');
+                    ArtisanController.sendMail('mustapha.mohammed1@aun.edu.ng', 'New Registration.', 'Please Review and activate');
                     return response.status(200).send({
                         token: ArtisanController.generateToken(foundUser)
                     });
@@ -905,7 +906,7 @@ class ArtisanController {
     static Drivers(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const drivers = yield schema_1.default.Artisan().find({ 'category': 'driver' }).where({ 'active': true }).sort({ '_id': -1 });
+                const drivers = yield schema_1.default.Artisan().find({ 'category': 'driver' }).where({ 'active': true }).where({ 'lat': !undefined }).where({ 'long': !undefined });
                 console.log(drivers);
                 return response.status(200).send({ value: drivers });
             }
@@ -920,7 +921,7 @@ class ArtisanController {
     static Logs(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const logs = yield schema_1.default.Artisan().find({ 'category': 'log' }).where({ 'active': true }).sort({ '_id': -1 });
+                const logs = yield schema_1.default.Artisan().find({ 'category': 'log' }).where({ 'active': true }).where({ 'lat': !undefined }).where({ 'long': !undefined });
                 console.log(logs);
                 return response.status(200).send({ value: logs });
             }
@@ -971,6 +972,38 @@ class ArtisanController {
             catch (error) {
                 console.log(error);
                 return response.status(404).send("an error occured");
+            }
+        });
+    }
+    //get company account
+    static allAccounts(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { uid } = request.body;
+            console.log(uid);
+            try {
+                const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                if (user) {
+                    //get accounts
+                    if (user.sub === 'yes') {
+                        const subs = yield schema_1.default.Artisan().find({ owner: user.owner }).sort({ '_id': -1 });
+                        console.log(subs);
+                        return response.status(200).send({ value: subs });
+                    }
+                    const subs = yield schema_1.default.Artisan().find({ owner: uid }).sort({ '_id': -1 });
+                    console.log(subs);
+                    return response.status(200).send({ value: subs });
+                }
+                else {
+                    return response.status(500).send({
+                        message: "User not found"
+                    });
+                }
+            }
+            catch (error) {
+                console.log(error.toString());
+                return response.status(500).send({
+                    message: 'something went wrong'
+                });
             }
         });
     }
@@ -1043,6 +1076,7 @@ class ArtisanController {
     static userDetails(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             var total = 0;
+            var expire = false;
             const { uid } = request.params;
             console.log(uid);
             try {
@@ -1060,23 +1094,28 @@ class ArtisanController {
                     console.log("rating:" + rate);
                     //get total amount
                     console.log('total earnings:' + user.earnings);
+                    console.log('total earnings:' + user.cash);
                     //amount to pay
-                    var pay = Math.round(user.earnings * 0.20);
+                    var pay = Math.round(user.earnings * 0.15);
                     const available = parseInt(user.earnings) - pay;
+                    var pay_cash = Math.round(user.cash * 0.15);
                     console.log('pay' + pay);
                     console.log('available' + available);
+                    console.log('cash to pay' + pay_cash);
                     console.log("TODAY:" + today);
-                    /**if(user.expireAt === today){
-                      expire = true
-                    }*/
-                    //console.log("EXPIRIED?" + expire)
+                    if (user.expireAt === today) {
+                        expire = true;
+                    }
+                    console.log("EXPIRIED?" + expire);
                     response.status(200).send({
                         user,
                         rating: rate,
                         earning: user.earnings,
+                        cash: user.cash,
                         pay: pay,
+                        pay_cash: pay_cash,
                         available: available,
-                        expired: false
+                        expired: expire
                     });
                     // console.log(user)
                 }
@@ -1105,10 +1144,14 @@ class ArtisanController {
             console.log(now.toLocaleDateString());
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
+                //find subaccounts
+                const sub = yield schema_1.default.Artisan().find({ owner: uid });
                 if (user) {
                     yield schema_1.default.Artisan().updateOne({ _id: uid }, {
                         $set: {
                             active: true,
+                            expireAt: nextweek,
+                            cash: 0
                         }
                     });
                     response.status(200).send({
@@ -1118,6 +1161,53 @@ class ArtisanController {
                 else {
                     response.status(404).send({
                         message: 'Cannot find details for this user'
+                    });
+                }
+                //if it has subaccounts activate them
+                if (sub) {
+                    yield schema_1.default.Artisan().updateMany({ owner: uid }, { $set: {
+                            active: true,
+                            expireAt: nextweek,
+                            cash: 0
+                        }
+                    }, function (err, result) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            console.log('Added free discounts');
+                            //send notification for expiry
+                            sub.map(usr => {
+                                console.log("tokens:" + usr.pushToken);
+                                let chunks = expo.chunkPushNotifications([{
+                                        "to": [usr.pushToken],
+                                        "sound": "default",
+                                        "title": "Account activated!",
+                                        "body": "your weekly payment has been made and your account is now active! :)"
+                                    }]);
+                                let tickets = [];
+                                (() => __awaiter(this, void 0, void 0, function* () {
+                                    for (let chunk of chunks) {
+                                        try {
+                                            let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                                            console.log(ticketChunk);
+                                            tickets.push(...ticketChunk);
+                                        }
+                                        catch (error) {
+                                            console.error(error);
+                                        }
+                                    }
+                                }))();
+                            });
+                        }
+                    });
+                    response.status(200).send({
+                        message: 'Account Activated!'
+                    });
+                }
+                else {
+                    response.status(404).send({
+                        message: 'Cannot find subaccounts for this user'
                     });
                 }
             }
@@ -1146,10 +1236,10 @@ class ArtisanController {
                         lat: lat,
                         long: long,
                         location: location,
-                        area1: area1,
-                        area2: area2,
-                        city: city,
-                        city2: city2
+                        area1: area1 === undefined ? '' : area1.trim(),
+                        area2: area2 === undefined ? '' : area2.trim(),
+                        city: city === undefined ? '' : city.trim(),
+                        city2: city2 === undefined ? '' : city2.trim(),
                     }
                 });
                 return response.status(200).send("location saved");
@@ -1472,9 +1562,9 @@ class ArtisanController {
                 var balance = parseInt(resp.body.split(":")[5].split(",")[0]);
                 try {
                     const user = yield schema_1.default.Artisan().findOne({ _id: uid });
-                    const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
+                    const admin = yield schema_1.default.User().findOne({ phone: '+2349038826995' });
                     console.log(user);
-                    const pay = Math.round(user.earnings * 0.20);
+                    const pay = Math.round(user.earnings * 0.15);
                     const available = parseInt(user.earnings) - pay;
                     const new_amount = parseInt(user.earnings) - parseInt(amount);
                     const limit = available - 50;
@@ -1510,14 +1600,15 @@ class ArtisanController {
                                         }
                                     }
                                 }))();
+                                ArtisanController.sendMail('mustapha.mohammed1@aun.edu.ng', 'Insufficient wallet Balance!', 'Check wallet balance ASAP!.');
                             }
                             return response.status(400).send({ message: 'Service is busy at the moment due to high number of requests. Please try again in a few minute :)' });
                         }
                         else {
                             //verify token
-                            if (user.otp != otp) {
-                                response.status(400).send({ error: 'The OTP you entered is incorrect. Please try again' });
-                            }
+                            /**if(user.otp != otp){
+                             response.status(400).send({error: 'The OTP you entered is incorrect. Please try again'})
+                           }*/
                             const payload = {
                                 "account_bank": bcode,
                                 "account_number": anumber,
@@ -1606,7 +1697,7 @@ class ArtisanController {
                 var balance = parseInt(resp.body.split(":")[5].split(",")[0]);
                 try {
                     const user = yield schema_1.default.Artisan().findOne({ _id: uid });
-                    const admin = yield schema_1.default.User().findOne({ name: 'mustafa mohammed' });
+                    const admin = yield schema_1.default.User().findOne({ phone: '+2349038826995' });
                     //console.log(user);
                     //console.log(admin)
                     const limit = parseInt(user.earnings) - 50;

@@ -29,6 +29,8 @@ const ArtisanController_1 = __importDefault(require("./controllers/ArtisanContro
 const util_1 = require("./util");
 const JobController_1 = __importDefault(require("./controllers/JobController"));
 const expo_server_sdk_1 = require("expo-server-sdk");
+const PaymentController_1 = __importDefault(require("./controllers/PaymentController"));
+const AdminContoller_1 = __importDefault(require("./controllers/AdminContoller"));
 const expo = new expo_server_sdk_1.Expo();
 const Flutterwave = require('flutterwave-node-v3');
 const flw = new Flutterwave(process.env.PUBLICK_KEY, process.env.SECRET_KEY, false);
@@ -48,7 +50,9 @@ app.post('/api/v1/adminsignin', Middleware_1.default.signinMiddleware, ArtisanCo
 //subaccount
 app.post('/api/v1/subaccount', ArtisanController_1.default.Subsignup);
 app.post('/api/v1/:uid/getSubs', ArtisanController_1.default.Subs);
+app.post('/api/v1/:uid/subAccounts', ArtisanController_1.default.allAccounts);
 app.post('/api/v1/:uid/deleteSub', ArtisanController_1.default.deleteSub);
+app.post('/api/v1/:rid/delegate', JobController_1.default.delegateLog);
 app.post('/api/v1/confirmation', UserController_1.default.confirm);
 app.post('/api/v1/resend-otp', UserController_1.default.resendOtp);
 app.post('/api/v1/forgot-password', UserController_1.default.forgotPassword);
@@ -125,6 +129,7 @@ app.post('/api/v1/job/:job_id/cancel-artisan', JobController_1.default.cancelArt
 app.post('/api/v1/job/:job_id/complete', JobController_1.default.completeJob);
 app.post('/api/v1/:uid/jobs', JobController_1.default.artisanJobs);
 app.post('/api/v1/:uid/job/artisan', JobController_1.default.getArtisan);
+app.post('/api/v1/:uid/job/track', JobController_1.default.trackReq);
 app.post('/api/v1/:uid/job/artisan/start', JobController_1.default.startedJob);
 app.post('/api/v1/job/:uid/lastjob', JobController_1.default.checkRating);
 app.post('/api/v1/job/:uid/rate', JobController_1.default.rateArtisan);
@@ -138,18 +143,34 @@ app.get('/api/v1/getdeliveires', JobController_1.default.Deliveries);
 app.get('/api/v1/getrides', JobController_1.default.Rides);
 app.post('/api/v1/:uid/activate', ArtisanController_1.default.adminActivate);
 app.post('/api/v1/:uid/deactivate', ArtisanController_1.default.deactivateAccount);
+app.get('/api/v1/statistics', AdminContoller_1.default.statistics);
+//send notification
+app.post('/api/v1/user/notification', AdminContoller_1.default.userNotification);
+app.post('/api/v1/driver/notification', AdminContoller_1.default.driverNotification);
+//send single notification
+app.post('/api/v1/user/snotification', AdminContoller_1.default.singleNot);
+app.post('/api/v1/driver/snotification', AdminContoller_1.default.singleNotD);
+//send text
+app.post('/api/v1/:uid/user/text', AdminContoller_1.default.userText);
+app.post('/api/v1/:uid/driver/text', AdminContoller_1.default.driverText);
+//****************************** */
 ////////PLATABOX WALLET ROUTES///////
 app.post('/api/v1/:uid/fund', UserController_1.default.fundWallet);
 app.post('/api/v1/:uid/withdraw', UserController_1.default.withdrawFund);
 app.post('/api/v1/:uid/transferRequest', UserController_1.default.transferRequests);
 app.post('/api/v1/:uid/updateTransfer', UserController_1.default.updateTransfer);
-app.post('/api/v1/:uid/getTrans', UserController_1.default.getTrans);
-app.get('/api/v1/getTransactions', UserController_1.default.allTrans);
+app.post('/api/v1/:uid/getTrans', UserController_1.default.allTrans);
+app.get('/api/v1/getTransactions', UserController_1.default.getTrans);
 //PLATABOX DRIVER WALLET
 app.post('/api/v1/:uid/driverwithdraw', ArtisanController_1.default.withdrawFund);
 app.post('/api/v1/:uid/drivertransferRequest', ArtisanController_1.default.transferRequests);
 app.post('/api/v1/:uid/driverupdateTransfer', ArtisanController_1.default.updateTransfer);
 app.post('/api/v1/:uid/drivergetTrans', ArtisanController_1.default.allTrans);
+//PLATABOX WALLET VERIFICATION
+app.post('/api/v1/verifyAccount', PaymentController_1.default.verifyAccount);
+///emergency 
+app.post('/api/v1/:uid/emergency/contact', UserController_1.default.emergencyContact);
+app.post('/api/v1/:uid/emergency', UserController_1.default.Emergency);
 //testing route
 app.get('/test', (request, response) => {
     response.send('working');
@@ -180,8 +201,6 @@ const deleteU = node_cron_1.default.schedule("00 23 * * *", () => __awaiter(void
     //find accounts
     const delete_account = yield schema_1.default.Artisan().deleteMany({ isConfirmed: false });
     console.log("deleted:" + delete_account);
-    const delete_user = yield schema_1.default.User().deleteMany({ isConfirmed: false });
-    console.log("deleted:" + delete_user);
 }), { scheduled: true });
 //deactivate expired accounts
 const deactivate = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
@@ -198,24 +217,38 @@ const deactivate = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(v
     console.log("today: " + today);
     console.log("next promo: " + next_promo);
     //deactivate account if expired
+    //deactivate s
     //find the user's first 
-    const user = yield schema_1.default.Artisan().find({ expireAt: today, earnings: { $gt: 1500 } });
+    const user = yield schema_1.default.Artisan().find({ name: 'Platabox Test' /**expireAt: today, earnings: {$gt: 2000}*/ });
     console.log(user);
     if (user) {
-        yield schema_1.default.Artisan().updateMany({ expireAt: today, earnings: { $gt: 1500 } }, { $set: { active: false } }, function (err, result) {
+        yield schema_1.default.Artisan().updateMany({ name: 'Platabox Test' /**expireAt: today, earnings: {$gt: 2000}*/ }, { $set: { active: false } }, function (err, result) {
             if (err) {
                 console.log(err);
             }
             else {
-                console.log('Expired users updated');
+                console.log('Expired accounts updated');
                 //send notification for expiry
                 user.map(usr => {
+                    //check if accounts have subaccouts
+                    const sub = schema_1.default.Artisan().find({ owner: usr._id });
+                    console.log(sub);
+                    if (sub) {
+                        schema_1.default.Artisan().updateMany({ owner: usr._id }, { $set: { active: false } }, function (err, result) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            else {
+                                console.log('Expired sub accounts updated');
+                            }
+                        });
+                    }
                     console.log("tokens:" + usr.pushToken);
                     let chunks = expo.chunkPushNotifications([{
                             "to": [usr.pushToken],
                             "sound": "default",
                             "title": "Account on hold",
-                            "body": "Please pay your 40% weeklu commission today to activate your account :)"
+                            "body": "Please pay your 15% weekly commission today to activate your account(s) :)"
                         }]);
                     let tickets = [];
                     (() => __awaiter(this, void 0, void 0, function* () {
@@ -233,245 +266,13 @@ const deactivate = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(v
                 });
             }
         });
-    }
-}), { scheduled: true });
-/**
- * const notificationA = cron.schedule("08 15 * * *", async () => {
-  
-  console.log(" notification initialized");
-//find accounts
-
-
-  const get_users = await Schema.User().find({pushToken: {$exists: true} })
- console.log("users:" + get_users)
-
-  get_users.map(users => {
- 
-    console.log("tokens:" + users.pushToken)
-    let chunks = expo.chunkPushNotifications([{
-      "to": [users.pushToken],
-      "sound": "default",
-      "title": "Resumption!",
-      "body": "We just want to let you know that we have fully resumed operations and ready to take your orders. we are also giving 30% discount to all our lovely customers :)"
-    }]);
-    let tickets = [];
-    (async () => {
-      for (let chunk of chunks) {
-        try {
-          let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-          console.log(ticketChunk);
-          tickets.push(...ticketChunk);
-       
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    })();
-    })
-  
-},
-
-{scheduled: true}
-);
- */
-//********DISCOUNT*******************
-//2. check if today is not discount then disable
-const discountCheck = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("discount check initialized");
-    //find accounts
-    //standard date
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const year = now.getFullYear();
-    const today = month + '/' + day + '/' + year;
-    const get_users = yield schema_1.default.User().find({ next_promo: { $ne: today }, pushToken: { $exists: true } });
-    console.log("users:" + get_users);
-    if (get_users) {
-        yield schema_1.default.User().updateMany({ next_promo: { $ne: today }, pushToken: { $exists: true } }, { $set: {
-                promo: false
-            }
-        }, function (err, result) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                console.log('updated discounts');
-            }
-        });
-    }
-}), { scheduled: true });
-//2. check if today is discount then enable 
-const discountCheck1 = node_cron_1.default.schedule("10 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("discount check initialized");
-    //find accounts
-    //standard date
-    const now = new Date();
-    const next = new Date();
-    next.setDate(next.getDate() + 7);
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const year = now.getFullYear();
-    const today = month + '/' + day + '/' + year;
-    const nmonth = next.getMonth() + 1;
-    const nday = next.getDate();
-    const nyear = next.getFullYear();
-    const next_promo = nmonth + '/' + nday + '/' + nyear;
-    //
-    const get_users = yield schema_1.default.User().find({ next_promo: today, pushToken: { $exists: true } });
-    console.log("users:" + get_users);
-    if (get_users) {
-        yield schema_1.default.User().updateMany({ next_promo: today, pushToken: { $exists: true } }, { $set: {
-                promo: true,
-                promo_date: today,
-                next_promo: next_promo
-            }
-        }, function (err, result) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                console.log('updated discounts');
-            }
-        });
-    }
-}), { scheduled: true });
-// send discount notification
-const discount = node_cron_1.default.schedule("00 10 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("discount notification initialized");
-    //find accounts
-    //standard date
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const nextday = now.getDate() + 1;
-    const year = now.getFullYear();
-    const today = month + '/' + day + '/' + year;
-    const next_promo = month + '/' + nextday + '/' + year;
-    console.log("today: " + today);
-    console.log("next promo: " + next_promo);
-    const get_users = yield schema_1.default.User().find({ promo: true, pushToken: { $exists: true } });
-    console.log("users:" + get_users);
-    get_users.map(users => {
-        console.log("tokens:" + users.pushToken);
-        let chunks = expo.chunkPushNotifications([{
-                "to": [users.pushToken],
-                "sound": "default",
-                "title": "Don't forget to use your 30% discount today :)",
-                "body": "Open your Platabox App"
-            }]);
-        let tickets = [];
-        (() => __awaiter(void 0, void 0, void 0, function* () {
-            for (let chunk of chunks) {
-                try {
-                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                    console.log(ticketChunk);
-                    tickets.push(...ticketChunk);
-                }
-                catch (error) {
-                    console.error(error);
-                }
-            }
-        }))();
-    });
-}), { scheduled: true });
-const discount1 = node_cron_1.default.schedule("00 13 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("discount notification initialized");
-    //find accounts//standard date
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const nextday = now.getDate() + 1;
-    const year = now.getFullYear();
-    const today = month + '/' + day + '/' + year;
-    const next_promo = month + '/' + nextday + '/' + year;
-    console.log("today: " + today);
-    console.log("next promo: " + next_promo);
-    const get_users = yield schema_1.default.User().find({ promo: true, pushToken: { $exists: true } });
-    console.log("users:" + get_users);
-    get_users.map(users => {
-        console.log("tokens:" + users.pushToken);
-        let chunks = expo.chunkPushNotifications([{
-                "to": [users.pushToken],
-                "sound": "default",
-                "title": "Enjoy your 30% discount today!",
-                "body": "Open your Platabox App"
-            }]);
-        let tickets = [];
-        (() => __awaiter(void 0, void 0, void 0, function* () {
-            for (let chunk of chunks) {
-                try {
-                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                    console.log(ticketChunk);
-                    tickets.push(...ticketChunk);
-                }
-                catch (error) {
-                    console.error(error);
-                }
-            }
-        }))();
-    });
-}), { scheduled: true });
-//FREE DISCOUNT**
-const freeDiscount = node_cron_1.default.schedule("16 01 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("discount notification initialized");
-    //find accountsfree 
-    //standard date
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const nextday = now.getDate() + 1;
-    const year = now.getFullYear();
-    const today = month + '/' + day + '/' + year;
-    const next_promo = month + '/' + nextday + '/' + year;
-    console.log("today: " + today);
-    console.log("next promo: " + next_promo);
-    //
-    const get_users = yield schema_1.default.User().find({ isConfirmed: true, pushToken: { $exists: true } });
-    console.log("users:" + get_users);
-    if (get_users) {
-        yield schema_1.default.User().updateMany({ isConfirmed: true, pushToken: { $exists: true } }, { $set: {
-                promo: true,
-                promo_date: today,
-                next_promo: next_promo
-            }
-        }, function (err, result) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                console.log('Added free discounts');
-                //send notification for expiry
-                get_users.map(usr => {
-                    console.log("tokens:" + usr.pushToken);
-                    let chunks = expo.chunkPushNotifications([{
-                            "to": [usr.pushToken],
-                            "sound": "default",
-                            "title": "Free 30% Discount!!",
-                            "body": "you have been awarded a free 30% discount :)"
-                        }]);
-                    let tickets = [];
-                    (() => __awaiter(this, void 0, void 0, function* () {
-                        for (let chunk of chunks) {
-                            try {
-                                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                                console.log(ticketChunk);
-                                tickets.push(...ticketChunk);
-                            }
-                            catch (error) {
-                                console.error(error);
-                            }
-                        }
-                    }))();
-                });
-            }
-        });
+        //check if user has sub accounts
     }
 }), { scheduled: true });
 //change everyone's discount date
 const users = () => __awaiter(void 0, void 0, void 0, function* () {
     yield schema_1.default.User().updateMany({ isConfirmed: true, pushToken: { $exists: true } }, { $set: {
-            promo: true,
+            promo: false,
             promo_date: today,
             next_promo: tomorrow
         }
@@ -485,34 +286,21 @@ const users = () => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 //users();
-const notificationB = node_cron_1.default.schedule("28 20 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(" notification initialized");
-    //find accounts
-    const get_users = yield schema_1.default.Artisan().find({ pushToken: { $exists: true } });
-    console.log("users:" + get_users);
-    get_users.map(users => {
-        console.log("tokens:" + users.pushToken);
-        let chunks = expo.chunkPushNotifications([{
-                "to": [users.pushToken],
-                "sound": "default",
-                "title": "New Update!",
-                "body": "Hello! Please update your app from your app store : )"
-            }]);
-        let tickets = [];
-        (() => __awaiter(void 0, void 0, void 0, function* () {
-            for (let chunk of chunks) {
-                try {
-                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                    console.log(ticketChunk);
-                    tickets.push(...ticketChunk);
-                }
-                catch (error) {
-                    console.error(error);
-                }
-            }
-        }))();
+//general drivers update
+const drivers = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield schema_1.default.Artisan().updateMany({ isConfirmed: true }, { $set: {
+            total_funds: 0
+        }
+    }, function (err, result) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log('Added');
+        }
     });
-}), { scheduled: true });
+});
+//drivers()
 //gen notification
 const genNot = () => __awaiter(void 0, void 0, void 0, function* () {
     const get_users = yield schema_1.default.User().find({ pushToken: { $exists: true } });
@@ -522,8 +310,8 @@ const genNot = () => __awaiter(void 0, void 0, void 0, function* () {
         let chunks = expo.chunkPushNotifications([{
                 "to": [users.pushToken],
                 "sound": "default",
-                "title": "Christmas Break",
-                "body": "Dear lovely customers, we want to inform you that we will be closed from the 25th of December till the 3rd of January. Have a wonderful Christmas and a Happy New Year! :)"
+                "title": "Fuel Scarcity",
+                "body": "You might experience a slight delay in pick-up time because of fuel scarcity. Please bear with us :)"
             }]);
         let tickets = [];
         (() => __awaiter(void 0, void 0, void 0, function* () {
@@ -540,6 +328,35 @@ const genNot = () => __awaiter(void 0, void 0, void 0, function* () {
         }))();
     });
 });
+//genNot()
+//driver update
+const genNotD = () => __awaiter(void 0, void 0, void 0, function* () {
+    const get_users = yield schema_1.default.Artisan().find({ pushToken: { $exists: true } });
+    console.log("users:" + get_users);
+    get_users.map(users => {
+        console.log("tokens:" + users.pushToken);
+        let chunks = expo.chunkPushNotifications([{
+                "to": [users.pushToken],
+                "sound": "default",
+                "title": "New Location Update",
+                "body": "Please update your platabox app from your Apple Playstore or Google App Store! :)"
+            }]);
+        let tickets = [];
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            for (let chunk of chunks) {
+                try {
+                    let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                    console.log(ticketChunk);
+                    tickets.push(...ticketChunk);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            }
+        }))();
+    });
+});
+//genNotD()
 const setBalance = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("balance initialized");
     //find accountsfree 
@@ -560,17 +377,46 @@ const setBalance = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 //setBalance();
-//get balance from FW
-//genNot()
-deleteU.start();
-//freeDiscount.start();
-discountCheck.start();
-discountCheck1.start();
-//deactivate.start();
-discount.start();
-discount1.start();
-//notificationA.start()
-//notificationB.start()
+const deleteJobs = () => __awaiter(void 0, void 0, void 0, function* () {
+    const jobs = yield schema_1.default.Job().find({ user: '6020683d04d67000178d683a' });
+    console.log(jobs);
+    yield schema_1.default.Job().deleteMany({
+        user: '6020683d04d67000178d683a'
+    });
+});
+//deleteJobs()
+//deleteU.start();
+deactivate.start();
+//verify account
+const verifyA = () => __awaiter(void 0, void 0, void 0, function* () {
+    var options = {
+        'method': 'POST',
+        'url': 'https://api.flutterwave.com/v3/accounts/resolve',
+        'headers': {
+            'Authorization': `Bearer ${process.env.SECRET_KEY}`,
+            'Content-Type': 'application/json'
+        },
+        'body': JSON.stringify({
+            "account_number": "0695945271",
+            "account_bank": "044"
+        })
+    };
+    request_1.default(options, (error, resp) => __awaiter(void 0, void 0, void 0, function* () {
+        if (error) {
+            console.log(error);
+        }
+        ;
+        console.log(resp.body.split(":")[1].split(",")[0].trim());
+        if (resp.body.split(":")[1].split(",")[0].trim() === '"error"') {
+            console.log("Invalid Account Details. Please check and try again");
+        }
+        else {
+            const m = resp.body.split(":")[5].split(",")[0].replace('}}', "");
+            console.log(m);
+        }
+    }));
+});
+//verifyA();
 const getBanks = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const payload = {
@@ -629,6 +475,41 @@ const getBalance = () => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 //getBalance();
+//test requests
+const req = () => __awaiter(void 0, void 0, void 0, function* () {
+    const category = 'log';
+    const city = 'Abuja';
+    const city2 = 'Abuja Municipal Area Council';
+    const job = yield schema_1.default.Artisan().find({ category: 'log', pushToken: { $exists: true }, $or: [{ city: city === undefined ? '' : city.trim() }, { city: city2 === undefined ? '' : city2.trim() }, { city2: city === undefined ? '' : city.trim() }, { city2: city2 === undefined ? '' : city2.trim() }] });
+    console.log('Drivers' + job);
+});
+//req()
+//send single notification
+const sinNot = () => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield schema_1.default.User().findOne({ pushToken: { $exists: true }, phone: '+2348032900274' });
+    console.log("users:" + user);
+    console.log("tokens:" + user);
+    let chunks = expo.chunkPushNotifications([{
+            "to": user.pushToken,
+            "sound": "default",
+            "title": "Credit Alert",
+            "body": "you have been given N2000 in your platabox wallet. Enjoy! :)"
+        }]);
+    let tickets = [];
+    (() => __awaiter(void 0, void 0, void 0, function* () {
+        for (let chunk of chunks) {
+            try {
+                let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
+                console.log(ticketChunk);
+                tickets.push(...ticketChunk);
+            }
+            catch (error) {
+                console.error(error);
+            }
+        }
+    }))();
+});
+//sinNot()
 //seedArtisan();
 //server
 const port = process.env.PORT && parseInt(process.env.PORT, 10) || 8081;
