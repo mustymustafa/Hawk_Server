@@ -191,7 +191,7 @@ const today = month + '/' + day + '/' + year
 
   static async logRequest (request:Request, response:Response){
 
-    const {city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime, p1,p2,p3,p4,p5} = request.body;
+    const {city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime, pn, p1,p2,p3,p4,p5} = request.body;
   //console.log(category)
 
 
@@ -237,6 +237,7 @@ const today = month + '/' + day + '/' + year
             city: city === undefined ? '' : city.trim(),
             city2: city2 === undefined ? '' : city2.trim(),
 
+            pn: pn,
             n1: p1,
             n2: p2,
             n3: p3,
@@ -971,7 +972,7 @@ const artisan = await Schema.Artisan().findOne({_id: uid});
 
     try {
      
-      response.status(200).send({hirer: hirer.name, number: hirer.phone, job: job, artisan: arti})
+      response.status(200).send({hirer: hirer.name, number: job.pn, job: job, artisan: arti})
 
 
 

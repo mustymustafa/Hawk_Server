@@ -170,6 +170,7 @@ class Schema {
             to4: String, 
             to5: String, 
         
+            pn: String,
             n1: String,
             n2: String,
             n3: String,
