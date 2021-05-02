@@ -329,7 +329,7 @@ const deleteU = cron.schedule("00 23 * * *", async () => {
 
 
 //deactivate expired accounts
-const deactivate = cron.schedule("00 00 * * *", async () => {
+const deactivate = cron.schedule("01 00 * * *", async () => {
   console.log("account paused for payment");
 //find accounts
 
@@ -349,10 +349,10 @@ console.log("next promo: " + next_promo)
 
 
 //find the user's first 
-const user = await Schema.Artisan().find({name: 'Platabox Test' /**expireAt: today, earnings: {$gt: 2000}*/});
+const user = await Schema.Artisan().find({ expireAt: today, cash: {$gt: 2000}});
 console.log(user)
 if(user){
-  await Schema.Artisan().updateMany({name: 'Platabox Test' /**expireAt: today, earnings: {$gt: 2000}*/},  
+  await Schema.Artisan().updateMany({ expireAt: today, cash: {$gt: 2000}},  
     {$set: {active: false}},
     function(err, result){ 
     if(err) {
@@ -427,11 +427,9 @@ if(user){
 //change everyone's discount date
 
 const users = async ()  => {
-  await Schema.User().updateMany({isConfirmed: true, pushToken: {$exists: true}},  
+  await Schema.Artisan().updateMany({isConfirmed: true},  
     {$set: {
-      promo: false,
-             promo_date: today,
-             next_promo: tomorrow
+      expireAt: today
     }
   
   },
@@ -439,7 +437,7 @@ const users = async ()  => {
     if(err) {
       console.log(err)
     } else {
-      console.log('Added free discounts');
+      console.log('Added expire at');
 }
     })
 }
