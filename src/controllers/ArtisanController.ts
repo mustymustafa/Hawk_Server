@@ -39,6 +39,14 @@ const nyear = next.getFullYear()
 const nextweek = nmonth + '/' + nday + '/' + nyear
 
 
+const tomorrow = month + '/' + (day+1) + '/' + year
+
+
+
+console.log("today" + today)
+console.log("tomorrow " + tomorrow)
+
+
 
 import Schema from '../schema/schema';
 import Validator from '../validator/Validator';

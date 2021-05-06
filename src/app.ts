@@ -329,7 +329,7 @@ const deleteU = cron.schedule("00 23 * * *", async () => {
 
 
 //deactivate expired accounts
-const deactivate = cron.schedule("01 00 * * *", async () => {
+const deactivate = cron.schedule("00 00 * * *", async () => {
   console.log("account paused for payment");
 //find accounts
 
@@ -351,10 +351,6 @@ console.log("next promo: " + next_promo)
 //find the user's first 
 const user = await Schema.Artisan().find({ expireAt: today, cash: {$gt: 1999}});
 console.log("up for payment:" + user)
-
-
-const delayP = await Schema.Artisan().find({ expireAt: today, cash: {$lt: 2000}});
-console.log("delay payment:" + delayP)
 
 
 
@@ -421,6 +417,35 @@ if(user){
 }
 
 
+  
+},
+
+{scheduled: true}
+);
+
+
+//deactivate expired accounts
+const moveDate = cron.schedule("01 00 * * *", async () => {
+  console.log("account paused for payment");
+//find accounts
+
+//standard date
+const now = new Date();
+const month = now.getMonth() + 1
+const day = now.getDate()
+const nextday = now.getDate() + 1
+const year = now.getFullYear()
+const today = month + '/' + day + '/' + year
+const next_promo = month + '/' + nextday + '/' + year
+console.log("today: " + today);
+console.log("next promo: " + next_promo)
+
+//find the user's first 
+
+const delayP = await Schema.Artisan().find({ expireAt: today, cash: {$lt: 2000}});
+console.log("delay payment:" + delayP)
+
+
 //update drivers with less than 2000 cash
 
 if(delayP){
@@ -443,7 +468,6 @@ if(delayP){
 
 {scheduled: true}
 );
-
 
 
 
@@ -605,6 +629,7 @@ const deleteJobs = async () => {
 //deleteU.start();
 
 deactivate.start();
+moveDate.start();
 
 
 
