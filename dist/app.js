@@ -219,10 +219,11 @@ const deactivate = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(v
     //deactivate account if expired
     //deactivate s
     //find the user's first 
-    const user = yield schema_1.default.Artisan().find({ name: 'Platabox Test' /**expireAt: today, earnings: {$gt: 2000}*/ });
-    console.log(user);
+    const user = yield schema_1.default.Artisan().find({ expireAt: today, cash: { $gt: 6999 } });
+    console.log("up for payment:" + user);
+    // update drivers with more than 2000 cash
     if (user) {
-        yield schema_1.default.Artisan().updateMany({ name: 'Platabox Test' /**expireAt: today, earnings: {$gt: 2000}*/ }, { $set: { active: false } }, function (err, result) {
+        yield schema_1.default.Artisan().updateMany({ expireAt: today, cash: { $gt: 6999 } }, { $set: { active: false } }, function (err, result) {
             if (err) {
                 console.log(err);
             }
@@ -269,23 +270,47 @@ const deactivate = node_cron_1.default.schedule("00 00 * * *", () => __awaiter(v
         //check if user has sub accounts
     }
 }), { scheduled: true });
-//change everyone's discount date
+//deactivate expired accounts
+const moveDate = node_cron_1.default.schedule("01 00 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("account paused for payment");
+    //find accounts
+    //standard date
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const nextday = now.getDate() + 1;
+    const year = now.getFullYear();
+    const today = month + '/' + day + '/' + year;
+    const next_promo = month + '/' + nextday + '/' + year;
+    console.log("today: " + today);
+    console.log("next promo: " + next_promo);
+    //find the user's first 
+    const delayP = yield schema_1.default.Artisan().find({ expireAt: today, cash: { $lt: 7000 } });
+    console.log("delay payment:" + delayP);
+    //update drivers with less than 2000 cash
+    if (delayP) {
+        yield schema_1.default.Artisan().updateMany({ expireAt: today, cash: { $lt: 7000 } }, { $set: { expireAt: tomorrow } }, function (err, result) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log('Expired accounts updated');
+            }
+        });
+    }
+}), { scheduled: true });
+//update
 const users = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield schema_1.default.User().updateMany({ isConfirmed: true, pushToken: { $exists: true } }, { $set: {
-            promo: false,
-            promo_date: today,
-            next_promo: tomorrow
-        }
-    }, function (err, result) {
+    yield schema_1.default.Artisan().updateMany({ active: false }, { $set: { expireAt: tomorrow } }, function (err, result) {
         if (err) {
             console.log(err);
         }
         else {
-            console.log('Added free discounts');
+            console.log(' accounts updated');
         }
     });
 });
-//users();
+users();
 //general drivers update
 const drivers = () => __awaiter(void 0, void 0, void 0, function* () {
     yield schema_1.default.Artisan().updateMany({ isConfirmed: true }, { $set: {
@@ -387,6 +412,7 @@ const deleteJobs = () => __awaiter(void 0, void 0, void 0, function* () {
 //deleteJobs()
 //deleteU.start();
 deactivate.start();
+moveDate.start();
 //verify account
 const verifyA = () => __awaiter(void 0, void 0, void 0, function* () {
     var options = {

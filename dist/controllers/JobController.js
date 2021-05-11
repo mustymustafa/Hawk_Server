@@ -137,8 +137,9 @@ class JobController {
     }
     static logRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime, p1, p2, p3, p4, p5 } = request.body;
+            const { city, city2, payment, category, uid, location, lat, long, destLat, destLat2, destLat3, destLat4, destLat5, destLong, destLong2, destLong3, destLong4, destLong5, to, to2, to3, to4, to5, from, time, distance, price, pTime, pn, p1, p2, p3, p4, p5 } = request.body;
             //console.log(category)
+            console.log("pickup number" + pn);
             const user = yield schema_1.default.User().findOne({ _id: uid });
             //console.log(price)
             //console.log(user.balance)
@@ -169,6 +170,7 @@ class JobController {
                     location: location,
                     city: city === undefined ? '' : city.trim(),
                     city2: city2 === undefined ? '' : city2.trim(),
+                    pn: pn,
                     n1: p1,
                     n2: p2,
                     n3: p3,
@@ -659,7 +661,7 @@ class JobController {
                 });
             }
             try {
-                response.status(200).send({ hirer: hirer.name, number: hirer.phone, job: job, artisan: arti });
+                response.status(200).send({ hirer: hirer.name, number: job.pn, job: job, artisan: arti });
             }
             catch (error) {
                 console.log(error);

@@ -39,6 +39,9 @@ const nmonth = next.getMonth() + 1;
 const nday = next.getDate();
 const nyear = next.getFullYear();
 const nextweek = nmonth + '/' + nday + '/' + nyear;
+const tomorrow = month + '/' + (day + 1) + '/' + year;
+console.log("today" + today);
+console.log("tomorrow " + tomorrow);
 const schema_1 = __importDefault(require("../schema/schema"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 var transporter = nodemailer_1.default.createTransport({

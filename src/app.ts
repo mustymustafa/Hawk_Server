@@ -349,14 +349,14 @@ console.log("next promo: " + next_promo)
 
 
 //find the user's first 
-const user = await Schema.Artisan().find({ expireAt: today, cash: {$gt: 1999}});
+const user = await Schema.Artisan().find({ expireAt: today, cash: {$gt: 6999}});
 console.log("up for payment:" + user)
 
 
 
 // update drivers with more than 2000 cash
 if(user){
-  await Schema.Artisan().updateMany({ expireAt: today, cash: {$gt: 2000}},  
+  await Schema.Artisan().updateMany({ expireAt: today, cash: {$gt: 6999}},  
     {$set: {active: false}},
     function(err, result){ 
     if(err) {
@@ -442,14 +442,14 @@ console.log("next promo: " + next_promo)
 
 //find the user's first 
 
-const delayP = await Schema.Artisan().find({ expireAt: today, cash: {$lt: 2000}});
+const delayP = await Schema.Artisan().find({ expireAt: today, cash: {$lt: 7000}});
 console.log("delay payment:" + delayP)
 
 
 //update drivers with less than 2000 cash
 
 if(delayP){
-  await Schema.Artisan().updateMany({ expireAt: today, cash: {$lt: 2000}},  
+  await Schema.Artisan().updateMany({ expireAt: today, cash: {$lt: 7000}},  
     {$set: {expireAt: tomorrow}},
     function(err, result){ 
     if(err) {
@@ -471,22 +471,20 @@ if(delayP){
 
 
 
-//change everyone's discount date
+//update
 
 const users = async ()  => {
-  await Schema.Artisan().updateMany({isConfirmed: true, active: false},  
-    {$set: {
-      expireAt: today
-    }
-  
-  },
+  await Schema.Artisan().updateMany({ active: false},  
+    {$set: {expireAt: tomorrow, active: true}},
     function(err, result){ 
     if(err) {
       console.log(err)
     } else {
-      console.log('Added expire at');
-}
+      console.log(' accounts updated');
+    
+    }
     })
+
 }
 //users();
 
