@@ -424,8 +424,9 @@ if(user){
 );
 
 
+
 //deactivate expired accounts
-const moveDate = cron.schedule("01 00 * * *", async () => {
+const moveDate = cron.schedule("02 00 * * *", async () => {
   console.log("account paused for payment");
 //find accounts
 
@@ -450,7 +451,7 @@ console.log("delay payment:" + delayP)
 
 if(delayP){
   await Schema.Artisan().updateMany({ expireAt: today, cash: {$lt: 7000}},  
-    {$set: {expireAt: tomorrow}},
+    {$set: {expireAt: tomorrow, active: true}},
     function(err, result){ 
     if(err) {
       console.log(err)
@@ -492,7 +493,7 @@ const users = async ()  => {
 const drivers = async ()  => {
   await Schema.Artisan().updateMany({isConfirmed: true},  
     {$set: {
-      total_funds: 0
+      expireAt: today
     }
   
   },
@@ -500,7 +501,7 @@ const drivers = async ()  => {
     if(err) {
       console.log(err)
     } else {
-      console.log('Added');
+      console.log('updated');
 }
     })
 }
