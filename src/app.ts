@@ -349,14 +349,14 @@ console.log("next promo: " + next_promo)
 
 
 //find the user's first 
-const user = await Schema.Artisan().find({ expireAt: today, cash: {$gt: 6999}});
+const user = await Schema.Artisan().find({ cash: {$gt: 6999}});
 console.log("up for payment:" + user)
 
 
 
 // update drivers with more than 2000 cash
 if(user){
-  await Schema.Artisan().updateMany({ expireAt: today, cash: {$gt: 6999}},  
+  await Schema.Artisan().updateMany({ cash: {$gt: 6999}},  
     {$set: {active: false}},
     function(err, result){ 
     if(err) {
@@ -365,9 +365,9 @@ if(user){
       console.log('Expired accounts updated');
 
       //send notification for expiry
-      user.map(usr => {
+      user.map(async (usr) => {
         //check if accounts have subaccouts
-        const sub =  Schema.Artisan().find({owner: usr._id});
+        const sub =  await Schema.Artisan().find({owner: usr._id});
         console.log(sub)
         if(sub){
           Schema.Artisan().updateMany({owner: usr._id},  
@@ -424,56 +424,7 @@ if(user){
 );
 
 
-
-//deactivate expired accounts
-const moveDate = cron.schedule("02 00 * * *", async () => {
-  console.log("account paused for payment");
-//find accounts
-
-//standard date
-const now = new Date();
-const month = now.getMonth() + 1
-const day = now.getDate()
-const nextday = now.getDate() + 1
-const year = now.getFullYear()
-const today = month + '/' + day + '/' + year
-const next_promo = month + '/' + nextday + '/' + year
-console.log("today: " + today);
-console.log("next promo: " + next_promo)
-
-//find the user's first 
-
-const delayP = await Schema.Artisan().find({ expireAt: today, cash: {$lt: 7000}});
-console.log("delay payment:" + delayP)
-
-
-//update drivers with less than 2000 cash
-
-if(delayP){
-  await Schema.Artisan().updateMany({ expireAt: today, cash: {$lt: 7000}},  
-    {$set: {expireAt: tomorrow, active: true}},
-    function(err, result){ 
-    if(err) {
-      console.log(err)
-    } else {
-      console.log('Expired accounts updated');
-    
-    }
-  }
-    );
-     
-}
-
-  
-},
-
-{scheduled: true}
-);
-
-
-
 //update
-
 const users = async ()  => {
   await Schema.Artisan().updateMany({ active: false},  
     {$set: {expireAt: tomorrow, active: true}},
@@ -628,7 +579,7 @@ const deleteJobs = async () => {
 //deleteU.start();
 
 deactivate.start();
-moveDate.start();
+
 
 
 
