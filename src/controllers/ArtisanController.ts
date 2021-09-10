@@ -140,7 +140,7 @@ class ArtisanController {
         message: 'User created successfully',
         status: 201
       });
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       response.status(500).send({
         message: "Somenthing went wrong"
@@ -208,7 +208,7 @@ class ArtisanController {
         message: 'User created successfully',
         status: 201
       });
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       response.status(500).send({
         message: "Somenthing went wrong"
@@ -261,7 +261,7 @@ class ArtisanController {
 
 
 
-      } catch (error) {
+      } catch (error: any) {
         console.log(error.toString());
         response.status(500).send({
           message: 'something went wrong'
@@ -308,7 +308,7 @@ class ArtisanController {
           message: 'User updated successfully',
           status: 201
         });
-      } catch (error) {
+      } catch (error: any) {
         console.log(error.toString());
         response.status(500).send({
           message: 'something went wrong'
@@ -437,7 +437,7 @@ class ArtisanController {
 
         return res.status(200).send("image set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -480,7 +480,7 @@ class ArtisanController {
 
         return res.status(200).send("image set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -523,7 +523,7 @@ class ArtisanController {
 
         return res.status(200).send("image set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -566,7 +566,7 @@ class ArtisanController {
 
         return res.status(200).send("image set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -608,7 +608,7 @@ class ArtisanController {
 
         return res.status(200).send("image set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -651,7 +651,7 @@ class ArtisanController {
 
         return res.status(200).send("image set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -694,7 +694,7 @@ class ArtisanController {
 
         return res.status(200).send("image set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -737,7 +737,7 @@ class ArtisanController {
 
         return res.status(200).send("image set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -783,7 +783,7 @@ class ArtisanController {
 
         return res.status(200).send("image set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -829,7 +829,7 @@ class ArtisanController {
 
         return res.status(200).send("cac set")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
       res.status(500).send({
         message: 'something went wrong'
@@ -869,7 +869,7 @@ class ArtisanController {
           message: 'User updated successfully',
           status: 201
         });
-      } catch (error) {
+      } catch (error: any) {
         console.log(error.toString());
         response.status(500).send({
           message: 'something went wrong'
@@ -913,7 +913,7 @@ class ArtisanController {
           message: 'User updated successfully',
           status: 201
         });
-      } catch (error) {
+      } catch (error: any) {
         console.log(error.toString());
         response.status(500).send({
           message: 'something went wrong'
@@ -971,7 +971,7 @@ class ArtisanController {
         message: 'Please check your phone for token'
       });
       return;
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString(), "========")
       return response.status(500).send({
         message: 'Something went wrong'
@@ -1015,7 +1015,7 @@ class ArtisanController {
         message: 'Please check your phone for token'
       });
       return;
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString(), "========")
       return response.status(500).send({
         message: 'Something went wrong'
@@ -1063,7 +1063,7 @@ class ArtisanController {
       return response.status(200).send({
         token: ArtisanController.generateToken(user)
       });
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString(), "========")
       return response.status(500).send({
         message: 'Something went wrong'
@@ -1188,7 +1188,7 @@ class ArtisanController {
           token: ArtisanController.generateToken(foundUser)
         });
 
-      } catch (error) {
+      } catch (error: any) {
         console.log(error.toString());
         response.status(500).send({
           message: 'something went wrong'
@@ -1212,7 +1212,7 @@ class ArtisanController {
       const drivers = await Schema.Artisan().find({'category': 'driver'}).where({'active': true}).where({'lat': !undefined}).where({'long': !undefined})
       console.log(drivers)
       return response.status(200).send({value: drivers})
-    } catch(error) {
+    } catch(error: any) {
         console.log(error.toString());
     return  response.status(500).send({
         message: 'something went wrong'
@@ -1227,7 +1227,7 @@ class ArtisanController {
       const logs = await Schema.Artisan().find({'category': 'log'}).where({'active': true}).where({'lat': !undefined}).where({'long': !undefined})
       console.log(logs)
       return response.status(200).send({value: logs})
-    } catch(error) {
+    } catch(error: any) {
         console.log(error.toString());
     return  response.status(500).send({
         message: 'something went wrong'
@@ -1244,7 +1244,7 @@ class ArtisanController {
       const subs = await Schema.Artisan().find({owner: uid}).sort({'_id': -1})  
       console.log(subs)
       return response.status(200).send({value: subs})
-    } catch(error) {
+    } catch(error: any) {
         console.log(error.toString());
     return  response.status(500).send({
         message: 'something went wrong'
@@ -1296,7 +1296,7 @@ class ArtisanController {
 
 
 
-    } catch(error) {
+    } catch(error: any) {
         console.log(error)
         return response.status(404).send("an error occured")
     }
@@ -1333,7 +1333,7 @@ class ArtisanController {
         });
       }
 
-    } catch(error) {
+    } catch(error: any) {
         console.log(error.toString());
     return  response.status(500).send({
         message: 'something went wrong'
@@ -1349,7 +1349,7 @@ static async getLogRegistartion(request: Request, response: Response) {
     const registrations = await Schema.Artisan().find({'category': 'log'}).where({'active': false}).sort({'_id': -1})  
     console.log(registrations)
     return response.status(200).send({value: registrations})
-  } catch(error) {
+  } catch(error: any) {
       console.log(error.toString());
   return  response.status(500).send({
       message: 'something went wrong'
@@ -1364,7 +1364,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
     const registrations = await Schema.Artisan().find({'category': 'driver'}).where({'active': false}).sort({'_id': -1})  
     console.log(registrations)
     return response.status(200).send({value: registrations})
-  } catch(error) {
+  } catch(error: any) {
       console.log(error.toString());
   return  response.status(500).send({
       message: 'something went wrong'
@@ -1391,7 +1391,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         }
       });
     
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString());
     }
   }
@@ -1490,7 +1490,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         });
         console.log("not found")
       }
-    } catch (error) {
+    } catch (error: any) {
       return response.status(500).send({
         message: 'Something went wrong'
       })
@@ -1571,7 +1571,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
                     console.log(ticketChunk);
                     tickets.push(...ticketChunk);
                  
-                  } catch (error) {
+                  } catch (error: any) {
                     console.error(error);
                   }
                 }
@@ -1593,7 +1593,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
       }
 
 
-    } catch (error) {
+    } catch (error: any) {
       response.status(404).send({ error: 'could not complete your request at the moment' })
     }
 
@@ -1631,7 +1631,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
           }
         });
       return response.status(200).send("location saved");
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString(), "========")
       return response.status(500).send({
         message: 'Something went wrong'
@@ -1667,7 +1667,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         });
 
       return response.status(200).send("location saved");
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString(), "========")
       return response.status(500).send({
         message: 'Something went wrong'
@@ -1700,7 +1700,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         });
         console.log("not found")
       }
-    } catch (error) {
+    } catch (error: any) {
       return response.status(500).send({
         message: 'Something went wrong'
       })
@@ -1734,7 +1734,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         });
         console.log("not found")
       }
-    } catch (error) {
+    } catch (error: any) {
       return response.status(500).send({
         message: 'Something went wrong'
       })
@@ -1768,7 +1768,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
       });
       console.log("not found")
     }
-  } catch (error) {
+  } catch (error: any) {
     return response.status(500).send({
       message: 'Something went wrong'
     })
@@ -1816,7 +1816,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
           }
         });
       return response.status(200).send("token saved");
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.toString(), "========")
       return response.status(500).send({
         message: 'Something went wrong'
@@ -1875,7 +1875,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
             console.log(ticketChunk);
             tickets.push(...ticketChunk);
          
-          } catch (error) {
+          } catch (error: any) {
             console.error(error);
           }
         }
@@ -1888,7 +1888,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       response.status(404).send({ error: 'could not complete your request at the moment' })
     }
 
@@ -1947,7 +1947,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
             console.log(ticketChunk);
             tickets.push(...ticketChunk);
          
-          } catch (error) {
+          } catch (error: any) {
             console.error(error);
           }
         }
@@ -1960,7 +1960,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       response.status(404).send({ error: 'could not complete your request at the moment' })
     }
 
@@ -2063,7 +2063,7 @@ static async withdrawFund(req: Request, response: Response){
            console.log(ticketChunk);
            tickets.push(...ticketChunk);
         
-         } catch (error) {
+         } catch (error: any) {
            console.error(error);
          }
        }
@@ -2144,7 +2144,7 @@ earnings: new_amount,
   return response.send({message: "User not found"})
   
 }
-  } catch(error) {
+  } catch(error: any) {
       console.log(error)
       return response.status(401).send({
         message: 'Something went wrong. please try again'
@@ -2216,7 +2216,7 @@ static async transferRequests(req: Request, response: Response){
              console.log(ticketChunk);
              tickets.push(...ticketChunk);
           
-           } catch (error) {
+           } catch (error: any) {
              console.error(error);
            }
          }
@@ -2255,7 +2255,7 @@ let tickets = [];
       console.log(ticketChunk);
       tickets.push(...ticketChunk);
    
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     }
   }
@@ -2375,7 +2375,7 @@ static async allTrans(request: Request, response: Response){
       response.status(500).send({error: 'Could not find Transactions for this user'})
     }
 
-  } catch(error) {
+  } catch(error: any) {
     console.log(error)
     response.status(500).send('Something went wrong')
 
