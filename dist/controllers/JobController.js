@@ -329,7 +329,7 @@ class JobController {
             //console.log(category);
             //console.log("city:" + city);
             //console.log("city2:" + city2);
-            const job = yield schema_1.default.Job().find({ category: 'log' }).where({ $or: [{ city: city === undefined ? '' : city.trim() }, { city: city2 === undefined ? '' : city2.trim() }, { city2: city === undefined ? '' : city.trim() }, { city2: city2 === undefined ? '' : city2.trim() }] }).and([{ status: 'active' }]).sort({ '_id': -1 });
+            const job = yield schema_1.default.Job().find({ category: 'log', $or: [{ city: city === undefined ? '' : city.trim() }, { city: city2 === undefined ? '' : city2.trim() }, { city2: city === undefined ? '' : city.trim() }, { city2: city2 === undefined ? '' : city2.trim() }] }).and([{ status: 'active' }]).sort({ '_id': -1 });
             //console.log(job)
             //get hirer id
             const user = job.map(usr => {
