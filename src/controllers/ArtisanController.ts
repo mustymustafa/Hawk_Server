@@ -53,6 +53,7 @@ import Validator from '../validator/Validator';
 
 import nodemailer from "nodemailer";
 import { create } from 'domain';
+import console from 'console';
 
 
 var transporter = nodemailer.createTransport({
@@ -1465,11 +1466,12 @@ static async getDriverRegistartion(request: Request, response: Response) {
         console.log("TODAY:" + today)
 
        if(user.cash > 6999){
+         console.log("expired")
           expire = true
         }
 
         console.log("EXPIRIED?" + expire)
-        
+
         response.status(200).send({
           user,
           rating: rate,
@@ -1518,7 +1520,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
           {
             $set: {
               active: true,
-              expireAt: nextweek,
+              expireAt: '-',
               cash: 0
             }
           }
@@ -1542,7 +1544,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
         await Schema.Artisan().updateMany({owner:uid},  
            {$set: {
             active: true,
-            expireAt: nextweek,
+            expireAt: '-',
             cash: 0
           }
         },
