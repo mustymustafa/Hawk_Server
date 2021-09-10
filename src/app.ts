@@ -444,7 +444,7 @@ const users = async ()  => {
 const drivers = async ()  => {
   await Schema.Artisan().updateMany({isConfirmed: true},  
     {$set: {
-      expireAt: today
+      expireAt: '-'
     }
   
   },
