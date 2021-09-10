@@ -1464,7 +1464,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
         console.log("TODAY:" + today)
 
-       if(user.expireAt === today){
+       if(user.cash > 6999){
           expire = true
         }
 
