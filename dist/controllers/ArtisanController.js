@@ -40,10 +40,11 @@ const nday = next.getDate();
 const nyear = next.getFullYear();
 const nextweek = nmonth + '/' + nday + '/' + nyear;
 const tomorrow = month + '/' + (day + 1) + '/' + year;
-console.log("today" + today);
-console.log("tomorrow " + tomorrow);
+console_1.default.log("today" + today);
+console_1.default.log("tomorrow " + tomorrow);
 const schema_1 = __importDefault(require("../schema/schema"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const console_1 = __importDefault(require("console"));
 var transporter = nodemailer_1.default.createTransport({
     service: 'gmail',
     auth: {
@@ -52,13 +53,13 @@ var transporter = nodemailer_1.default.createTransport({
     }
 });
 function addWeek(date, week) {
-    console.log(date);
+    console_1.default.log(date);
     const d = date.getDate();
     date.setDate(date.getDate() + +week);
     if (date.getDate() != d) {
         date.setDate(0);
     }
-    console.log(date);
+    console_1.default.log(date);
     return date;
 }
 class ArtisanController {
@@ -66,7 +67,7 @@ class ArtisanController {
     static signup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fullname, email, password, phone, cpassword, country } = request.body;
-            console.log(phone);
+            console_1.default.log(phone);
             try {
                 const foundPhone = yield schema_1.default.Artisan().find({ phone: phone.trim() });
                 const foundEmail = yield schema_1.default.Artisan().find({ email: email.trim() });
@@ -76,14 +77,14 @@ class ArtisanController {
                     });
                 }
                 if (foundEmail && foundEmail.length > 0) {
-                    console.log(foundEmail[0]);
+                    console_1.default.log(foundEmail[0]);
                     return response.status(409).send({
                         message: 'This email already exists',
                         isConfirmed: foundEmail[0].isConfirmed
                     });
                 }
                 if (foundPhone && foundPhone.length > 0) {
-                    console.log(foundPhone[0]);
+                    console_1.default.log(foundPhone[0]);
                     return response.status(409).send({
                         message: 'This number already exists',
                         isConfirmed: foundPhone[0].isConfirmed
@@ -108,7 +109,7 @@ class ArtisanController {
                 });
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 response.status(500).send({
                     message: "Somenthing went wrong"
                 });
@@ -119,11 +120,11 @@ class ArtisanController {
     static Subsignup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, sub, password, phone, owner } = request.body;
-            console.log(sub);
+            console_1.default.log(sub);
             try {
-                console.log("owner id " + owner);
+                console_1.default.log("owner id " + owner);
                 const findOwner = yield schema_1.default.Artisan().findOne({ _id: owner });
-                console.log("owner: " + findOwner);
+                console_1.default.log("owner: " + findOwner);
                 if (findOwner.sub === sub) {
                     return response.status(409).send({
                         message: 'you are not authorized to create a subaccount',
@@ -131,7 +132,7 @@ class ArtisanController {
                 }
                 const foundEmail = yield schema_1.default.Artisan().find({ phone: phone });
                 if (foundEmail && foundEmail.length > 0) {
-                    console.log(foundEmail[0]);
+                    console_1.default.log(foundEmail[0]);
                     return response.status(409).send({
                         message: 'This number already exists'
                     });
@@ -161,7 +162,7 @@ class ArtisanController {
                 });
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 response.status(500).send({
                     message: "Somenthing went wrong"
                 });
@@ -172,10 +173,10 @@ class ArtisanController {
     static continueSignup(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, bio, phone, category, vl_expiry, id_expiry, vcolor, vmodel, plate, sname, sphone, vyear } = request.body;
-            console.log(request.body);
+            console_1.default.log(request.body);
             const foundUser = yield schema_1.default.Artisan().findOne({ email: email.trim() });
             if (foundUser) {
-                console.log(foundUser);
+                console_1.default.log(foundUser);
                 try {
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
@@ -201,7 +202,7 @@ class ArtisanController {
                     });
                 }
                 catch (error) {
-                    console.log(error.toString());
+                    console_1.default.log(error.toString());
                     response.status(500).send({
                         message: 'something went wrong'
                     });
@@ -216,10 +217,10 @@ class ArtisanController {
     static updateArtisan(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid, bio, wage, phone, name } = request.body;
-            console.log(request.body);
+            console_1.default.log(request.body);
             const foundUser = yield schema_1.default.Artisan().findOne({ _id: uid });
             if (foundUser && Object.keys(foundUser).length > 0) {
-                console.log(foundUser);
+                console_1.default.log(foundUser);
                 try {
                     yield schema_1.default.Artisan().updateOne({
                         _id: uid
@@ -237,7 +238,7 @@ class ArtisanController {
                     });
                 }
                 catch (error) {
-                    console.log(error.toString());
+                    console_1.default.log(error.toString());
                     response.status(500).send({
                         message: 'something went wrong'
                     });
@@ -250,76 +251,76 @@ class ArtisanController {
     static uploadimage(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     static uploadDp(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     static uploadVl(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     static uploadIns(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     static uploadPoo(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     static uploadVir(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     static uploadVpic(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     static uploadCert(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     //this is now MOT
     static uploadSchool(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     static uploadCac(req, res) {
         const parts = req.file.originalname.split(' ');
         const find = parts[0];
-        console.log(find);
+        console_1.default.log(find);
         res.json(req.file);
     }
     //set images
     static setId(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -331,7 +332,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -340,15 +341,15 @@ class ArtisanController {
     }
     static setDp(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -360,7 +361,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -369,15 +370,15 @@ class ArtisanController {
     }
     static setCert(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -389,7 +390,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -398,15 +399,15 @@ class ArtisanController {
     }
     static setVl(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -418,7 +419,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -427,15 +428,15 @@ class ArtisanController {
     }
     static setIns(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -447,7 +448,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -456,15 +457,15 @@ class ArtisanController {
     }
     static setPoo(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -476,7 +477,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -485,15 +486,15 @@ class ArtisanController {
     }
     static setVir(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -505,7 +506,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -514,15 +515,15 @@ class ArtisanController {
     }
     static setVpic(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -534,7 +535,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -544,15 +545,15 @@ class ArtisanController {
     //set MOT
     static setSchool(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -564,7 +565,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -574,15 +575,15 @@ class ArtisanController {
     // set CAC
     static setCac(request, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            console_1.default.log(request.body);
             try {
                 const email = request.body.email;
                 const image = request.body.image;
-                console.log(email);
-                console.log(image);
+                console_1.default.log(email);
+                console_1.default.log(image);
                 const foundUser = yield schema_1.default.Artisan().findOne({ email });
                 if (foundUser && Object.keys(foundUser).length > 0) {
-                    console.log(foundUser);
+                    console_1.default.log(foundUser);
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
                     }, {
@@ -594,7 +595,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 res.status(500).send({
                     message: 'something went wrong'
                 });
@@ -605,10 +606,10 @@ class ArtisanController {
     static idExpiry(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, id_expiry, } = request.body;
-            console.log(request.body);
+            console_1.default.log(request.body);
             const foundUser = yield schema_1.default.Artisan().findOne({ email });
             if (foundUser && Object.keys(foundUser).length > 0) {
-                console.log(foundUser);
+                console_1.default.log(foundUser);
                 try {
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
@@ -623,7 +624,7 @@ class ArtisanController {
                     });
                 }
                 catch (error) {
-                    console.log(error.toString());
+                    console_1.default.log(error.toString());
                     response.status(500).send({
                         message: 'something went wrong'
                     });
@@ -636,10 +637,10 @@ class ArtisanController {
     static vehicleDetails(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, phone, vl_expiry, vcolor, vmodel, plate, sname, sphone, vyear } = request.body;
-            console.log(request.body);
+            console_1.default.log(request.body);
             const foundUser = yield schema_1.default.Artisan().findOne({ email });
             if (foundUser && Object.keys(foundUser).length > 0) {
-                console.log(foundUser);
+                console_1.default.log(foundUser);
                 try {
                     yield schema_1.default.Artisan().updateOne({
                         _id: foundUser._id
@@ -660,7 +661,7 @@ class ArtisanController {
                     });
                 }
                 catch (error) {
-                    console.log(error.toString());
+                    console_1.default.log(error.toString());
                     response.status(500).send({
                         message: 'something went wrong'
                     });
@@ -690,14 +691,14 @@ class ArtisanController {
                     from: '+17076402854',
                     to: phone
                 })
-                    .then(response => console.log(response.sid));
+                    .then(response => console_1.default.log(response.sid));
                 response.status(200).send({
                     message: 'Please check your phone for token'
                 });
                 return;
             }
             catch (error) {
-                console.log(error.toString(), "========");
+                console_1.default.log(error.toString(), "========");
                 return response.status(500).send({
                     message: 'Something went wrong'
                 });
@@ -732,14 +733,14 @@ class ArtisanController {
                     from: '+17076402854',
                     to: user.phone
                 })
-                    .then(response => console.log(response.sid));
+                    .then(response => console_1.default.log(response.sid));
                 response.status(200).send({
                     message: 'Please check your phone for token'
                 });
                 return;
             }
             catch (error) {
-                console.log(error.toString(), "========");
+                console_1.default.log(error.toString(), "========");
                 return response.status(500).send({
                     message: 'Something went wrong'
                 });
@@ -785,7 +786,7 @@ class ArtisanController {
                 });
             }
             catch (error) {
-                console.log(error.toString(), "========");
+                console_1.default.log(error.toString(), "========");
                 return response.status(500).send({
                     message: 'Something went wrong'
                 });
@@ -796,7 +797,7 @@ class ArtisanController {
     static signin(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { phone, password } = request.body;
-            console.log(phone);
+            console_1.default.log(phone);
             const foundUser = yield schema_1.default.Artisan().findOne({ phone: phone.trim() });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
@@ -819,7 +820,7 @@ class ArtisanController {
     static adminSignin(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = request.body;
-            console.log(email);
+            console_1.default.log(email);
             const foundUser = yield schema_1.default.Artisan().findOne({ email: email.trim() });
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (!bcrypt_1.default.compareSync(password, foundUser.password)) {
@@ -864,9 +865,9 @@ class ArtisanController {
     static confirm(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { phone, confirmationCode } = request.body;
-            console.log(confirmationCode);
+            console_1.default.log(confirmationCode);
             const foundUser = yield schema_1.default.Artisan().findOne({ phone });
-            console.log(foundUser.confirmationCode);
+            console_1.default.log(foundUser.confirmationCode);
             if (foundUser && Object.keys(foundUser).length > 0) {
                 if (foundUser.confirmationCode !== confirmationCode) {
                     return response.status(403).send({
@@ -892,7 +893,7 @@ class ArtisanController {
                     });
                 }
                 catch (error) {
-                    console.log(error.toString());
+                    console_1.default.log(error.toString());
                     response.status(500).send({
                         message: 'something went wrong'
                     });
@@ -910,11 +911,11 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const drivers = yield schema_1.default.Artisan().find({ 'category': 'driver' }).where({ 'active': true }).where({ 'lat': !undefined }).where({ 'long': !undefined });
-                console.log(drivers);
+                console_1.default.log(drivers);
                 return response.status(200).send({ value: drivers });
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 return response.status(500).send({
                     message: 'something went wrong'
                 });
@@ -925,11 +926,11 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const logs = yield schema_1.default.Artisan().find({ 'category': 'log' }).where({ 'active': true }).where({ 'lat': !undefined }).where({ 'long': !undefined });
-                console.log(logs);
+                console_1.default.log(logs);
                 return response.status(200).send({ value: logs });
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 return response.status(500).send({
                     message: 'something went wrong'
                 });
@@ -939,14 +940,14 @@ class ArtisanController {
     static Subs(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid } = request.body;
-            console.log(uid);
+            console_1.default.log(uid);
             try {
                 const subs = yield schema_1.default.Artisan().find({ owner: uid }).sort({ '_id': -1 });
-                console.log(subs);
+                console_1.default.log(subs);
                 return response.status(200).send({ value: subs });
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 return response.status(500).send({
                     message: 'something went wrong'
                 });
@@ -958,7 +959,7 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid } = request.body;
             const sub = yield schema_1.default.Artisan().findOne({ _id: uid });
-            console.log("sub found:" + sub);
+            console_1.default.log("sub found:" + sub);
             if (!sub) {
                 return response.status(404).send({
                     message: 'sub does not exist'
@@ -966,14 +967,14 @@ class ArtisanController {
             }
             try {
                 yield schema_1.default.Artisan().deleteOne({ _id: uid });
-                console.log("deleted");
+                console_1.default.log("deleted");
                 response.status(201).send({
                     message: 'Sub Deleted successfully',
                     status: 201
                 });
             }
             catch (error) {
-                console.log(error);
+                console_1.default.log(error);
                 return response.status(404).send("an error occured");
             }
         });
@@ -982,18 +983,18 @@ class ArtisanController {
     static allAccounts(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid } = request.body;
-            console.log(uid);
+            console_1.default.log(uid);
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                 if (user) {
                     //get accounts
                     if (user.sub === 'yes') {
                         const subs = yield schema_1.default.Artisan().find({ owner: user.owner }).sort({ '_id': -1 });
-                        console.log(subs);
+                        console_1.default.log(subs);
                         return response.status(200).send({ value: subs });
                     }
                     const subs = yield schema_1.default.Artisan().find({ owner: uid }).sort({ '_id': -1 });
-                    console.log(subs);
+                    console_1.default.log(subs);
                     return response.status(200).send({ value: subs });
                 }
                 else {
@@ -1003,7 +1004,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 return response.status(500).send({
                     message: 'something went wrong'
                 });
@@ -1015,11 +1016,11 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const registrations = yield schema_1.default.Artisan().find({ 'category': 'log' }).where({ 'active': false }).sort({ '_id': -1 });
-                console.log(registrations);
+                console_1.default.log(registrations);
                 return response.status(200).send({ value: registrations });
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 return response.status(500).send({
                     message: 'something went wrong'
                 });
@@ -1030,11 +1031,11 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const registrations = yield schema_1.default.Artisan().find({ 'category': 'driver' }).where({ 'active': false }).sort({ '_id': -1 });
-                console.log(registrations);
+                console_1.default.log(registrations);
                 return response.status(200).send({ value: registrations });
             }
             catch (error) {
-                console.log(error.toString());
+                console_1.default.log(error.toString());
                 return response.status(500).send({
                     message: 'something went wrong'
                 });
@@ -1051,15 +1052,15 @@ class ArtisanController {
             };
             transporter.sendMail(msg, function (error, info) {
                 if (error) {
-                    console.log(error);
+                    console_1.default.log(error);
                 }
                 else {
-                    console.log('Email sent: ' + info.response);
+                    console_1.default.log('Email sent: ' + info.response);
                 }
             });
         }
         catch (error) {
-            console.log(error.toString());
+            console_1.default.log(error.toString());
         }
     }
     static generateSalt() {
@@ -1081,35 +1082,36 @@ class ArtisanController {
             var total = 0;
             var expire = false;
             const { uid } = request.params;
-            console.log(uid);
+            console_1.default.log(uid);
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                 //console.log(user)
                 if (user && Object.keys(user).length) {
                     //get Rating
                     const getRating = user.rating;
-                    console.log(getRating.length);
+                    console_1.default.log(getRating.length);
                     // get rate
                     for (var i = 0; i < getRating.length; i++) {
                         total += getRating[i];
                     }
                     var rate = Math.round(total / getRating.length);
-                    console.log("rating:" + rate);
+                    console_1.default.log("rating:" + rate);
                     //get total amount
-                    console.log('total earnings:' + user.earnings);
-                    console.log('total earnings:' + user.cash);
+                    console_1.default.log('total earnings:' + user.earnings);
+                    console_1.default.log('total earnings:' + user.cash);
                     //amount to pay
                     var pay = Math.round(user.earnings * 0.15);
                     const available = parseInt(user.earnings) - pay;
                     var pay_cash = Math.round(user.cash * 0.15);
-                    console.log('pay' + pay);
-                    console.log('available' + available);
-                    console.log('cash to pay' + pay_cash);
-                    console.log("TODAY:" + today);
-                    if (user.expireAt === today) {
+                    console_1.default.log('pay' + pay);
+                    console_1.default.log('available' + available);
+                    console_1.default.log('cash to pay' + pay_cash);
+                    console_1.default.log("TODAY:" + today);
+                    if (user.cash > 6999) {
+                        console_1.default.log("expired");
                         expire = true;
                     }
-                    console.log("EXPIRIED?" + expire);
+                    console_1.default.log("EXPIRIED?" + expire);
                     response.status(200).send({
                         user,
                         rating: rate,
@@ -1126,7 +1128,7 @@ class ArtisanController {
                     response.status(404).send({
                         message: 'Cannot find details for this user'
                     });
-                    console.log("not found");
+                    console_1.default.log("not found");
                 }
             }
             catch (error) {
@@ -1144,7 +1146,7 @@ class ArtisanController {
             var now = new Date();
             //after 7 days
             const expire = now.setDate(now.getDate() + 7);
-            console.log(now.toLocaleDateString());
+            console_1.default.log(now.toLocaleDateString());
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                 //find subaccounts
@@ -1153,7 +1155,7 @@ class ArtisanController {
                     yield schema_1.default.Artisan().updateOne({ _id: uid }, {
                         $set: {
                             active: true,
-                            expireAt: nextweek,
+                            expireAt: '-',
                             cash: 0
                         }
                     });
@@ -1170,18 +1172,18 @@ class ArtisanController {
                 if (sub) {
                     yield schema_1.default.Artisan().updateMany({ owner: uid }, { $set: {
                             active: true,
-                            expireAt: nextweek,
+                            expireAt: '-',
                             cash: 0
                         }
                     }, function (err, result) {
                         if (err) {
-                            console.log(err);
+                            console_1.default.log(err);
                         }
                         else {
-                            console.log('Added free discounts');
+                            console_1.default.log('Added free discounts');
                             //send notification for expiry
                             sub.map(usr => {
-                                console.log("tokens:" + usr.pushToken);
+                                console_1.default.log("tokens:" + usr.pushToken);
                                 let chunks = expo.chunkPushNotifications([{
                                         "to": [usr.pushToken],
                                         "sound": "default",
@@ -1193,11 +1195,11 @@ class ArtisanController {
                                     for (let chunk of chunks) {
                                         try {
                                             let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                                            console.log(ticketChunk);
+                                            console_1.default.log(ticketChunk);
                                             tickets.push(...ticketChunk);
                                         }
                                         catch (error) {
-                                            console.error(error);
+                                            console_1.default.error(error);
                                         }
                                     }
                                 }))();
@@ -1248,7 +1250,7 @@ class ArtisanController {
                 return response.status(200).send("location saved");
             }
             catch (error) {
-                console.log(error.toString(), "========");
+                console_1.default.log(error.toString(), "========");
                 return response.status(500).send({
                     message: 'Something went wrong'
                 });
@@ -1279,7 +1281,7 @@ class ArtisanController {
                 return response.status(200).send("location saved");
             }
             catch (error) {
-                console.log(error.toString(), "========");
+                console_1.default.log(error.toString(), "========");
                 return response.status(500).send({
                     message: 'Something went wrong'
                 });
@@ -1305,7 +1307,7 @@ class ArtisanController {
                     response.status(404).send({
                         message: 'Cannot find details for this user'
                     });
-                    console.log("not found");
+                    console_1.default.log("not found");
                 }
             }
             catch (error) {
@@ -1321,14 +1323,14 @@ class ArtisanController {
             try {
                 const user = yield schema_1.default.Artisan().find({ category: 'driver' });
                 if (user) {
-                    console.log(user);
+                    console_1.default.log(user);
                     return response.status(200).send({ user });
                 }
                 else {
                     response.status(404).send({
                         message: 'Cannot find details for this user'
                     });
-                    console.log("not found");
+                    console_1.default.log("not found");
                 }
             }
             catch (error) {
@@ -1344,14 +1346,14 @@ class ArtisanController {
             try {
                 const user = yield schema_1.default.Artisan().find({ category: 'log' });
                 if (user) {
-                    console.log(user);
+                    console_1.default.log(user);
                     return response.status(200).send({ user });
                 }
                 else {
                     response.status(404).send({
                         message: 'Cannot find details for this user'
                     });
-                    console.log("not found");
+                    console_1.default.log("not found");
                 }
             }
             catch (error) {
@@ -1365,10 +1367,10 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid } = request.params;
             const token = request.body.token;
-            console.log(token);
+            console_1.default.log(token);
             //check token
             if (!expo_server_sdk_1.Expo.isExpoPushToken(token)) {
-                console.log("invalid token");
+                console_1.default.log("invalid token");
                 return response.status(404).send({
                     message: "invalid token"
                 });
@@ -1397,7 +1399,7 @@ class ArtisanController {
                 return response.status(200).send("token saved");
             }
             catch (error) {
-                console.log(error.toString(), "========");
+                console_1.default.log(error.toString(), "========");
                 return response.status(500).send({
                     message: 'Something went wrong'
                 });
@@ -1412,7 +1414,7 @@ class ArtisanController {
             var now = new Date();
             //after 7 days
             const expire = now.setDate(now.getDate() + 7);
-            console.log(now.toLocaleDateString());
+            console_1.default.log(now.toLocaleDateString());
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                 if (user) {
@@ -1437,11 +1439,11 @@ class ArtisanController {
                         for (let chunk of chunks) {
                             try {
                                 let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                                console.log(ticketChunk);
+                                console_1.default.log(ticketChunk);
                                 tickets.push(...ticketChunk);
                             }
                             catch (error) {
-                                console.error(error);
+                                console_1.default.error(error);
                             }
                         }
                     }))();
@@ -1466,7 +1468,7 @@ class ArtisanController {
             var now = new Date();
             //after 7 days
             const expire = now.setDate(now.getDate() + 7);
-            console.log(now.toLocaleDateString());
+            console_1.default.log(now.toLocaleDateString());
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                 if (user) {
@@ -1491,11 +1493,11 @@ class ArtisanController {
                         for (let chunk of chunks) {
                             try {
                                 let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                                console.log(ticketChunk);
+                                console_1.default.log(ticketChunk);
                                 tickets.push(...ticketChunk);
                             }
                             catch (error) {
-                                console.error(error);
+                                console_1.default.error(error);
                             }
                         }
                     }))();
@@ -1518,7 +1520,7 @@ class ArtisanController {
         return __awaiter(this, void 0, void 0, function* () {
             const { uid } = request.body;
             const user = yield schema_1.default.Artisan().findOne({ _id: uid });
-            console.log(user);
+            console_1.default.log(user);
             if (user) {
                 const otp = String(Date.now()).slice(9, 13);
                 yield schema_1.default.Artisan()
@@ -1558,20 +1560,20 @@ class ArtisanController {
             };
             request_1.default(options, (error, resp) => __awaiter(this, void 0, void 0, function* () {
                 if (error) {
-                    console.log(error);
+                    console_1.default.log(error);
                 }
                 ;
-                console.log(parseInt(resp.body.split(":")[5].split(",")[0]));
+                console_1.default.log(parseInt(resp.body.split(":")[5].split(",")[0]));
                 var balance = parseInt(resp.body.split(":")[5].split(",")[0]);
                 try {
                     const user = yield schema_1.default.Artisan().findOne({ _id: uid });
                     const admin = yield schema_1.default.User().findOne({ phone: '+2349038826995' });
-                    console.log(user);
+                    console_1.default.log(user);
                     const pay = Math.round(user.earnings * 0.15);
                     const available = parseInt(user.earnings) - pay;
                     const new_amount = parseInt(user.earnings) - parseInt(amount);
                     const limit = available - 50;
-                    console.log(limit);
+                    console_1.default.log(limit);
                     if (user) {
                         //check if amount the amount is greatr than the limit
                         if (anumber.length > 10 || anumber.length < 10) {
@@ -1595,11 +1597,11 @@ class ArtisanController {
                                     for (let chunk of chunks) {
                                         try {
                                             let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                                            console.log(ticketChunk);
+                                            console_1.default.log(ticketChunk);
                                             tickets.push(...ticketChunk);
                                         }
                                         catch (error) {
-                                            console.error(error);
+                                            console_1.default.error(error);
                                         }
                                     }
                                 }))();
@@ -1622,21 +1624,21 @@ class ArtisanController {
                                 "reference": "pbwd-" + Date.now()
                             };
                             const resp = yield rave.Transfer.initiate(payload);
-                            console.log(resp);
+                            console_1.default.log(resp);
                             if (resp.data.fullname === 'N/A') {
-                                console.log('Invalid account number');
+                                console_1.default.log('Invalid account number');
                                 return response.send({
                                     message: 'Invalid account number'
                                 });
                             }
                             if (resp.data.status === 'FAILED') {
-                                console.log('transaction failed. Please try again later');
+                                console_1.default.log('transaction failed. Please try again later');
                                 return response.send({
                                     message: 'Transaction failed. Please check your account details and try again'
                                 });
                             }
                             if (resp.data.status === 'NEW') {
-                                console.log('Transaction Successful');
+                                console_1.default.log('Transaction Successful');
                                 // if successful
                                 // send success message
                                 //remove amount
@@ -1655,7 +1657,7 @@ class ArtisanController {
                                     status: 'withdraw',
                                     date: today
                                 });
-                                console.log('new amount ' + new_amount);
+                                console_1.default.log('new amount ' + new_amount);
                                 return response.send({
                                     message: 'Transaction Successful'
                                 });
@@ -1667,7 +1669,7 @@ class ArtisanController {
                     }
                 }
                 catch (error) {
-                    console.log(error);
+                    console_1.default.log(error);
                     return response.status(401).send({
                         message: 'Something went wrong. please try again'
                     });
@@ -1680,9 +1682,9 @@ class ArtisanController {
     static transferRequests(req, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { amount, uid, anumber, bank } = req.body;
-            console.log(bank);
-            console.log(anumber);
-            console.log(uid);
+            console_1.default.log(bank);
+            console_1.default.log(anumber);
+            console_1.default.log(uid);
             var options = {
                 'method': 'GET',
                 'url': 'https://api.flutterwave.com/v3/balances/NGN',
@@ -1693,10 +1695,10 @@ class ArtisanController {
             };
             request_1.default(options, (error, resp) => __awaiter(this, void 0, void 0, function* () {
                 if (error) {
-                    console.log(error);
+                    console_1.default.log(error);
                 }
                 ;
-                console.log(parseInt(resp.body.split(":")[5].split(",")[0]));
+                console_1.default.log(parseInt(resp.body.split(":")[5].split(",")[0]));
                 var balance = parseInt(resp.body.split(":")[5].split(",")[0]);
                 try {
                     const user = yield schema_1.default.Artisan().findOne({ _id: uid });
@@ -1727,11 +1729,11 @@ class ArtisanController {
                                     for (let chunk of chunks) {
                                         try {
                                             let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                                            console.log(ticketChunk);
+                                            console_1.default.log(ticketChunk);
                                             tickets.push(...ticketChunk);
                                         }
                                         catch (error) {
-                                            console.error(error);
+                                            console_1.default.error(error);
                                         }
                                     }
                                 }))();
@@ -1760,11 +1762,11 @@ class ArtisanController {
                                 for (let chunk of chunks) {
                                     try {
                                         let ticketChunk = yield expo.sendPushNotificationsAsync(chunk);
-                                        console.log(ticketChunk);
+                                        console_1.default.log(ticketChunk);
                                         tickets.push(...ticketChunk);
                                     }
                                     catch (error) {
-                                        console.error(error);
+                                        console_1.default.error(error);
                                     }
                                 }
                             }))();
@@ -1774,14 +1776,14 @@ class ArtisanController {
                         });
                     }
                     else {
-                        console.log('User not found');
+                        console_1.default.log('User not found');
                         return response.status(500).send({
                             message: 'User not found'
                         });
                     }
                 }
                 catch (err) {
-                    console.log(err);
+                    console_1.default.log(err);
                     return response.status(500).send({
                         message: 'An error occured'
                     });
@@ -1793,8 +1795,8 @@ class ArtisanController {
     static updateTransfer(req, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { amount, uid } = req.body;
-            console.log(amount);
-            console.log(uid);
+            console_1.default.log(amount);
+            console_1.default.log(uid);
             const getBalance = () => __awaiter(this, void 0, void 0, function* () {
                 var options = {
                     'method': 'GET',
@@ -1806,7 +1808,7 @@ class ArtisanController {
                 };
                 request_1.default(options, function (error, response) {
                     if (error) {
-                        console.log(error);
+                        console_1.default.log(error);
                     }
                     ;
                     return parseInt(response.body.split(":")[5].split(",")[0]);
@@ -1814,9 +1816,9 @@ class ArtisanController {
             });
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
-                console.log(user);
+                console_1.default.log(user);
                 const new_amount = user.earnings - amount;
-                console.log("new amount " + new_amount);
+                console_1.default.log("new amount " + new_amount);
                 if (user) {
                     //update amount
                     yield schema_1.default.Artisan()
@@ -1838,14 +1840,14 @@ class ArtisanController {
                     });
                 }
                 else {
-                    console.log('User not found');
+                    console_1.default.log('User not found');
                     return response.status(500).send({
                         message: 'User not found'
                     });
                 }
             }
             catch (err) {
-                console.log(err);
+                console_1.default.log(err);
                 return response.status(500).send({
                     message: 'An error occured'
                 });
@@ -1858,9 +1860,9 @@ class ArtisanController {
             const { uid } = request.body;
             try {
                 const user = yield schema_1.default.Artisan().findOne({ _id: uid });
-                console.log(user);
+                console_1.default.log(user);
                 const trans = yield schema_1.default.DTransaction().find({ user: uid }).sort({ '_id': -1 });
-                console.log(trans);
+                console_1.default.log(trans);
                 if (user && trans) {
                     response.status(200).send({ trans: trans });
                 }
@@ -1869,7 +1871,7 @@ class ArtisanController {
                 }
             }
             catch (error) {
-                console.log(error);
+                console_1.default.log(error);
                 response.status(500).send('Something went wrong');
             }
         });
