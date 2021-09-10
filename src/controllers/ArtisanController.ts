@@ -1464,12 +1464,11 @@ static async getDriverRegistartion(request: Request, response: Response) {
 
         console.log("TODAY:" + today)
 
-       if(user.cash > 6999){
+       if(user.expireAt === today){
           expire = true
         }
 
         console.log("EXPIRIED?" + expire)
-        
         response.status(200).send({
           user,
           rating: rate,
@@ -1478,7 +1477,7 @@ static async getDriverRegistartion(request: Request, response: Response) {
           pay: pay,
           pay_cash: pay_cash,
           available: available,
-          expired: expire
+          expired:expire
 
         });
         // console.log(user)
