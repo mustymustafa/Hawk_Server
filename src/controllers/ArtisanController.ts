@@ -948,6 +948,10 @@ class ArtisanController {
     } = request.body;
 
     const confirmationCode = String(Date.now()).slice(9, 13);
+        const user = await Schema.User().findOne({ phone: phone });
+        if(!user){
+          return response.status(404).send({message: 'user not found'})
+        }
     try {
       await Schema.Artisan()
         .updateOne({
@@ -958,8 +962,8 @@ class ArtisanController {
           }
         });
       const message = `Token: ${confirmationCode}`;
-      //ArtisanController.sendMail(email, message, 'Registration');
-      client.messages
+      ArtisanController.sendMail(user.email, message, 'Registration');
+      /** client.messages
         .create({
           body: message,
           from: '+17076402854',
@@ -969,7 +973,7 @@ class ArtisanController {
       response.status(200).send({
         message: 'Please check your phone for token'
       });
-      return;
+      return; */
     } catch (error) {
       console.log(error.toString(), "========")
       return response.status(500).send({
@@ -1002,8 +1006,8 @@ class ArtisanController {
           }
         });
       const message = `Token: ${confirmationCode}`;
-      //ArtisanController.sendMail(user.email, message, 'Password change');
-      client.messages
+      ArtisanController.sendMail(user.email, message, 'Confirmation code');
+      /**client.messages
         .create({
           body: message,
           from: '+17076402854',
@@ -1013,7 +1017,7 @@ class ArtisanController {
       response.status(200).send({
         message: 'Please check your phone for token'
       });
-      return;
+      return;*/
     } catch (error) {
       console.log(error.toString(), "========")
       return response.status(500).send({

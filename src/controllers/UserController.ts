@@ -60,33 +60,30 @@ class UserController {
 
     try {
       if (!phone || phone.length != 14) {
-
         return response.status(409).send({
-          message: 'Please enter a valid  number',
+          message: "Please enter a valid  number",
         });
       }
-  
-      const foundEmail = await Schema.User().find({phone: phone.trim()});
-      if (foundEmail && foundEmail.length > 0) {
 
-        console.log(foundEmail[0])
+      const foundEmail = await Schema.User().find({ phone: phone.trim() });
+      if (foundEmail && foundEmail.length > 0) {
+        console.log(foundEmail[0]);
         return response.status(409).send({
-          message: 'This number already exists',
-          isConfirmed: foundEmail[0].isConfirmed
+          message: "This number already exists",
+          isConfirmed: foundEmail[0].isConfirmed,
         });
       }
 
       if (cpassword.trim() !== password.trim()) {
-
         return response.status(409).send({
-          message: 'The Password do not match'
+          message: "The Password do not match",
         });
       }
-   
-  
+
       const confirmationCode = String(Date.now()).slice(9, 13);
-      const message = `Verification code: ${confirmationCode}`
-      //UserController.sendMail(email.trim(), message)
+      const message = `Verification code: ${confirmationCode}`;
+      UserController.sendMail(email.trim(), message);
+      /** 
       client.messages 
       .create({ 
          body: message, 
@@ -94,21 +91,24 @@ class UserController {
          to: phone 
        }) 
       .then(response => console.log(response.sid)) 
-      
+      */
+
       await Schema.User().create({
         name: fullname.trim(),
         country: country,
         email: email.trim(),
-        password: bcrypt.hashSync(password.trim(), UserController.generateSalt()),
+        password: bcrypt.hashSync(
+          password.trim(),
+          UserController.generateSalt()
+        ),
         phone,
         confirmationCode,
-        isConfirmed: false
-
+        isConfirmed: false,
       });
 
       response.status(201).send({
-        message: 'User created successfully',
-        status: 201
+        message: "User created successfully",
+        status: 201,
       });
     } catch (error) {
       console.log(error.toString());
@@ -126,6 +126,8 @@ class UserController {
     console.log(phone)
 
     const confirmationCode = String(Date.now()).slice(9, 13);
+    const user = await Schema.User().findOne({phone: phone})
+    if(user){
     try {
       await Schema.User()
         .updateOne({
@@ -136,8 +138,9 @@ class UserController {
         }
       });
       const message = `Token: ${confirmationCode}`;
-      //UserController.sendMail(email, message, 'Registration');
-      client.messages 
+      UserController.sendMail(user.email, message, 'Registration');
+     
+     /** client.messages 
       .create({ 
          body: message, 
          from: '+17076402854',       
@@ -148,11 +151,15 @@ class UserController {
         message: 'Please check your phone for token'
       });
       return;
+      */
     } catch (error) {
         console.log(error.toString(), "========")
         return response.status(500).send({
           message: 'Something went wrong'
         })
+    } }
+    else {
+      return response.status(404).send({message: 'User not found'})
     }
   }
 
@@ -171,16 +178,19 @@ class UserController {
 
     const confirmationCode = String(Date.now()).slice(9, 13);
     try {
-      await Schema.User()
-        .updateOne({
+      await Schema.User().updateOne(
+        {
           _id: user._id,
-        }, {
-        $set: {
-          confirmationCode
+        },
+        {
+          $set: {
+            confirmationCode,
+          },
         }
-      });
+      );
       const message = `Token: ${confirmationCode}`;
-     // UserController.sendMail(user.email, message, 'Password change');
+      UserController.sendMail(user.email, message, "Confirmation Code");
+      /** 
      client.messages 
      .create({ 
         body: message, 
@@ -192,12 +202,13 @@ class UserController {
         message: 'Please check your phone for token'
       });
       return;
+      */
     } catch (error) {
         console.log(error.toString(), "========")
         return response.status(500).send({
           message: 'Something went wrong'
         })
-    }
+    } 
   }
 
   //change password

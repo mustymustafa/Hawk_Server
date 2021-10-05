@@ -297,7 +297,7 @@ const today = month + '/' + day + '/' + year
 
     //send otp to receivers if number is not undefined
     const message = `Delivery Token: ${confirmationCode}`;
-  
+  /** 
     if(user.phone.length > 0 && user.phone !== undefined && payment === 'wallet' ){
       client.messages
           .create({
@@ -351,7 +351,7 @@ const today = month + '/' + day + '/' + year
             to: p5
           });
         }
-    
+    */
 
 
         
