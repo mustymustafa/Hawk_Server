@@ -82,7 +82,7 @@ class UserController {
 
       const confirmationCode = String(Date.now()).slice(9, 13);
       const message = `Verification code: ${confirmationCode}`;
-      UserController.sendMail(email.trim(), message);
+      UserController.sendMail(email.trim(), message, 'Confirmation Code');
       /** 
       client.messages 
       .create({ 
